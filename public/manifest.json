@@ -2,24 +2,36 @@
   "name": "Dentwise IA",
   "short_name": "Dentwise",
   "description": "Votre assistant dentaire intelligent et carnet de santé numérique.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#e78a53",
   "orientation": "portrait",
-  "scope": "/",
   "icons": [
     {
       "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
