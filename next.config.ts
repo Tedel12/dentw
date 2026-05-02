@@ -4,7 +4,8 @@ const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: false, // On active même en dev pour tester si besoin, ou on laisse process.env.NODE_ENV === "development"
+  disable: process.env.NODE_ENV === "development",
+  buildExcludes: [/app-build-manifest\.json$/, /middleware-manifest\.json$/],
 });
 
 const nextConfig: NextConfig = {

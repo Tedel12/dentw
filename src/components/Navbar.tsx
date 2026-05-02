@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUserRole } from "@/lib/actions/users";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { PWAInstallPrompt } from "./ui/pwa-install-prompt";
 
 function Navbar() {
   const { user: clerkUser, isLoaded } = useUser();
@@ -126,14 +127,15 @@ function Navbar() {
                   <SheetHeader>
                     <SheetTitle>Navigation</SheetTitle>
                   </SheetHeader>
-                  <div className="px-4 pb-6 space-y-2">
-                    <SheetClose asChild>
-                      <Link href="/dashboard" className={`${linkClass("/dashboard")} p-3 rounded-xl hover:bg-muted`}>
-                        <HomeIcon className="w-4 h-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                    </SheetClose>
-
+                  <div className="px-4 pb-6 space-y-4 pt-4">
+                    <PWAInstallPrompt />
+                    <div className="space-y-2">
+                      <SheetClose asChild>
+                        <Link href="/dashboard" className={`${linkClass("/dashboard")} p-3 rounded-xl hover:bg-muted`}>
+                          <HomeIcon className="w-4 h-4" />
+                          <span>Dashboard</span>
+                        </Link>
+                      </SheetClose>
                     <SheetClose asChild>
                       <Link href="/about-project" className={`${linkClass("/about-project")} p-3 rounded-xl hover:bg-muted`}>
                         <Sparkles className="w-4 h-4 text-primary" />
@@ -180,7 +182,8 @@ function Navbar() {
                       </Link>
                     </SheetClose>
                   </div>
-                </SheetContent>
+                </div>
+              </SheetContent>
               </Sheet>
               <UserButton />
             </>
