@@ -40,6 +40,8 @@ export const viewport = {
 import Footer from "@/components/landing/Footer";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 
+import { PWAInstallBanner } from "@/components/ui/pwa-install-banner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,7 +53,7 @@ export default function RootLayout({
         appearance={{
           variables: {
             colorPrimary:"#e78a53",
-            colorBackground: "#ffffff",
+            colorBackground: "#020617",
             colorText: "#ffffff",
             colorTextSecondary: "#94a3b8",
             colorInputBackground: "#1e293b"
@@ -60,8 +62,9 @@ export default function RootLayout({
       >
         <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased dark bg-[#020617] text-white`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased dark bg-[#020617] text-white overflow-x-hidden min-h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]`}
         >
+          <PWAInstallBanner />
           <Toaster />
           <CustomCursor />
            {/* <UserSync /> */}
