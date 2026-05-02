@@ -17,9 +17,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dentwise",
-  description: "Your voice assitant for a better appointement",
+  title: "Dentwise IA",
+  description: "Votre assistant vocal pour de meilleurs soins dentaires",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Dentwise",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
+
+export const viewport = {
+    themeColor: "#e78a53",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+}
 
 import Footer from "@/components/landing/Footer";
 import { CustomCursor } from "@/components/ui/custom-cursor";
