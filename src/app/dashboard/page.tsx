@@ -33,25 +33,27 @@ async function DashboardPage() {
     <>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
         {user.role === "DOCTOR" && !user.doctorProfile && (
           <div
-            className="mb-6 flex flex-col gap-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+            className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 md:flex-row md:items-center md:justify-between shadow-inner shadow-primary/5"
             role="status"
           >
-            <p className="text-sm text-foreground">
-              <span className="font-semibold">Profil praticien incomplet.</span> Complétez vos informations
+            <p className="text-sm text-foreground/90 font-medium leading-relaxed">
+              <span className="font-black italic text-primary uppercase tracking-tighter">Profil praticien incomplet.</span> Complétez vos informations
               professionnelles pour utiliser l&apos;espace praticien et les ordonnances.
             </p>
-            <Button asChild size="sm" className="shrink-0">
+            <Button asChild size="sm" className="shrink-0 rounded-xl font-bold">
               <Link href="/pro/patients">Compléter mon profil</Link>
             </Button>
           </div>
         )}
-        <HealthAccessNotifications requests={user.healthAccessRequests as any} />
-        <WelcomeSection />
-        <MainActions />
-        <ActivityOverview />
+        <div className="space-y-10 md:space-y-16">
+            <HealthAccessNotifications requests={user.healthAccessRequests as any} />
+            <WelcomeSection />
+            <MainActions />
+            <ActivityOverview />
+        </div>
       </div>
     </>
   );

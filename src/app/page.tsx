@@ -8,6 +8,7 @@ import CTA from "@/components/landing/CTA";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { syncUser } from "@/lib/actions/users";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 export default async function Home() {
 
@@ -29,6 +30,7 @@ export default async function Home() {
         <PricingSection/>
         <CTA/>
       </main>
+      <ScrollToTop />
     </div>
   );
 }

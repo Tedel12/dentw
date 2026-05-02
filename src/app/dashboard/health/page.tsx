@@ -54,23 +54,23 @@ export default async function HealthPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto px-6 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
         <FadeIn direction="down">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 text-white">
-            <div>
-                <h1 className="text-4xl font-black tracking-tight italic">Mon Carnet de Santé</h1>
-                <p className="text-muted-foreground font-medium">Gérez vos traitements et votre historique médical numérique.</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 text-white text-center md:text-left">
+            <div className="w-full md:w-auto">
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight italic">Mon Carnet de Santé</h1>
+                <p className="text-muted-foreground font-medium text-sm md:text-base">Gérez vos traitements et votre historique médical numérique.</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <ExportCarnetDialog />
                 <AddTreatmentDialog patientId={user.id} />
             </div>
             </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
           {/* Section Profil Santé */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-8">
             <FadeIn delay={0.2}>
                 <Card className="border-primary/20 shadow-xl shadow-primary/5 overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between pb-4 bg-primary/5">

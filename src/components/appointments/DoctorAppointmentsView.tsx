@@ -96,23 +96,25 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
           appointments.map((apt: any) => (
             <Card key={apt.id} className="overflow-hidden border-white/5 bg-white/5 backdrop-blur-md hover:border-primary/40 transition-all duration-500 group rounded-3xl shadow-xl shadow-black/20">
               <div className="flex flex-col md:flex-row">
-                <div className="bg-primary/10 p-8 flex flex-col items-center justify-center border-r border-white/5 md:w-48 group-hover:bg-primary/20 transition-colors">
-                  <span className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-1">{format(new Date(apt.date), "EEE", { locale: fr })}</span>
-                  <span className="text-5xl font-black text-white italic tracking-tighter">{format(new Date(apt.date), "dd")}</span>
+                <div className="bg-primary/10 p-6 md:p-8 flex flex-row md:flex-col items-center justify-between md:justify-center border-b md:border-b-0 md:border-r border-white/5 md:w-48 group-hover:bg-primary/20 transition-colors">
+                  <div className="flex flex-col items-start md:items-center">
+                    <span className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-1">{format(new Date(apt.date), "EEE", { locale: fr })}</span>
+                    <span className="text-3xl md:text-5xl font-black text-white italic tracking-tighter">{format(new Date(apt.date), "dd")}</span>
+                  </div>
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">{format(new Date(apt.date), "MMMM", { locale: fr })}</span>
                 </div>
                 
-                <div className="flex-1 p-8">
-                  <div className="flex flex-col lg:flex-row justify-between gap-8">
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500">
-                          <User className="w-7 h-7 text-primary" />
+                <div className="flex-1 p-6 md:p-8">
+                  <div className="flex flex-col lg:flex-row justify-between gap-6 md:gap-8">
+                    <div className="space-y-4 md:space-y-6">
+                      <div className="flex items-center gap-4 text-left">
+                        <div className="shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500">
+                          <User className="w-6 h-6 md:w-7 md:h-7 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-black text-2xl tracking-tight text-white">{apt.user?.firstName} {apt.user?.lastName}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase">{apt.reason || "Consultation"}</Badge>
+                          <h3 className="font-black text-xl md:text-2xl tracking-tight text-white">{apt.user?.firstName} {apt.user?.lastName}</h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] md:text-[10px] font-black uppercase">{apt.reason || "Consultation"}</Badge>
                             <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                                 <Clock className="size-3" /> {apt.time}
                             </span>
@@ -120,22 +122,24 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
                         </div>
                       </div>
                       
-                      <div className="flex flex-wrap gap-6 text-sm">
-                        <div className="flex items-center gap-2 text-slate-400 font-medium hover:text-white transition-colors cursor-default">
-                          <div className="p-1.5 bg-white/5 rounded-lg border border-white/5"><Mail className="w-3.5 h-3.5" /></div>
-                          {apt.user?.email}
+                      <div className="flex flex-wrap gap-4 text-xs md:text-sm">
+                        <div className="flex items-center gap-2 text-slate-400 font-medium hover:text-white transition-colors cursor-default max-w-full overflow-hidden">
+                          <div className="shrink-0 p-1.5 bg-white/5 rounded-lg border border-white/5"><Mail className="w-3 md:w-3.5 h-3 md:h-3.5" /></div>
+                          <span className="truncate">{apt.user?.email}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col justify-between items-end gap-6">
-                      <Badge className={`px-4 py-1.5 rounded-full font-black uppercase tracking-widest text-[10px] border-none ${
-                        apt.status === "CONFIRMED" ? "bg-green-500/20 text-green-400" : "bg-amber-500/20 text-amber-400"
+                    <div className="flex flex-col justify-between items-stretch md:items-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
+                      <Badge className={`w-fit self-end px-4 py-1.5 rounded-full font-black uppercase tracking-widest text-[10px] border-none ${
+                        apt.status === "CONFIRMED" ? "bg-green-500/20 text-green-400" : 
+                        apt.status === "COMPLETED" ? "bg-blue-500/20 text-blue-400" : "bg-amber-500/20 text-amber-400"
                       }`}>
-                        {apt.status === "CONFIRMED" ? "Confirmé" : "En attente"}
+                        {apt.status === "CONFIRMED" ? "Confirmé" : 
+                         apt.status === "COMPLETED" ? "Terminé" : "En attente"}
                       </Badge>
                       
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 md:gap-3">
                         <Button 
                             variant="ghost" 
                             size="sm" 
@@ -283,7 +287,7 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
                     >
                         <XCircle className="mr-2 size-4" /> Annuler
                     </Button>
-r                     <Button 
+                    <Button 
                         className="flex-1 md:flex-none h-14 px-10 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-green-900/40 transition-all hover:scale-105"
                         onClick={() => currentAppointmentId && handleUpdateStatus(currentAppointmentId, "CONFIRMED")}
                     >

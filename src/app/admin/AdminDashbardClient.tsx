@@ -33,20 +33,20 @@ const AdminDashbardClient = () => {
       
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-6 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
         {/* ADMIN WELCOME SECTION */}
-        <div className="mb-12 flex items-center justify-between bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-3xl p-8 border border-primary/20">
-          <div className="space-y-4">
+        <div className="mb-8 md:mb-12 flex flex-col md:flex-row items-center justify-between bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-3xl p-6 md:p-8 border border-primary/20">
+          <div className="space-y-4 text-center md:text-left w-full md:w-auto">
             <div className='inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20'>
               <div className='w-2 h-2 bg-primary rounded-full animate-pulse'></div>
               <span className='text-sm font-medium text-primary'>Dashboard Admin</span>
             </div>
             <div>
-              <h1 className='text-4xl font-bold mb-2'>
+              <h1 className='text-2xl md:text-4xl font-bold mb-2'>
                 Content de te revoir, {user?.firstName || 'Admin'} !
               </h1>
-              <p className='text-muted-foreground'>
-                Gérez les médecins, supervisez les rendez-vous et suivez les performances de votre cabinet dentaire.
+              <p className='text-muted-foreground text-sm md:text-base'>
+                Gérez les médecins et supervisez les rendez-vous de votre cabinet.
               </p>
             </div>
           </div>

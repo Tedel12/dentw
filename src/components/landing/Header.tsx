@@ -18,7 +18,8 @@ const Header = () => {
         <div className='hidden md:flex items-center gap-8'>
           <a href="#how-it-works" className='text-muted-foreground hover:text-foreground transition-colors'>Comment ça marche ?</a>
           <a href="#pricing" className='text-muted-foreground hover:text-foreground transition-colors'>Tarification</a>
-          <a href="#about" className='text-muted-foreground hover:text-foreground transition-colors'>A propos</a>
+          <a href="#about" className='text-muted-foreground hover:text-foreground transition-colors'>À propos</a>
+          <Link href="/about-project" className='text-primary font-bold hover:text-primary/80 transition-colors'>Le Projet</Link>
         </div>
 
         <div className='hidden md:flex items-center gap-3 cursor-pointer'>
@@ -66,6 +67,11 @@ const Header = () => {
                   <a href="#about" className='block rounded-xl p-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors'>
                     A propos
                   </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/about-project" className='block rounded-xl p-3 text-primary font-bold hover:bg-primary/10 transition-colors'>
+                    Le Projet
+                  </Link>
                 </SheetClose>
                 <SignUpButton mode='modal'>
                   <Button className='w-full mt-2'>S'inscrire</Button>

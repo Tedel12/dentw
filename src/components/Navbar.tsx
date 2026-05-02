@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton, useUser } from "@clerk/nextjs";
-import { CalendarIcon, HomeIcon, MenuIcon, Stethoscope, Users } from "lucide-react";
+import { CalendarIcon, HomeIcon, MenuIcon, Sparkles, Stethoscope, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -56,6 +56,11 @@ function Navbar() {
               <span className="hidden lg:inline">Dashboard</span>
             </Link>
 
+            <Link href="/about-project" className={linkClass("/about-project")}>
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="hidden lg:inline font-bold italic">Le Projet</span>
+            </Link>
+
             {/* Role-based links */}
             {role === "PATIENT" && (
               <>
@@ -106,6 +111,13 @@ function Navbar() {
                   <Link href="/dashboard" className={`${linkClass("/dashboard")} p-3 rounded-xl hover:bg-muted`}>
                     <HomeIcon className="w-4 h-4" />
                     <span>Dashboard</span>
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link href="/about-project" className={`${linkClass("/about-project")} p-3 rounded-xl hover:bg-muted`}>
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span>Le Projet</span>
                   </Link>
                 </SheetClose>
 

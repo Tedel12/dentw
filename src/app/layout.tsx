@@ -34,7 +34,7 @@ export const viewport = {
     themeColor: "#e78a53",
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
+    userScalable: false,
 }
 
 import Footer from "@/components/landing/Footer";
@@ -69,6 +69,21 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                      console.log('ServiceWorker registration successful');
+                    }, function(err) {
+                      console.log('ServiceWorker registration failed: ', err);
+                    });
+                  });
+                }
+              `,
+            }}
+          />
           </body>
         </html>
       </ClerkProvider>
