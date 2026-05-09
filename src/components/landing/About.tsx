@@ -28,24 +28,24 @@ const features = [
 
 export const About = () => {
   return (
-    <section id="about" className="py-24 bg-[#020617] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-20 relative z-10">
+    <section id="about" className="py-16 md:py-24 bg-[#020617] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16 space-y-4"
+          className="text-center mb-12 md:mb-16 space-y-4"
         >
-          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-sm">À propos de Dentwise</h2>
-          <h3 className="text-4xl md:text-5xl font-black italic text-white tracking-tighter">
-            L'INNOVATION AU SERVICE <br/> DE VOTRE SOURIRE
+          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px] md:text-sm">À propos de Dentwise</h2>
+          <h3 className="text-3xl md:text-5xl font-black italic text-white tracking-tighter leading-tight">
+            L'INNOVATION AU SERVICE <br className="hidden md:block"/> DE VOTRE SOURIRE
           </h3>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+          <p className="text-slate-400 max-w-2xl mx-auto text-base md:text-lg">
             Dentwise est née d'une vision simple : transformer l'angoisse du dentiste en une expérience de santé connectée, fluide et rassurante.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {features.map((f, i) => (
             <motion.div
               key={i}
@@ -54,7 +54,7 @@ export const About = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -10 }}
-              className="p-8 bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-primary/30 transition-all group"
+              className="p-6 md:p-8 bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-primary/30 transition-all group"
             >
               <div className="mb-6 bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 {f.icon}

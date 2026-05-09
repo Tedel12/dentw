@@ -2,11 +2,29 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; /* Protection contre les décalages */
+  width: 100vw;
 }
 
+body {
+  overflow-x: hidden;
+  width: 100vw;
+  max-width: 100%;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Protection universelle contre les dépassements de cartes et images */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix pour les encoches iPhone (Safe Areas) */
 :root {
   --background: #ffffff;
   --foreground: #111827;
