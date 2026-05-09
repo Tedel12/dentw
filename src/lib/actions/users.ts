@@ -135,3 +135,50 @@ export async function completeDoctorProfile(data: {
     return { success: false, error: "Failed to create doctor profile" };
   }
 }
+
+export async function updateExportPin(pin: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, error: "Unauthorized" };
+
+  try {
+    if (pin.length < 4) {
+      return { success: false, error: "Le PIN doit contenir au moins 4 chiffres" };
+    }
+
+    await prisma.user.update({
+      where: { clerkId: clerkUser.id },
+      data: { exportPin: pin },
+    });
+
+    revalidatePath("/dashboard/health");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating PIN:", error);
+    return { success: false, error: "Failed to update PIN" };
+  }
+}
+
+export async function checkUserExportPin(pin: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, error: "Unauthorized" };
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUser.id },
+      select: { exportPin: true },
+    });
+
+    if (!user?.exportPin) {
+      return { success: false, error: "Aucun PIN configuré. Veuillez le configurer dans votre profil." };
+    }
+
+    if (user.exportPin !== pin) {
+      return { success: false, error: "Code PIN incorrect" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error checking PIN:", error);
+    return { success: false, error: "Verification failed" };
+  }
+}

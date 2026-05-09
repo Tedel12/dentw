@@ -20,6 +20,12 @@ enum UserRole {
   DOCTOR
 }
 
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PRO
+}
+
 enum VerificationStatus {
   PENDING
   VERIFIED
@@ -34,6 +40,8 @@ model User {
   lastName  String?
   phone     String?
   role      UserRole @default(PATIENT)
+  plan      SubscriptionPlan @default(FREE)
+  exportPin String?  // Code PIN pour l'export du carnet
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

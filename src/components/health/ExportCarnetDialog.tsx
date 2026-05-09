@@ -17,7 +17,8 @@ import { FileDown, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { getOwnHealthData, verifyExportPin } from "@/lib/actions/health";
+import { getOwnHealthData } from "@/lib/actions/health";
+import { checkUserExportPin } from "@/lib/actions/users";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatGenderFr } from "@/lib/utils";
@@ -95,13 +96,14 @@ export function ExportCarnetDialog() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleExport = async () => {
-    const pinValidation = await verifyExportPin(pin);
+    setLoading(true);
+    const pinValidation = await checkUserExportPin(pin);
     if (!pinValidation.success) {
-      toast.error("Code de sécurité incorrect ou non configuré");
+      toast.error(pinValidation.error || "Code de sécurité incorrect");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const res = await getOwnHealthData();
 
     if (!res.success || !res.data) {
@@ -271,15 +273,15 @@ export function ExportCarnetDialog() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="pin">Code PIN (6 chiffres)</Label>
+            <Label htmlFor="pin">Code PIN (4 chiffres min.)</Label>
             <Input
               id="pin"
               type="password"
-              placeholder="••••••"
-              maxLength={6}
+              placeholder="••••"
+              maxLength={10}
               value={pin}
               onChange={(e) => setPin(e.target.value)}
-              className="text-center text-2xl tracking-[1em]"
+              className="text-center text-2xl tracking-[0.5em]"
             />
           </div>
         </div>
@@ -287,7 +289,7 @@ export function ExportCarnetDialog() {
           <Button variant="ghost" onClick={() => setIsOpen(false)}>
             Annuler
           </Button>
-          <Button onClick={handleExport} disabled={loading || pin.length < 6}>
+          <Button onClick={handleExport} disabled={loading || pin.length < 4}>
             {loading ? "Génération..." : "Confirmer & Télécharger"}
           </Button>
         </DialogFooter>

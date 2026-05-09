@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BloodGroup } from "@prisma/client";
 import { updateHealthProfile } from "@/lib/actions/health";
+import { updateExportPin } from "@/lib/actions/users";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Droplet, AlertTriangle, ShieldCheck, Scale } from "lucide-react";
+import { User, Droplet, AlertTriangle, ShieldCheck, Scale, Lock } from "lucide-react";
 
 const formSchema = z.object({
   pseudo: z.string().min(2, "Le pseudo est requis"),
@@ -36,6 +37,7 @@ const formSchema = z.object({
   chronicDiseases: z.string().optional(),
   electrophoresis: z.string().optional(),
   vaccines: z.string().optional(),
+  exportPin: z.string().min(4, "Le PIN doit contenir au moins 4 chiffres").optional(),
 });
 
 interface EditHealthProfileProps {
@@ -58,11 +60,21 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
       chronicDiseases: initialData?.chronicDiseases || "",
       electrophoresis: initialData?.electrophoresis || "",
       vaccines: initialData?.vaccines || "",
+      exportPin: initialData?.exportPin || "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+
+    if (values.exportPin && values.exportPin !== initialData?.exportPin) {
+      const pinRes = await updateExportPin(values.exportPin);
+      if (!pinRes.success) {
+        toast.error(pinRes.error || "Erreur lors de la mise à jour du PIN");
+        setLoading(false);
+        return;
+      }
+    }
 
     const age = parseInt(values.age, 10);
     if (isNaN(age) || age < 0 || age > 120) {
@@ -163,6 +175,21 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="exportPin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-primary" /> Code PIN Export (4+ chiffres)
+                </FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
