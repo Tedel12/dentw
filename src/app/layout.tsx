@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   title: "Dentwise IA",
   description: "Votre assistant vocal pour de meilleurs soins dentaires",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
