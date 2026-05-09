@@ -210,16 +210,19 @@ export function ExportCarnetDialog() {
 
       const treatmentRows =
         treatments.length > 0
-          ? treatments.map((t: any) => [
-              format(new Date(t.createdAt), "dd/MM/yy"),
-              truncateCell(t.name, 22),
-              truncateCell(t.dosage, 12),
-              truncateCell(t.frequency, 10),
-              truncateCell(t.pathology || "—", 18),
-              truncateCell(t.administrationRoute || "—", 14),
-              doctorShortLabel(t.prescribingDoctor ?? undefined),
-              truncateCell(t.notes || "—", 28),
-            ])
+          ? treatments.map((t: any, idx: number) => {
+              const hasImage = !!t.prescriptionUrl;
+              return [
+                format(new Date(t.createdAt), "dd/MM/yy"),
+                truncateCell(t.name, 22),
+                truncateCell(t.dosage, 12),
+                truncateCell(t.frequency, 10),
+                truncateCell(t.pathology || "—", 18),
+                truncateCell(t.administrationRoute || "—", 14),
+                doctorShortLabel(t.prescribingDoctor ?? undefined),
+                hasImage ? "🔗 (Voir annexe)" : truncateCell(t.notes || "—", 28),
+              ];
+            })
           : [["—", "Aucun traitement", "—", "—", "—", "—", "—", "—"]];
 
       autoTable(doc, {
@@ -230,6 +233,31 @@ export function ExportCarnetDialog() {
         headStyles: PDF_TABLE_HEAD,
         styles: { fontSize: 7, cellPadding: 1.5 },
       });
+
+      // SECTION ANNEXES (Photos d'ordonnances)
+      const treatmentsWithImages = treatments.filter((t: any) => !!t.prescriptionUrl);
+      if (treatmentsWithImages.length > 0) {
+        for (const t of treatmentsWithImages) {
+          doc.addPage();
+          doc.setFillColor(PDF_ROSE_PRIMARY[0], PDF_ROSE_PRIMARY[1], PDF_ROSE_PRIMARY[2]);
+          doc.rect(0, 0, 210, 20, "F");
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(12);
+          doc.text(`ANNEXE : PREUVE MÉDICALE - ${t.name.toUpperCase()}`, 105, 13, { align: "center" });
+
+          doc.setTextColor(100);
+          doc.setFontSize(8);
+          doc.text(`Prescription du ${format(new Date(t.createdAt), "dd MMMM yyyy", { locale: fr })}`, 15, 30);
+
+          try {
+            // Ajout de l'image (base64)
+            doc.addImage(t.prescriptionUrl as string, "JPEG", 15, 35, 180, 240, undefined, 'FAST');
+          } catch (e) {
+            doc.setTextColor(255, 0, 0);
+            doc.text("Erreur lors du chargement de l'image de l'ordonnance.", 15, 45);
+          }
+        }
+      }
 
       const pageCount = doc.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
