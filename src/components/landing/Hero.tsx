@@ -30,7 +30,7 @@ const Hero = () => {
     <section 
       ref={ref}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020617] text-white"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020617] text-white pt-24 pb-12 md:pt-0 md:pb-0"
     >
       <StarrySky />
 

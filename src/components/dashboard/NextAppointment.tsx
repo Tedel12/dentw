@@ -31,67 +31,66 @@ async function NextAppointment() {
   const isToday = isSameDay(appointmentDate, new Date());
 
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background w-full overflow-hidden">
+      <CardHeader className="p-4 md:p-6 pb-2 md:pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <CalendarIcon className="size-5 text-primary" />
           Prochain rendez-vous
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 md:p-6 pt-0 md:pt-0">
         {/* Status Badge */}
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-primary">
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">
               {isToday ? "Aujourd'hui" : "À venir"}
             </span>
           </div>
-          <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">
+          <span className="text-[10px] font-black uppercase text-muted-foreground bg-muted/50 px-2 py-1 rounded">
             {nextAppointment.status}
           </span>
         </div>
 
         {/* Appointment Details */}
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center shrink-0 border border-primary/10 shadow-inner group-hover:scale-110 transition-transform">
               <UserIcon className="size-4 text-primary" />
             </div>
-            <div>
-              <p className="font-medium text-sm">{nextAppointment.doctorName}</p>
-              <p className="text-xs text-muted-foreground">{nextAppointment.reason}</p>
+            <div className="min-w-0">
+              <p className="font-black text-sm text-white truncate">{nextAppointment.doctorName}</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{nextAppointment.reason}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center shrink-0 border border-primary/10 shadow-inner group-hover:scale-110 transition-transform">
               <CalendarIcon className="size-4 text-primary" />
             </div>
-            <div>
-              <p className="font-medium text-sm">{formattedDate}</p>
-              <p className="text-xs text-muted-foreground">
+            <div className="min-w-0">
+              <p className="font-black text-sm text-white truncate">{formattedDate}</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 {isToday ? "Aujourd'hui" : format(appointmentDate, "EEEE")}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center shrink-0 border border-primary/10 shadow-inner group-hover:scale-110 transition-transform">
               <ClockIcon className="size-4 text-primary" />
             </div>
-            <div>
-              <p className="font-medium text-sm">{nextAppointment.time}</p>
-              <p className="text-xs text-muted-foreground">Heure locale</p>
+            <div className="min-w-0">
+              <p className="font-black text-sm text-white truncate">{nextAppointment.time}</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider italic">Heure locale</p>
             </div>
           </div>
         </div>
 
         {/* More Appointments Count */}
         {upcomingAppointments.length > 1 && (
-          <p className="text-xs text-center text-muted-foreground">
-            +{upcomingAppointments.length - 1} autre rendez-vous à venir
-            {upcomingAppointments.length > 2 ? "s" : ""}
+          <p className="text-[10px] text-center text-muted-foreground/60 font-bold uppercase tracking-[0.2em] pt-2">
+            +{upcomingAppointments.length - 1} autre rendez-vous
           </p>
         )}
       </CardContent>
