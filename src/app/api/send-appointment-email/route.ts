@@ -14,6 +14,8 @@ export async function POST(request: Request) {
       appointmentType,
       duration,
       price,
+      mode,
+      roomId
     } = body;
 
     // Vérification des champs obligatoires
@@ -25,7 +27,6 @@ export async function POST(request: Request) {
     }
 
     // Envoi de l'email
-    // À utiliser uniquement pour tests, pas en production
     const { data, error } = await resend.emails.send({
       from: "DentWise <no-reply@resend.dev>",
       to: [userEmail],
@@ -37,6 +38,8 @@ export async function POST(request: Request) {
         appointmentType,
         duration,
         price,
+        mode,
+        roomId
       }),
     });
 

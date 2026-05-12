@@ -6,7 +6,8 @@ import DoctorSelectionStep from "@/components/appointments/DoctorSelectionStep";
 import ProgressSteps from "@/components/appointments/ProgressSteps";
 import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
 import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment";
-import { APPOINTMENT_TYPES } from "@/lib/utils";
+import { useAvailableDoctors } from "@/hooks/use-doctors";
+import { APPOINTMENT_TYPES, getDoctorAppointmentTypes } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export function PatientAppointmentsClient() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
 
+  const { data: dentists = [] } = useAvailableDoctors();
   const bookAppointmentMutation = useBookAppointment();
   const { data: userAppointments = [] } = useUserAppointments();
 
@@ -41,7 +43,13 @@ export function PatientAppointmentsClient() {
       return;
     }
 
-    const appointmentType = APPOINTMENT_TYPES.find((t) => t.id === selectedType);
+    const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
+    const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
+    const appointmentType = appointmentTypes.find((t) => t.id === selectedType);
+
+    // Extraire les valeurs numériques pour la durée et le prix
+    const durationValue = parseInt(appointmentType?.duration || "30");
+    const priceValue = parseFloat(appointmentType?.price?.replace(/[^0-9.]/g, '') || "0");
 
     bookAppointmentMutation.mutate(
       {
@@ -50,6 +58,8 @@ export function PatientAppointmentsClient() {
         time: selectedTime,
         reason: appointmentType?.name,
         type: selectedMode,
+        duration: durationValue,
+        price: priceValue,
       },
       {
         onSuccess: async (appointment) => {
@@ -178,7 +188,7 @@ export function PatientAppointmentsClient() {
                         </div>
                     </div>
 
-                    {appointment.type === 'ONLINE' && (
+                    {appointment.type === 'ONLINE' && appointment.status === 'CONFIRMED' && (
                         <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black italic rounded-xl h-12 shadow-lg shadow-blue-600/20 group">
                             <Link href={`/appointments/room/${appointment.id}`} className="flex items-center justify-center gap-2">
                                 <VideoIcon className="size-4 group-hover:animate-bounce" />

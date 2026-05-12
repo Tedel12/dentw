@@ -18,19 +18,28 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
-import { VideoIcon } from "lucide-react";
+import { Settings, VideoIcon } from "lucide-react";
 import Link from "next/link";
+import { DoctorSettingsClient } from "@/components/admin/DoctorSettingsClient";
 
 interface DoctorAppointmentsViewProps {
   appointments: any[];
+  doctorProfile?: any;
 }
 
-export function DoctorAppointmentsView({ appointments: initialAppointments }: DoctorAppointmentsViewProps) {
+export function DoctorAppointmentsView({ 
+  appointments: initialAppointments,
+  doctorProfile 
+}: DoctorAppointmentsViewProps) {
   const { user: clerkUser } = useUser();
-  const [appointments, setAppointments] = useState(initialAppointments);
+  // Ne garder que les CONFIRMED ou PENDING pour l'affichage principal
+  const [appointments, setAppointments] = useState(
+    initialAppointments.filter(apt => apt.status !== "COMPLETED" && apt.status !== "CANCELLED")
+  );
   const [patientData, setPatientData] = useState<any>(null);
   const [isAccessing, setIsAccessing] = useState(false);
   const [showFileDialog, setShowFileDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [currentAppointmentId, setCurrentAppointmentId] = useState<string | null>(null);
 
   const handleUpdateStatus = async (id: string, status: string) => {
@@ -88,10 +97,28 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
           <h1 className="text-3xl font-black italic tracking-tighter">Mon Agenda Praticien</h1>
           <p className="text-muted-foreground font-medium italic">Gérez vos consultations et accédez aux dossiers médicaux sécurisés.</p>
         </div>
-        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-black px-4 py-2 uppercase tracking-widest text-xs">
-          {appointments.length} Consultation(s)
-        </Badge>
+        <div className="flex items-center gap-3">
+            <Button 
+                onClick={() => setShowSettingsDialog(true)}
+                variant="outline" 
+                className="bg-white/5 border-white/10 text-white font-black px-4 py-2 uppercase tracking-widest text-[10px] h-10 rounded-xl hover:bg-white/10"
+            >
+                <Settings className="w-4 h-4 mr-2 text-primary" />
+                Configuration Cabinet
+            </Button>
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-black px-4 py-2 uppercase tracking-widest text-xs h-10 flex items-center">
+            {appointments.length} Consultation(s)
+            </Badge>
+        </div>
       </div>
+
+      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto rounded-[2.5rem] border-white/10 bg-[#020617] p-0 custom-scrollbar text-white">
+            <div className="p-8">
+                <DoctorSettingsClient doctor={doctorProfile} />
+            </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-6">
         {appointments.length > 0 ? (
@@ -118,8 +145,13 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
                           <div className="flex flex-wrap items-center gap-2 mt-1">
                             <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] md:text-[10px] font-black uppercase">{apt.reason || "Consultation"}</Badge>
                             <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
-                                <Clock className="size-3" /> {apt.time}
+                                <Clock className="size-3" /> {apt.time} ({apt.duration || 30} min)
                             </span>
+                            {apt.price > 0 && (
+                                <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 text-[9px] font-black">
+                                    {apt.price} FCFA
+                                </Badge>
+                            )}
                           </div>
                         </div>
                       </div>

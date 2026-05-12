@@ -1,5 +1,6 @@
 import { useBookedTimeSlots } from "@/hooks/use-appointment";
-import { APPOINTMENT_TYPES, getAvailableTimeSlots, getNext5Days } from "@/lib/utils";
+import { useAvailableDoctors } from "@/hooks/use-doctors";
+import { getDoctorAppointmentTypes, getAvailableTimeSlots, getNext5Days } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon, ClockIcon, VideoIcon, MapPin } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
@@ -32,14 +33,30 @@ function TimeSelectionStep({
   selectedMode,
 }: TimeSelectionStepProps) {
   const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDentistId, selectedDate);
+  const { data: dentists = [] } = useAvailableDoctors();
+  
+  const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
 
   const availableDates = getNext5Days();
-  const availableTimeSlots = getAvailableTimeSlots();
+  const availableTimeSlots = getAvailableTimeSlots(
+    selectedDoctor?.workingHoursStart || "09:00",
+    selectedDoctor?.workingHoursEnd || "18:00",
+    selectedDoctor?.consultationDuration || 30
+  );
+
+  const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
 
   const handleDateSelect = (date: string) => {
     onDateChange(date);
     // réinitialiser l’heure lorsque la date change
     onTimeChange("");
+  };
+
+  const isDayAvailable = (date: string) => {
+    if (!selectedDoctor?.availableDays) return true;
+    const dayName = new Date(date).toLocaleDateString("fr-FR", { weekday: "long" });
+    const capitalizedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    return selectedDoctor.availableDays.split(",").includes(capitalizedDay);
   };
 
   return (
@@ -96,7 +113,7 @@ function TimeSelectionStep({
             <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/80">Type de soin</h3>
             <div className="space-y-3">
-                {APPOINTMENT_TYPES.map((type: any) => (
+                {appointmentTypes.map((type: any) => (
                 <Card
                     key={type.id}
                     className={`cursor-pointer transition-all duration-300 border-white/5 bg-slate-900/40 hover:border-primary/30 ${
@@ -126,24 +143,29 @@ function TimeSelectionStep({
 
             {/* sélection de la date */}
             <div className="grid grid-cols-2 gap-3">
-                {availableDates.map((date: any) => (
-                <Button
-                    key={date}
-                    variant={selectedDate === date ? "default" : "outline"}
-                    onClick={() => handleDateSelect(date)}
-                    className={`h-auto p-4 rounded-2xl border-white/5 hover:border-primary/30 transition-all font-bold ${selectedDate === date ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-900/40'}`}
-                >
-                    <div className="text-center">
-                    <div className="text-sm">
-                        {new Date(date).toLocaleDateString("fr-FR", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                        })}
-                    </div>
-                    </div>
-                </Button>
-                ))}
+                {availableDates.map((date: any) => {
+                const available = isDayAvailable(date);
+                return (
+                    <Button
+                        key={date}
+                        variant={selectedDate === date ? "default" : "outline"}
+                        disabled={!available}
+                        onClick={() => available && handleDateSelect(date)}
+                        className={`h-auto p-4 rounded-2xl border-white/5 hover:border-primary/30 transition-all font-bold ${selectedDate === date ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-slate-900/40'} ${!available ? "opacity-20 grayscale cursor-not-allowed" : ""}`}
+                    >
+                        <div className="text-center">
+                        <div className="text-sm">
+                            {new Date(date).toLocaleDateString("fr-FR", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            })}
+                        </div>
+                        {!available && <div className="text-[8px] uppercase font-black text-red-500/50 mt-1">Fermé</div>}
+                        </div>
+                    </Button>
+                );
+                })}
             </div>
           </div>
 

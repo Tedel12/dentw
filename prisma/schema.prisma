@@ -80,6 +80,13 @@ model Doctor {
   gender      Gender
   isActive    Boolean @default(true)
 
+  // Nouveaux champs pour la dynamisation
+  basePrice           Float?   @default(0) // Tarif de base de la consultation
+  availableDays       String?  // Jours dispo (ex: "Lundi,Mardi,Mercredi")
+  workingHoursStart   String?  @default("09:00")
+  workingHoursEnd     String?  @default("18:00")
+  consultationDuration Int     @default(30) // Durée standard par défaut
+
   // Certification Professionnelle (Admin Validation required)
   licenseNumber       String             @unique
   verificationStatus  VerificationStatus @default(PENDING)
@@ -113,20 +120,22 @@ model Appointment {
   date        DateTime
   time        String // store time as string i.e. 14:30
   duration    Int               @default(30) // duration in minutes
+  price       Float?            @default(0)  // Prix payé/dû pour la séance
   status      AppointmentStatus @default(CONFIRMED)
   type        AppointmentType   @default(IN_PERSON)
   notes       String?
   reason      String? // reason for appointment - teeth cleaning? emergency visit? etc.
+  summary     String? // Résumé de la consultation après la session
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
   // foreign keys
   userId String
-  doctorId String
+  doctorId String?
 
   // relationships
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor Doctor? @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("appointments")
 }

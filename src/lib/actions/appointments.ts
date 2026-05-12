@@ -11,6 +11,8 @@ export async function bookAppointment(data: {
   time: string;
   reason?: string;
   type?: AppointmentType;
+  duration?: number;
+  price?: number;
 }) {
   const clerkUser = await currentUser();
   if (!clerkUser) throw new Error("Non autorisé");
@@ -30,6 +32,8 @@ export async function bookAppointment(data: {
       reason: data.reason,
       status: "CONFIRMED",
       type: data.type || "IN_PERSON",
+      duration: data.duration || 30,
+      price: data.price || 0,
     },
     include: {
       doctor: true,
@@ -60,11 +64,14 @@ export async function getUserAppointments() {
   if (!user) return [];
 
   const appointments = await prisma.appointment.findMany({
-    where: { userId: user.id },
+    where: { 
+      userId: user.id,
+      status: { in: ["CONFIRMED", "COMPLETED"] } 
+    },
     include: {
       doctor: true,
     },
-    orderBy: { date: "asc" },
+    orderBy: { date: "desc" },
   });
 
   return appointments.map((apt) => ({
@@ -77,6 +84,28 @@ export async function getUserAppointments() {
     status: apt.status,
     type: apt.type,
   }));
+}
+
+export async function completeAppointment({ id, summary }: { id: string; summary?: string }) {
+  try {
+    const appointment = await prisma.appointment.update({
+      where: { id },
+      data: { 
+        status: "COMPLETED",
+        summary: summary?.trim() || "Consultation terminée."
+      },
+    });
+    
+    revalidatePath("/appointments");
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/health");
+    revalidatePath(`/appointments/room/${id}`);
+    
+    return { success: true, appointment };
+  } catch (error) {
+    console.error("Error completing appointment:", error);
+    return { success: false, error: "Erreur lors de la clôture du rendez-vous" };
+  }
 }
 
 export async function getUserAppointmentStats() {

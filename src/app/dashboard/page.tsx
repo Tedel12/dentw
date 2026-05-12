@@ -1,7 +1,9 @@
 import ActivityOverview from "@/components/dashboard/ActivityOverview";
 import MainActions from "@/components/dashboard/MainActions";
 import WelcomeSection from "@/components/dashboard/WelcomeSection";
+import NextAppointment from "@/components/dashboard/NextAppointment";
 import Navbar from "@/components/Navbar";
+import { DoctorAppointmentsView } from "@/components/appointments/DoctorAppointmentsView";
 import { HealthAccessNotifications } from "@/components/dashboard/HealthAccessNotifications";
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
@@ -34,29 +36,46 @@ async function DashboardPage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
-        {user.role === "DOCTOR" && !user.doctorProfile && (
-          <div
-            className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 md:flex-row md:items-center md:justify-between shadow-inner shadow-primary/5"
-            role="status"
-          >
-            <p className="text-sm text-foreground/90 font-medium leading-relaxed">
-              <span className="font-black italic text-primary uppercase tracking-tighter">Profil praticien incomplet.</span> Complétez vos informations
-              professionnelles pour utiliser l&apos;espace praticien et les ordonnances.
-            </p>
-            <Button asChild size="sm" className="shrink-0 rounded-xl font-bold">
-              <Link href="/pro/patients">Compléter mon profil</Link>
-            </Button>
-          </div>
-        )}
-        <div className="space-y-10 md:space-y-16">
-            <HealthAccessNotifications requests={user.healthAccessRequests as any} />
+        {user.role === "DOCTOR" ? (
+          <div className="space-y-12 pb-20">
             <WelcomeSection />
-            <MainActions />
+            
+            {/* Statistiques en haut */}
             <ActivityOverview />
-        </div>
+
+            {/* Agenda principal */}
+            <div className="bg-white/5 border border-white/5 p-6 md:p-8 rounded-[3rem]">
+                <h2 className="text-2xl font-black italic mb-8">Consultations à venir</h2>
+                <DoctorAppointmentsView appointments={user.doctorProfile ? (await getDoctorAppointments(user.doctorProfile.id)).appointments || [] : []} />
+            </div>
+          </div>
+        ) : (
+          <>
+             {/* Vue patient inchangée */}
+             <div className="space-y-10 md:space-y-16">
+                <HealthAccessNotifications requests={user.healthAccessRequests as any} />
+                <WelcomeSection />
+                <div className="grid lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-10">
+                        <MainActions role={user.role} />
+                        <ActivityOverview />
+                    </div>
+                    <div className="hidden lg:block">
+                        <NextAppointment role={user.role} />
+                    </div>
+                </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
+}
+
+// Fonction utilitaire locale pour récupérer les RDV dans le dashboard
+async function getDoctorAppointments(doctorId: string) {
+    const { getDoctorAppointments } = await import("@/lib/actions/appointments");
+    return await getDoctorAppointments(doctorId);
 }
 
 export default DashboardPage;

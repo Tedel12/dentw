@@ -73,23 +73,33 @@ export const getNext5Days = () => {
   return dates;
 };
 
-export const getAvailableTimeSlots = () => {
-  return [
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-  ];
+export const getAvailableTimeSlots = (start = "09:00", end = "18:00", duration = 30) => {
+  const slots = [];
+  let [currentHour, currentMin] = start.split(":").map(Number);
+  const [endHour, endMin] = end.split(":").map(Number);
+
+  while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
+    const time = `${String(currentHour).padStart(2, "0")}:${String(currentMin).padStart(2, "0")}`;
+    slots.push(time);
+
+    currentMin += duration;
+    if (currentMin >= 60) {
+      currentHour += Math.floor(currentMin / 60);
+      currentMin %= 60;
+    }
+  }
+
+  return slots;
 };
 
+export const getDoctorAppointmentTypes = (basePrice: number = 3000) => {
+  return [
+    { id: "checkup", name: "Contrôle de routine", duration: "60 min", price: `${basePrice * 1.5} FCFA` },
+    { id: "cleaning", name: "Nettoyage dentaire", duration: "45 min", price: `${basePrice * 2} FCFA` },
+    { id: "consultation", name: "Consultation simple", duration: "30 min", price: `${basePrice} FCFA` },
+    { id: "emergency", name: "Urgence dentaire", duration: "30 min", price: `${basePrice * 2.5} FCFA` },
+  ];
+};
 
 export const APPOINTMENT_TYPES = [
   { id: "checkup", name: "Contrôle de routine", duration: "60 min", price: "2000 FCFA" },

@@ -29,6 +29,7 @@ import {
 import { EditHealthProfile } from "@/components/health/EditHealthProfile";
 import { ExportCarnetDialog } from "@/components/health/ExportCarnetDialog";
 import { AddTreatmentDialog } from "@/components/health/AddTreatmentDialog";
+import { AddPastConsultationDialog } from "@/components/health/AddPastConsultationDialog";
 import { MarkTreatmentTakenButton } from "@/components/health/MarkTreatmentTakenButton";
 import { AnimatedTimelineItem, AnimatedTreatmentCard } from "@/components/health/AnimatedHealthContent";
 import { FadeIn } from "@/components/ui/motion-wrapper";
@@ -80,6 +81,7 @@ export default function HealthPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <ExportCarnetDialog />
+                <AddPastConsultationDialog />
                 <AddTreatmentDialog patientId={user.id} />
             </div>
             </div>
@@ -224,9 +226,27 @@ export default function HealthPage() {
                 Journal de Santé
               </h2>
               <div className="relative before:absolute before:inset-0 before:left-2 before:w-0.5 before:bg-white/5 ml-2">
-                {user.treatments?.map((t: any, index: number) => (
-                  <AnimatedTimelineItem key={t.id} t={t} index={index} />
-                ))}
+                {(() => {
+                  // Fusionner et trier par date décroissante
+                  const timelineItems = [
+                    ...(user.treatments || []),
+                    ...(user.appointments || [])
+                  ].sort((a, b) => {
+                    const dateA = new Date(a.date || a.createdAt).getTime();
+                    const dateB = new Date(b.date || b.createdAt).getTime();
+                    return dateB - dateA;
+                  });
+
+                  return timelineItems.map((item: any, index: number) => (
+                    <AnimatedTimelineItem key={item.id} item={item} index={index} />
+                  ));
+                })()}
+                
+                {(!user.treatments?.length && !user.appointments?.length) && (
+                    <div className="pl-10 py-4">
+                        <p className="text-sm text-slate-500 italic">Aucun historique disponible pour le moment.</p>
+                    </div>
+                )}
               </div>
             </section>
           </div>

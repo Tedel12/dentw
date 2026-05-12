@@ -1,8 +1,9 @@
-import { APPOINTMENT_TYPES } from "@/lib/utils";
+import { getDoctorAppointmentTypes } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon, VideoIcon, MapPin, ShieldCheck, Wallet, CalendarDays, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import DoctorInfo from "./DoctorInfo";
+import { useAvailableDoctors } from "@/hooks/use-doctors";
 
 interface BookingConfirmationStepProps {
   selectedDentistId: string;
@@ -27,7 +28,11 @@ function BookingConfirmationStep({
   onConfirm,
   onModify,
 }: BookingConfirmationStepProps) {
-  const appointmentType = APPOINTMENT_TYPES.find((t) => t.id === selectedType);
+  const { data: dentists = [] } = useAvailableDoctors();
+  const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
+  
+  const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
+  const appointmentType = appointmentTypes.find((t) => t.id === selectedType);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

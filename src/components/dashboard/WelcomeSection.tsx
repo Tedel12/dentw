@@ -20,10 +20,10 @@ export default async function WelcomeSection() {
                 : new Date().getHours() < 18
                 ? "Bon après-midi"
                 : "Bonsoir"}
-              , {user?.firstName} 👋
+              , Dr. {user?.firstName} {user?.lastName} 👋
             </h1>
             <p className="text-muted-foreground max-w-lg leading-relaxed text-sm md:text-base">
-              Votre assistant IA DentWise surveille votre santé bucco-dentaire. Que souhaitez-vous faire aujourd'hui ?
+              Gérez vos consultations du jour et suivez le parcours de santé de vos patients.
             </p>
           </div>
         </div>

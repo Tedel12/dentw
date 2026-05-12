@@ -31,7 +31,7 @@ const item = {
   }
 };
 
-export default function MainActions() {
+export default function MainActions({ role }: { role: string }) {
   return (
     <motion.div 
       variants={container}
@@ -91,75 +91,73 @@ export default function MainActions() {
               </div>
               <div>
                 <h3 className="text-xl font-black mb-1 text-primary">Carnet de Santé</h3>
-                <p className="text-sm text-primary/70">Gérez vos antécédents et ordonnances</p>
+                <p className="text-sm text-primary/70">{role === 'DOCTOR' ? 'Accès dossier patient' : 'Gérez vos antécédents'}</p>
               </div>
             </div>
 
             <div className="space-y-4 flex-1">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-                <span className="text-sm font-bold">Profil médical sécurisé</span>
+                <span className="text-sm font-bold">{role === 'DOCTOR' ? 'Consultation sécurisée' : 'Profil médical sécurisé'}</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
                 <span className="text-sm font-bold">Historique des traitements</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-                <span className="text-sm font-bold">Partage temporaire médecin</span>
-              </div>
             </div>
 
-            <Link href="/dashboard/health" className="w-full mt-6">
+            <Link href={role === 'DOCTOR' ? '/appointments' : '/dashboard/health'} className="w-full mt-6">
               <Button
                 className="w-full bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white font-black py-6 rounded-2xl transition-all duration-500 group-hover:-translate-y-1 shadow-sm"
               >
                 <Stethoscope className="mr-2 h-5 w-5" />
-                Accéder au carnet
+                {role === 'DOCTOR' ? 'Accéder aux RDV' : 'Accéder au carnet'}
               </Button>
             </Link>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Book Appointment */}
-      <motion.div variants={item}>
-        <Card className="h-full relative overflow-hidden group hover:shadow-2xl transition-all duration-500 border-2 hover:border-primary/50 shadow-sm bg-background">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="relative p-8 flex flex-col h-full">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                <Image src="/calendar.png" alt="Calendar" width={32} height={32} className="w-10" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black mb-1">Prendre rendez-vous</h3>
-                <p className="text-sm text-muted-foreground">Planifiez avec des dentistes vérifiés</p>
-              </div>
-            </div>
+      {/* Book Appointment (Caché pour le docteur) */}
+      {role !== 'DOCTOR' && (
+        <motion.div variants={item}>
+            <Card className="h-full relative overflow-hidden group hover:shadow-2xl transition-all duration-500 border-2 hover:border-primary/50 shadow-sm bg-background">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <CardContent className="relative p-8 flex flex-col h-full">
+                <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                    <Image src="/calendar.png" alt="Calendar" width={32} height={32} className="w-10" />
+                </div>
+                <div>
+                    <h3 className="text-xl font-black mb-1">Prendre rendez-vous</h3>
+                    <p className="text-sm text-muted-foreground">Planifiez avec des dentistes vérifiés</p>
+                </div>
+                </div>
 
-            <div className="space-y-4 flex-1">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-                <span className="text-sm font-medium">Professionnels dentaires vérifiés</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-                <span className="text-sm font-medium">Confirmations instantanées</span>
-              </div>
-            </div>
+                <div className="space-y-4 flex-1">
+                <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
+                    <span className="text-sm font-medium">Professionnels dentaires vérifiés</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
+                    <span className="text-sm font-medium">Confirmations instantanées</span>
+                </div>
+                </div>
 
-            <Link href="/appointments" className="w-full mt-6">
-              <Button
-                variant="outline"
-                className="w-full border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 font-bold py-6 rounded-2xl transition-all duration-500 group-hover:-translate-y-1 shadow-sm"
-              >
-                <CalendarIcon className="mr-2 h-5 w-5" />
-                Planifier maintenant
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </motion.div>
+                <Link href="/appointments" className="w-full mt-6">
+                <Button
+                    variant="outline"
+                    className="w-full border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/5 font-bold py-6 rounded-2xl transition-all duration-500 group-hover:-translate-y-1 shadow-sm"
+                >
+                    <CalendarIcon className="mr-2 h-5 w-5" />
+                    Planifier maintenant
+                </Button>
+                </Link>
+            </CardContent>
+            </Card>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

@@ -131,35 +131,56 @@ export async function updateDoctor(input: UpdateDoctorInput) {
 
     if (!currentDoctor) throw new Error("Doctor not found");
 
-    // if email is changing, check if the new email already exists
-    if (input.email !== currentDoctor.email) {
-      const existingDoctor = await prisma.doctor.findUnique({
-        where: { email: input.email },
-      });
-
-      if (existingDoctor) {
-        throw new Error("A doctor with this email already exists");
-      }
-    }
-
     const doctor = await prisma.doctor.update({
       where: { id: input.id },
       data: {
-        name: input.name,
-        email: input.email,
-        phone: input.phone,
-        speciality: input.speciality,
-        gender: input.gender,
-        isActive: input.isActive,
-        licenseNumber: input.licenseNumber,
-        workplaceType: input.workplaceType,
+        ...input,
       },
     });
 
+    revalidatePath("/pro/patients");
+    revalidatePath("/admin");
     return doctor;
   } catch (error) {
     console.error("Error updating doctor:", error);
     throw new Error("Failed to update doctor");
+  }
+}
+
+export async function getDoctorProfile(clerkId: string) {
+  try {
+    const doctor = await prisma.doctor.findUnique({
+      where: { clerkId },
+      include: {
+        user: true
+      }
+    });
+    return doctor;
+  } catch (error) {
+    console.error("Error fetching doctor profile:", error);
+    return null;
+  }
+}
+
+export async function updateDoctorSettings(clerkId: string, data: {
+  basePrice: number;
+  availableDays: string;
+  workingHoursStart: string;
+  workingHoursEnd: string;
+  consultationDuration: number;
+}) {
+  try {
+    const doctor = await prisma.doctor.update({
+      where: { clerkId },
+      data: {
+        ...data,
+      },
+    });
+    revalidatePath("/pro/patients");
+    return { success: true, doctor };
+  } catch (error) {
+    console.error("Error updating doctor settings:", error);
+    return { success: false, error: "Failed to update settings" };
   }
 }
 

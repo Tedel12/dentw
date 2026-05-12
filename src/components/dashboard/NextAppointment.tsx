@@ -2,12 +2,16 @@ import { getUserAppointments } from "@/lib/actions/appointments";
 import { format, isAfter, isSameDay, parseISO } from "date-fns";
 import NoNextAppointments from "./NoNextAppointments";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CalendarIcon, ClockIcon, UserIcon, VideoIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, UserIcon, VideoIcon, Stethoscope } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 
-async function NextAppointment() {
+interface NextAppointmentProps {
+  role?: "PATIENT" | "DOCTOR";
+}
+
+async function NextAppointment({ role = "PATIENT" }: NextAppointmentProps) {
   const appointments = await getUserAppointments();
 
   const toDate = (value: Date | string) => {
@@ -27,7 +31,28 @@ async function NextAppointment() {
   // get the next appointment (earliest upcoming one)
   const nextAppointment = upcomingAppointments[0];
 
-  if (!nextAppointment) return <NoNextAppointments />; // no appointments, return nothing
+  if (!nextAppointment) {
+    return (
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background w-full overflow-hidden">
+            <CardHeader className="p-4 md:p-6 pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                    <CalendarIcon className="size-5 text-primary" />
+                    {role === "DOCTOR" ? "Agenda du jour" : "Prochain rendez-vous"}
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 text-center">
+                <p className="text-sm font-medium text-slate-500">
+                    {role === "DOCTOR" ? "Aucune consultation programmée." : "Aucun rendez-vous prévu."}
+                </p>
+                {role !== "DOCTOR" && (
+                    <Button asChild variant="outline" className="mt-4 rounded-xl">
+                        <Link href="/appointments">Planifier maintenant</Link>
+                    </Button>
+                )}
+            </CardContent>
+        </Card>
+    );
+  }
 
   const appointmentDate = toDate(nextAppointment.date);
   const formattedDate = format(appointmentDate, "EEEE, MMMM d, yyyy");
@@ -37,8 +62,8 @@ async function NextAppointment() {
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background w-full overflow-hidden">
       <CardHeader className="p-4 md:p-6 pb-2 md:pb-4">
         <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-          <CalendarIcon className="size-5 text-primary" />
-          Prochain rendez-vous
+          {role === "DOCTOR" ? <Stethoscope className="size-5 text-primary" /> : <CalendarIcon className="size-5 text-primary" />}
+          {role === "DOCTOR" ? "Prochaine Consultation" : "Prochain rendez-vous"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 p-4 md:p-6 pt-0 md:pt-0">
@@ -69,7 +94,7 @@ async function NextAppointment() {
               <UserIcon className="size-4 text-primary" />
             </div>
             <div className="min-w-0">
-              <p className="font-black text-sm text-white truncate">{nextAppointment.doctorName}</p>
+              <p className="font-black text-sm text-white truncate">{role === "DOCTOR" ? nextAppointment.doctorName : nextAppointment.doctorName}</p>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">{nextAppointment.reason}</p>
             </div>
           </div>
@@ -98,11 +123,11 @@ async function NextAppointment() {
         </div>
 
         {/* Action Button for Online Appointments */}
-        {nextAppointment.type === "ONLINE" && (
+        {nextAppointment.type === "ONLINE" && nextAppointment.status === "CONFIRMED" && (
           <Button asChild className="w-full bg-primary hover:bg-primary/90 font-black italic rounded-xl shadow-lg shadow-primary/20 group">
             <Link href={`/appointments/room/${nextAppointment.id}`} className="flex items-center justify-center gap-2">
               <VideoIcon className="size-4 group-hover:animate-bounce" />
-              REJOINDRE LA CONSULTATION
+              {role === "DOCTOR" ? "REJOINDRE LA SÉANCE" : "REJOINDRE LA CONSULTATION"}
             </Link>
           </Button>
         )}
@@ -110,7 +135,7 @@ async function NextAppointment() {
         {/* More Appointments Count */}
         {upcomingAppointments.length > 1 && (
           <p className="text-[10px] text-center text-muted-foreground/60 font-bold uppercase tracking-[0.2em] pt-2">
-            +{upcomingAppointments.length - 1} autre rendez-vous
+            +{upcomingAppointments.length - 1} autre{upcomingAppointments.length > 2 ? 's' : ''} rendez-vous
           </p>
         )}
       </CardContent>

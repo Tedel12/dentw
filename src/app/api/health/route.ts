@@ -23,6 +23,13 @@ export async function GET() {
           },
           orderBy: { createdAt: "desc" },
         },
+        appointments: {
+          where: { status: "COMPLETED" },
+          include: {
+            doctor: true,
+          },
+          orderBy: { date: "desc" },
+        },
       },
     });
 

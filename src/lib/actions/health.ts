@@ -181,41 +181,6 @@ export async function addTreatmentsBatch(
   }
 }
 
-export async function getPatientHealthData(userId: string, doctorId: string) {
-  try {
-    const authUser = await getAuthenticatedDbUser();
-    if (!authUser || authUser.role !== "DOCTOR" || authUser.doctorProfile?.id !== doctorId) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Check access first
-    const hasAccess = await checkDoctorAccess(userId, doctorId);
-    if (!hasAccess) {
-      return { success: false, error: "Access denied or expired" };
-    }
-
-    const patientData = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        treatments: {
-          orderBy: { createdAt: "desc" },
-          include: {
-            prescribingDoctor: {
-              include: {
-                user: { select: { firstName: true, lastName: true } },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return { success: true, data: patientData };
-  } catch (error) {
-    return { success: false, error: "Failed to fetch patient data" };
-  }
-}
-
 export async function searchPatient(query: string) {
   try {
     const authUser = await getAuthenticatedDbUser();
@@ -394,12 +359,55 @@ export async function getOwnHealthData() {
             },
           },
         },
+        appointments: {
+          where: { status: "COMPLETED" },
+          orderBy: { date: "desc" },
+          include: {
+            doctor: true
+          }
+        }
       },
     });
 
     return { success: true, data: user };
   } catch (error) {
     return { success: false, error: "Failed to fetch health data" };
+  }
+}
+
+export async function getPatientHealthData(patientId: string, doctorId: string) {
+  try {
+    const hasAccess = await checkDoctorAccess(patientId, doctorId);
+    if (!hasAccess) {
+      return { success: false, error: "Access denied" };
+    }
+
+    const patient = await prisma.user.findUnique({
+      where: { id: patientId },
+      include: {
+        treatments: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            prescribingDoctor: {
+              include: {
+                user: { select: { firstName: true, lastName: true } },
+              },
+            },
+          },
+        },
+        appointments: {
+          where: { status: "COMPLETED" },
+          orderBy: { date: "desc" },
+          include: {
+            doctor: true
+          }
+        }
+      },
+    });
+
+    return { success: true, data: patient };
+  } catch (error) {
+    return { success: false, error: "Failed to fetch patient data" };
   }
 }
 
