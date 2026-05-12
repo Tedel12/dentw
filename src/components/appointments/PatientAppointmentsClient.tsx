@@ -10,12 +10,16 @@ import { APPOINTMENT_TYPES } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
+import { VideoIcon, MapPin, Calendar, Clock } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function PatientAppointmentsClient() {
   const [selectedDentistId, setSelectedDentistId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [selectedMode, setSelectedMode] = useState<"IN_PERSON" | "ONLINE">("IN_PERSON");
   const [currentStep, setCurrentStep] = useState(1);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
@@ -28,6 +32,7 @@ export function PatientAppointmentsClient() {
     setSelectedDate("");
     setSelectedTime("");
     setSelectedType("");
+    setSelectedMode("IN_PERSON");
   };
 
   const handleBookAppointment = async () => {
@@ -44,6 +49,7 @@ export function PatientAppointmentsClient() {
         date: selectedDate,
         time: selectedTime,
         reason: appointmentType?.name,
+        type: selectedMode,
       },
       {
         onSuccess: async (appointment) => {
@@ -60,6 +66,8 @@ export function PatientAppointmentsClient() {
                 appointmentType: appointmentType?.name,
                 duration: appointmentType?.duration,
                 price: appointmentType?.price,
+                mode: selectedMode,
+                roomId: appointment.id
               }),
             });
           } catch (error) {}
@@ -78,8 +86,8 @@ export function PatientAppointmentsClient() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-white">Prendre un rendez-vous</h1>
-        <p className="text-muted-foreground">Trouvez et prenez rendez-vous avec nos praticiens.</p>
+        <h1 className="text-3xl font-bold mb-2 text-white tracking-tight">Prendre un rendez-vous</h1>
+        <p className="text-muted-foreground font-medium">Trouvez et prenez rendez-vous avec nos praticiens certifiés.</p>
       </div>
 
       <ProgressSteps currentStep={currentStep} />
@@ -98,11 +106,13 @@ export function PatientAppointmentsClient() {
           selectedDate={selectedDate}
           selectedTime={selectedTime}
           selectedType={selectedType}
+          selectedMode={selectedMode}
           onBack={() => setCurrentStep(1)}
           onContinue={() => setCurrentStep(3)}
           onDateChange={setSelectedDate}
           onTimeChange={setSelectedTime}
           onTypeChange={setSelectedType}
+          onModeChange={setSelectedMode}
         />
       )}
 
@@ -112,6 +122,7 @@ export function PatientAppointmentsClient() {
           selectedDate={selectedDate}
           selectedTime={selectedTime}
           selectedType={selectedType}
+          selectedMode={selectedMode}
           isBooking={bookAppointmentMutation.isPending}
           onBack={() => setCurrentStep(2)}
           onModify={() => setCurrentStep(2)}
@@ -133,21 +144,48 @@ export function PatientAppointmentsClient() {
       )}
 
       {userAppointments.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4 text-white">Mes rendez-vous à venir</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black italic text-white">Mes rendez-vous à venir</h2>
+            <div className="h-[2px] flex-1 mx-6 bg-primary/10 hidden md:block"></div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {userAppointments.map((appointment: any) => (
-              <div key={appointment.id} className="bg-card/50 border border-primary/10 rounded-2xl p-5 backdrop-blur-sm shadow-sm hover:border-primary/30 transition-all">
-                <div className="flex items-center gap-4 mb-4 text-white">
-                  <img src={appointment.doctorImageUrl} alt={appointment.doctorName} className="size-12 rounded-full ring-2 ring-primary/20" />
-                  <div>
-                    <p className="font-bold">{appointment.doctorName}</p>
-                    <p className="text-muted-foreground text-xs font-medium">{appointment.reason}</p>
+              <div key={appointment.id} className="group bg-slate-900/40 border border-white/5 rounded-3xl p-6 backdrop-blur-md shadow-xl hover:border-primary/40 transition-all duration-300">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <img src={appointment.doctorImageUrl} alt={appointment.doctorName} className="size-14 rounded-2xl object-cover ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all" />
+                    <div>
+                      <p className="font-black text-white">{appointment.doctorName}</p>
+                      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{appointment.reason}</p>
+                    </div>
+                  </div>
+                  <div className={`p-2 rounded-xl border ${appointment.type === 'ONLINE' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-primary/10 border-primary/20 text-primary'}`}>
+                    {appointment.type === 'ONLINE' ? <VideoIcon className="size-5" /> : <MapPin className="size-5" />}
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-sm bg-primary/5 p-3 rounded-xl border border-primary/5 text-white">
-                  <span className="flex items-center gap-1.5 font-medium italic">{format(new Date(appointment.date), "dd MMM yyyy")}</span>
-                  <span className="font-black text-primary">{appointment.time}</span>
+
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
+                        <div className="flex-1 flex items-center gap-2">
+                            <Calendar className="size-4 text-primary" />
+                            <span className="text-sm font-bold text-slate-300">{format(new Date(appointment.date), "dd MMM yyyy")}</span>
+                        </div>
+                        <div className="w-[1px] h-4 bg-white/10" />
+                        <div className="flex-1 flex items-center justify-end gap-2">
+                            <Clock className="size-4 text-primary" />
+                            <span className="text-sm font-black text-white">{appointment.time}</span>
+                        </div>
+                    </div>
+
+                    {appointment.type === 'ONLINE' && (
+                        <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black italic rounded-xl h-12 shadow-lg shadow-blue-600/20 group">
+                            <Link href={`/appointments/room/${appointment.id}`} className="flex items-center justify-center gap-2">
+                                <VideoIcon className="size-4 group-hover:animate-bounce" />
+                                REJOINDRE L&apos;APPEL
+                            </Link>
+                        </Button>
+                    )}
                 </div>
               </div>
             ))}
@@ -157,3 +195,4 @@ export function PatientAppointmentsClient() {
     </>
   );
 }
+

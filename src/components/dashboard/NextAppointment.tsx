@@ -2,7 +2,10 @@ import { getUserAppointments } from "@/lib/actions/appointments";
 import { format, isAfter, isSameDay, parseISO } from "date-fns";
 import NoNextAppointments from "./NoNextAppointments";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, UserIcon, VideoIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import Link from "next/link";
 
 async function NextAppointment() {
   const appointments = await getUserAppointments();
@@ -41,11 +44,18 @@ async function NextAppointment() {
       <CardContent className="space-y-4 p-4 md:p-6 pt-0 md:pt-0">
         {/* Status Badge */}
         <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">
-              {isToday ? "Aujourd'hui" : "À venir"}
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                {isToday ? "Aujourd'hui" : "À venir"}
+              </span>
+            </div>
+            {nextAppointment.type === "ONLINE" && (
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] uppercase font-black px-2 py-0.5">
+                Vidéo
+              </Badge>
+            )}
           </div>
           <span className="text-[10px] font-black uppercase text-muted-foreground bg-muted/50 px-2 py-1 rounded">
             {nextAppointment.status}
@@ -86,6 +96,16 @@ async function NextAppointment() {
             </div>
           </div>
         </div>
+
+        {/* Action Button for Online Appointments */}
+        {nextAppointment.type === "ONLINE" && (
+          <Button asChild className="w-full bg-primary hover:bg-primary/90 font-black italic rounded-xl shadow-lg shadow-primary/20 group">
+            <Link href={`/appointments/room/${nextAppointment.id}`} className="flex items-center justify-center gap-2">
+              <VideoIcon className="size-4 group-hover:animate-bounce" />
+              REJOINDRE LA CONSULTATION
+            </Link>
+          </Button>
+        )}
 
         {/* More Appointments Count */}
         {upcomingAppointments.length > 1 && (

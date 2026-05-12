@@ -98,12 +98,23 @@ model Doctor {
   @@map("doctors")
 }
 
+enum AppointmentStatus {
+ CONFIRMED
+ COMPLETED
+}
+
+enum AppointmentType {
+  IN_PERSON
+  ONLINE
+}
+
 model Appointment {
   id          String            @id @default(cuid())
   date        DateTime
   time        String // store time as string i.e. 14:30
   duration    Int               @default(30) // duration in minutes
   status      AppointmentStatus @default(CONFIRMED)
+  type        AppointmentType   @default(IN_PERSON)
   notes       String?
   reason      String? // reason for appointment - teeth cleaning? emergency visit? etc.
   createdAt   DateTime          @default(now())
@@ -172,11 +183,6 @@ model HealthAccessRequest {
 enum Gender {
   MALE
   FEMALE
-}
-
-enum AppointmentStatus {
- CONFIRMED
- COMPLETED
 }
 
 enum BloodGroup {

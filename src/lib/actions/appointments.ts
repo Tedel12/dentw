@@ -3,12 +3,14 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { AppointmentType } from "@prisma/client";
 
 export async function bookAppointment(data: {
   doctorId: string;
   date: string;
   time: string;
   reason?: string;
+  type?: AppointmentType;
 }) {
   const clerkUser = await currentUser();
   if (!clerkUser) throw new Error("Non autorisé");
@@ -27,6 +29,7 @@ export async function bookAppointment(data: {
       time: data.time,
       reason: data.reason,
       status: "CONFIRMED",
+      type: data.type || "IN_PERSON",
     },
     include: {
       doctor: true,
@@ -40,6 +43,7 @@ export async function bookAppointment(data: {
     id: appointment.id,
     date: appointment.date,
     time: appointment.time,
+    type: appointment.type,
     doctorName: appointment.doctor.name,
     patientEmail: user.email,
   };
@@ -71,6 +75,7 @@ export async function getUserAppointments() {
     doctorName: apt.doctor.name,
     doctorImageUrl: apt.doctor.imageUrl,
     status: apt.status,
+    type: apt.type,
   }));
 }
 
@@ -159,4 +164,20 @@ export async function getAppointments() {
             doctor: true
         }
     });
+}
+
+export async function getAppointment(id: string) {
+  try {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        doctor: true,
+      },
+    });
+    return appointment;
+  } catch (error) {
+    console.error("Error fetching appointment:", error);
+    return null;
+  }
 }

@@ -18,6 +18,8 @@ interface AppointmentConfirmationEmailProps {
   appointmentType: string;
   duration: string;
   price: string;
+  mode?: "IN_PERSON" | "ONLINE";
+  roomId?: string;
 }
 
 function AppointmentConfirmationEmail({
@@ -27,7 +29,11 @@ function AppointmentConfirmationEmail({
   appointmentType,
   duration,
   price,
+  mode = "IN_PERSON",
+  roomId,
 }: AppointmentConfirmationEmailProps) {
+  const isOnline = mode === "ONLINE";
+
   return (
     <Html>
       <Head />
@@ -60,6 +66,11 @@ function AppointmentConfirmationEmail({
             <Text style={detailLabel}>Type de rendez-vous</Text>
             <Text style={detailValue}>{appointmentType}</Text>
 
+            <Text style={detailLabel}>Mode de consultation</Text>
+            <Text style={isOnline ? onlineValue : detailValue}>
+                {isOnline ? "📹 Téléconsultation (Vidéo)" : "📍 En Cabinet (Présentiel)"}
+            </Text>
+
             <Text style={detailLabel}>Date</Text>
             <Text style={detailValue}>{appointmentDate}</Text>
 
@@ -73,16 +84,26 @@ function AppointmentConfirmationEmail({
             <Text style={detailValue}>{price}</Text>
 
             <Text style={detailLabel}>Lieu</Text>
-            <Text style={detailValue}>Centre Dentaire</Text>
+            <Text style={detailValue}>
+                {isOnline ? "Salle virtuelle Dentwise" : "Centre Dentaire"}
+            </Text>
           </Section>
 
-          <Text style={text}>
-            Merci d’arriver 15 minutes avant votre rendez-vous. Si vous devez reporter ou annuler, veuillez nous contacter au moins 24 heures à l’avance.
-          </Text>
+          {isOnline ? (
+            <Section style={alertBox}>
+                <Text style={alertText}>
+                    <strong>Note importante :</strong> Votre consultation se fera en ligne. Vous pourrez rejoindre la salle vidéo directement depuis votre tableau de bord 5 minutes avant l'heure prévue.
+                </Text>
+            </Section>
+          ) : (
+            <Text style={text}>
+                Merci d’arriver 15 minutes avant votre rendez-vous au cabinet.
+            </Text>
+          )}
 
           <Section style={buttonContainer}>
-            <Link style={button} href={process.env.NEXT_PUBLIC_APP_URL + "/appointments"}>
-              Voir mes rendez-vous
+            <Link style={button} href={process.env.NEXT_PUBLIC_APP_URL + (isOnline && roomId ? `/appointments/room/${roomId}` : "/appointments")}>
+              {isOnline ? "Rejoindre la salle vidéo" : "Voir mes rendez-vous"}
             </Link>
           </Section>
 
@@ -130,7 +151,7 @@ const logo = {
 const logoText = {
   fontSize: "20px",
   fontWeight: "bold",
-  color: "#2563eb",
+  color: "#e78a53",
   margin: "0",
   display: "inline",
   marginLeft: "12px",
@@ -173,13 +194,34 @@ const detailValue = {
   margin: "0 0 16px 0",
 };
 
+const onlineValue = {
+    color: "#2563eb",
+    fontSize: "16px",
+    fontWeight: "bold",
+    margin: "0 0 16px 0",
+};
+
+const alertBox = {
+    backgroundColor: "#eff6ff",
+    borderRadius: "8px",
+    padding: "16px",
+    marginBottom: "20px",
+};
+
+const alertText = {
+    color: "#1d4ed8",
+    fontSize: "14px",
+    lineHeight: "22px",
+    margin: "0",
+};
+
 const buttonContainer = {
   textAlign: "center" as const,
   margin: "32px 0",
 };
 
 const button = {
-  backgroundColor: "#2563eb",
+  backgroundColor: "#e78a53",
   borderRadius: "6px",
   color: "#ffffff",
   fontSize: "16px",

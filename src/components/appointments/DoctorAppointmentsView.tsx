@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
+import { VideoIcon } from "lucide-react";
+import Link from "next/link";
 
 interface DoctorAppointmentsViewProps {
   appointments: any[];
@@ -150,6 +152,18 @@ export function DoctorAppointmentsView({ appointments: initialAppointments }: Do
                           {isAccessing && currentAppointmentId === apt.id ? <Loader2 className="mr-2 size-3 animate-spin" /> : <FileText className="mr-2 size-3" />}
                           Dossier Patient
                         </Button>
+
+                        {apt.type === "ONLINE" && apt.status === "CONFIRMED" && (
+                            <Button 
+                                asChild
+                                size="sm" 
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-blue-900/20"
+                            >
+                                <Link href={`/appointments/room/${apt.id}`} className="flex items-center gap-2">
+                                    <VideoIcon className="size-3" /> Rejoindre l'appel
+                                </Link>
+                            </Button>
+                        )}
 
                         {apt.status === "CONFIRMED" && (
                             <Button 
