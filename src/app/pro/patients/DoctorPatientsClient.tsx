@@ -19,6 +19,7 @@ import {
 import { completeDoctorProfile } from "@/lib/actions/users";
 import { toast } from "sonner";
 import { AddPrescriptionForm } from "@/components/health/AddPrescriptionForm";
+import { BlurData } from "@/components/ui/blur-data";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -367,7 +368,14 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
               )}
             </div>
 
-            {hasAccess && patientData ? (
+            {hasAccess && patientData ? (  
+              <>
+                <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-center gap-3 mb-6">
+                <ShieldAlert className="w-5 h-5 text-amber-500" />
+                <p className="text-amber-500 text-xs font-black uppercase tracking-widest">
+                  PROTECTION ACTIVE : Survolez les zones floutées pour afficher les données sensibles.
+                </p>
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 space-y-6">
                   <Card className="bg-card/40 backdrop-blur-sm border-primary/10 rounded-3xl shadow-sm text-white">
@@ -375,9 +383,11 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                     <CardContent className="space-y-5">
                        <div className="flex justify-between items-center bg-primary/5 p-3 rounded-xl border border-primary/10">
                           <span className="text-muted-foreground font-bold">G. Sanguin</span>
-                          <span className="font-black text-2xl text-red-500 tracking-tighter">
-                            {formatBloodGroup(patientData.bloodGroup)}
-                          </span>
+                          <BlurData>
+                            <span className="font-black text-2xl text-red-500 tracking-tighter">
+                              {formatBloodGroup(patientData.bloodGroup)}
+                            </span>
+                          </BlurData>
                        </div>
 
                        <div className="grid grid-cols-2 gap-3">
@@ -404,27 +414,35 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                        </div>
                        <div className="space-y-2">
                           <span className="text-sm font-bold uppercase text-muted-foreground tracking-widest">Allergies</span>
-                          <p className="bg-amber-500/10 text-amber-200 p-4 rounded-2xl border border-amber-500/20 font-semibold leading-snug">
-                            {patientData.allergies || "Aucune allergie connue"}
-                          </p>
+                          <BlurData>
+                            <p className="bg-amber-500/10 text-amber-200 p-4 rounded-2xl border border-amber-500/20 font-semibold leading-snug">
+                              {patientData.allergies || "Aucune allergie connue"}
+                            </p>
+                          </BlurData>
                        </div>
                        <div className="space-y-2">
                           <span className="text-sm font-bold uppercase text-muted-foreground tracking-widest">Pathologies</span>
-                          <p className="bg-blue-500/10 text-blue-200 p-4 rounded-2xl border border-blue-500/20 font-semibold">
-                            {patientData.chronicDiseases || "Néant"}
-                          </p>
+                          <BlurData>
+                            <p className="bg-blue-500/10 text-blue-200 p-4 rounded-2xl border border-blue-500/20 font-semibold">
+                              {patientData.chronicDiseases || "Néant"}
+                            </p>
+                          </BlurData>
                        </div>
                        <div className="space-y-2">
                           <span className="text-sm font-bold uppercase text-muted-foreground tracking-widest">Electrophorèse</span>
-                          <p className="bg-violet-500/10 text-violet-200 p-4 rounded-2xl border border-violet-500/20 font-semibold">
-                            {patientData.electrophoresis || "Non renseigné"}
-                          </p>
+                          <BlurData>
+                            <p className="bg-violet-500/10 text-violet-200 p-4 rounded-2xl border border-violet-500/20 font-semibold">
+                              {patientData.electrophoresis || "Non renseigné"}
+                            </p>
+                          </BlurData>
                        </div>
                        <div className="space-y-2">
                           <span className="text-sm font-bold uppercase text-muted-foreground tracking-widest">Vaccins</span>
-                          <p className="bg-emerald-500/10 text-emerald-200 p-4 rounded-2xl border border-emerald-500/20 font-semibold">
-                            {patientData.vaccines || "Non renseigné"}
-                          </p>
+                          <BlurData>
+                            <p className="bg-emerald-500/10 text-emerald-200 p-4 rounded-2xl border border-emerald-500/20 font-semibold">
+                              {patientData.vaccines || "Non renseigné"}
+                            </p>
+                          </BlurData>
                        </div>
                     </CardContent>
                   </Card>
@@ -493,6 +511,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                   </Card>
                 </div>
               </div>
+                </>
             ) : !hasAccess && (
               <div className="flex flex-col items-center justify-center py-32 bg-primary/5 rounded-[3rem] border-4 border-dashed border-primary/10">
                 <Lock className="w-16 h-16 text-primary/30 mb-6" />

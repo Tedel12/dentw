@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { CalendarIcon, HomeIcon, MenuIcon, Sparkles, Stethoscope, Users } from "lucide-react";
+import { CalendarIcon, HomeIcon, MenuIcon, Shield, Sparkles, Stethoscope, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -63,8 +63,8 @@ function Navbar() {
                 </Link>
 
                 <Link href="/about-project" className={linkClass("/about-project")}>
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="hidden lg:inline font-bold italic">Le Projet</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden lg:inline">A propos</span>
                 </Link>
 
                 {/* Role-based links */}
@@ -91,6 +91,14 @@ function Navbar() {
                   <Link href="/pro/patients" className={linkClass("/pro/patients")}>
                     <Users className="w-4 h-4" />
                     <span className="hidden lg:inline">Espace Praticien</span>
+                  </Link>
+                )}
+
+                {/* Lien Admin conditionnel */}
+                {clerkUser.primaryEmailAddress?.emailAddress === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+                  <Link href="/admin" className={linkClass("/admin")}>
+                    <Shield className="w-4 h-4" />
+                    <span className="hidden lg:inline">Administration</span>
                   </Link>
                 )}
 

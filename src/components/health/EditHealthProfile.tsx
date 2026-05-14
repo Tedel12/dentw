@@ -7,6 +7,7 @@ import * as z from "zod";
 import { BloodGroup } from "@prisma/client";
 import { updateHealthProfile } from "@/lib/actions/health";
 import { updateExportPin } from "@/lib/actions/users";
+import { revokeAllAccess } from "@/lib/actions/security-revoke";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -48,6 +49,19 @@ interface EditHealthProfileProps {
 
 export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealthProfileProps) {
   const [loading, setLoading] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+
+  const handlePanicRevoke = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir révoquer TOUS les accès médecins ? Cette action est irréversible.")) return;
+    setRevoking(true);
+    const res = await revokeAllAccess(userId);
+    if (res.success) {
+        toast.success("Tous les accès ont été révoqués");
+    } else {
+        toast.error("Erreur lors de la révocation");
+    }
+    setRevoking(false);
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -259,7 +273,15 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
         <Button type="submit" className="w-full gap-2" disabled={loading}>
           <ShieldCheck className="w-4 h-4" /> {loading ? "Enregistrement..." : "Sauvegarder mon profil sécurisé"}
         </Button>
+        
+        <Button type="button" onClick={handlePanicRevoke} variant="destructive" className="w-full gap-2 mt-4" disabled={revoking}>
+            <AlertTriangle className="w-4 h-4" /> {revoking ? "Révocation..." : "PANIC BUTTON: Révoquer tous les accès"}
+        </Button>
       </form>
     </Form>
   );
 }
+
+// Ajouter la fonction handlePanicRevoke et l'import manquant avant le return si nécessaire, 
+// mais ici je l'ajoute juste avant le rendu final.
+// NOTE: Assurez-vous d'ajouter `import { revokeAllAccess } from "@/lib/actions/security-revoke";` en haut du fichier.

@@ -167,65 +167,69 @@ export function DoctorAppointmentsView({
                     <div className="flex flex-col justify-between items-stretch md:items-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
                       <Badge className={`w-fit self-end px-4 py-1.5 rounded-full font-black uppercase tracking-widest text-[10px] border-none ${
                         apt.status === "CONFIRMED" ? "bg-green-500/20 text-green-400" : 
-                        apt.status === "COMPLETED" ? "bg-blue-500/20 text-blue-400" : "bg-amber-500/20 text-amber-400"
+                        apt.status === "COMPLETED" ? "bg-blue-500/20 text-blue-400" : 
+                        apt.status === "CANCELLED" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"
                       }`}>
                         {apt.status === "CONFIRMED" ? "Confirmé" : 
-                         apt.status === "COMPLETED" ? "Terminé" : "En attente"}
+                         apt.status === "COMPLETED" ? "Terminé" : 
+                         apt.status === "CANCELLED" ? "Annulé" : "En attente"}
                       </Badge>
                       
                       <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 md:gap-3">
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            disabled={isAccessing}
-                            className="text-primary hover:text-primary hover:bg-primary/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl border border-primary/20"
-                            onClick={() => handleViewPatientFile(apt.user?.id, apt.id)}
-                        >
-                          {isAccessing && currentAppointmentId === apt.id ? <Loader2 className="mr-2 size-3 animate-spin" /> : <FileText className="mr-2 size-3" />}
-                          Dossier Patient
-                        </Button>
+                        {apt.status !== "CANCELLED" && (
+                            <>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    disabled={isAccessing}
+                                    className="text-primary hover:text-primary hover:bg-primary/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl border border-primary/20"
+                                    onClick={() => handleViewPatientFile(apt.user?.id, apt.id)}
+                                >
+                                {isAccessing && currentAppointmentId === apt.id ? <Loader2 className="mr-2 size-3 animate-spin" /> : <FileText className="mr-2 size-3" />}
+                                Dossier Patient
+                                </Button>
 
-                        {apt.type === "ONLINE" && apt.status === "CONFIRMED" && (
-                            <Button 
-                                asChild
-                                size="sm" 
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-blue-900/20"
-                            >
-                                <Link href={`/appointments/room/${apt.id}`} className="flex items-center gap-2">
-                                    <VideoIcon className="size-3" /> Rejoindre l'appel
-                                </Link>
-                            </Button>
-                        )}
+                                {apt.type === "ONLINE" && apt.status === "CONFIRMED" && (
+                                    <Button 
+                                        asChild
+                                        size="sm" 
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-blue-900/20"
+                                    >
+                                        <Link href={`/appointments/room/${apt.id}`} className="flex items-center gap-2">
+                                            <VideoIcon className="size-3" /> Rejoindre l'appel
+                                        </Link>
+                                    </Button>
+                                )}
 
-                        {apt.status === "CONFIRMED" && (
-                            <Button 
-                                size="sm" 
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-emerald-900/20"
-                                onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
-                            >
-                                <CheckCircle2 className="mr-2 size-3" /> Terminer
-                            </Button>
-                        )}
+                                {apt.status === "CONFIRMED" && (
+                                    <Button 
+                                        size="sm" 
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-emerald-900/20"
+                                        onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
+                                    >
+                                        <CheckCircle2 className="mr-2 size-3" /> Terminer
+                                    </Button>
+                                )}
 
-                        {apt.status !== "CONFIRMED" && apt.status !== "COMPLETED" && (
-                            <Button 
-                                size="sm" 
-                                className="bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-green-900/20"
-                                onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
-                            >
-                                <CheckCircle className="mr-2 size-3" /> Confirmer
-                            </Button>
-                        )}
-                        
-                        {apt.status !== "COMPLETED" && (
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="border-destructive/30 text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl"
-                                onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
-                            >
-                                <XCircle className="mr-2 size-3" /> Annuler
-                            </Button>
+                                {apt.status !== "CONFIRMED" && apt.status !== "COMPLETED" && (
+                                    <Button 
+                                        size="sm" 
+                                        className="bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-green-900/20"
+                                        onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
+                                    >
+                                        <CheckCircle className="mr-2 size-3" /> Confirmer
+                                    </Button>
+                                )}
+                                
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="border-destructive/30 text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl"
+                                    onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
+                                >
+                                    <XCircle className="mr-2 size-3" /> Annuler
+                                </Button>
+                            </>
                         )}
                       </div>
                     </div>

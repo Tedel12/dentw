@@ -2,7 +2,11 @@ import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
 import { FadeIn } from "../ui/motion-wrapper";
 
-export default async function WelcomeSection() {
+interface WelcomeSectionProps {
+  role?: string;
+}
+
+export default async function WelcomeSection({ role }: WelcomeSectionProps) {
   const user = await currentUser();
 
   return (
@@ -20,10 +24,12 @@ export default async function WelcomeSection() {
                 : new Date().getHours() < 18
                 ? "Bon après-midi"
                 : "Bonsoir"}
-              , Dr. {user?.firstName} {user?.lastName} 👋
+              , {role === 'DOCTOR' ? `Dr. ${user?.firstName} ${user?.lastName}` : user?.firstName} 👋
             </h1>
             <p className="text-muted-foreground max-w-lg leading-relaxed text-sm md:text-base">
-              Gérez vos consultations du jour et suivez le parcours de santé de vos patients.
+              {role === 'DOCTOR' 
+                ? "Gérez vos consultations du jour et suivez le parcours de santé de vos patients."
+                : "Votre assistant IA DentWise surveille votre santé bucco-dentaire. Que souhaitez-vous faire aujourd'hui ?"}
             </p>
           </div>
         </div>

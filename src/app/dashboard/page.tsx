@@ -34,48 +34,43 @@ async function DashboardPage() {
   return (
     <>
       <Navbar />
+<div className="w-full px-4 md:px-8 py-8 pt-24">
+  {user.role === "DOCTOR" ? (
+    <div className="space-y-12 pb-20 max-w-[1600px] mx-auto">
+      <WelcomeSection role={user.role} />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
-        {user.role === "DOCTOR" ? (
-          <div className="space-y-12 pb-20">
-            <WelcomeSection />
-            
-            {/* Statistiques en haut */}
-            <ActivityOverview />
+      {/* Statistiques en haut */}
+      <ActivityOverview />
 
-            {/* Agenda principal */}
-            <div className="bg-white/5 border border-white/5 p-6 md:p-8 rounded-[3rem]">
-                <h2 className="text-2xl font-black italic mb-8">Consultations à venir</h2>
-                <DoctorAppointmentsView appointments={user.doctorProfile ? (await getDoctorAppointments(user.doctorProfile.id)).appointments || [] : []} />
-            </div>
-          </div>
-        ) : (
-          <>
-             {/* Vue patient inchangée */}
-             <div className="space-y-10 md:space-y-16">
-                <HealthAccessNotifications requests={user.healthAccessRequests as any} />
-                <WelcomeSection />
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-10">
-                        <MainActions role={user.role} />
-                        <ActivityOverview />
-                    </div>
-                    <div className="hidden lg:block">
-                        <NextAppointment role={user.role} />
-                    </div>
-                </div>
-            </div>
-          </>
-        )}
+      {/* Agenda principal */}
+      <div className="bg-white/5 border border-white/5 p-6 md:p-8 rounded-[3rem]">
+          <h2 className="text-2xl font-black italic mb-8">Consultations à venir</h2>
+          <DoctorAppointmentsView 
+              appointments={user.doctorProfile ? (await getDoctorAppointments(user.doctorProfile.id)).appointments || [] : []} 
+              doctorProfile={user.doctorProfile} 
+          />
       </div>
-    </>
+    </div>
+  ) : (
+    <div className="space-y-12 pb-20 max-w-[1600px] mx-auto">
+      <HealthAccessNotifications requests={user.healthAccessRequests as any} />
+      <WelcomeSection role={user.role} />
+
+      <div className="w-full">
+          <MainActions role={user.role} />
+          <ActivityOverview />
+      </div>
+    </div>
+  )}
+  </div>
+  </>
   );
-}
+  }
 
-// Fonction utilitaire locale pour récupérer les RDV dans le dashboard
-async function getDoctorAppointments(doctorId: string) {
-    const { getDoctorAppointments } = await import("@/lib/actions/appointments");
-    return await getDoctorAppointments(doctorId);
-}
+  // Fonction utilitaire locale pour récupérer les RDV dans le dashboard
+  async function getDoctorAppointments(doctorId: string) {
+  const { getDoctorAppointments } = await import("@/lib/actions/appointments");
+  return await getDoctorAppointments(doctorId);
+  }
 
-export default DashboardPage;
+  export default DashboardPage;

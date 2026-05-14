@@ -19,6 +19,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getOwnHealthData } from "@/lib/actions/health";
 import { checkUserExportPin } from "@/lib/actions/users";
+import { logSecurityEvent } from "@/lib/actions/security";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatGenderFr } from "@/lib/utils";
@@ -67,6 +68,8 @@ function truncateCell(s: string, max: number) {
 
 /** Données carnet pour export (aligné sur Prisma après `prisma generate`) */
 interface HealthPdfUser {
+  id: string;
+  clerkId: string;
   firstName?: string | null;
   lastName?: string | null;
   pseudo?: string | null;
@@ -114,25 +117,46 @@ export function ExportCarnetDialog() {
 
     const user = res.data as HealthPdfUser;
 
+    // Log de l'exportation
+    await logSecurityEvent({
+        userId: user.id,
+        accessedBy: user.clerkId,
+        action: "EXPORT_PDF",
+        targetId: user.id
+    });
+    
     try {
-      const doc = new jsPDF();
+      const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+      
+      // Palette et Polices
+      const ROSE = [214, 91, 138];
+      const GRIS_TEXTE = [55, 65, 81];
+      const NOIR = [17, 24, 39];
 
-      doc.setFillColor(PDF_ROSE_PRIMARY[0], PDF_ROSE_PRIMARY[1], PDF_ROSE_PRIMARY[2]);
-      doc.rect(0, 0, 210, 40, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(22);
-      doc.text("DENTWISE", 105, 15, { align: "center" });
-      doc.setFontSize(14);
-      doc.text("Carnet de Santé Personnel Digitalisé", 105, 25, { align: "center" });
-      doc.setFontSize(10);
-      doc.text(`Généré le : ${format(new Date(), "PPP", { locale: fr })}`, 105, 32, { align: "center" });
+      // Ajout logo
+      const logoUrl = "https://i.ibb.co.com/tRy6cC2/logo.png";
+      try {
+        doc.addImage(logoUrl, "PNG", 15, 10, 15, 15);
+      } catch (e) { console.warn("Logo non chargé"); }
 
-      doc.setTextColor(0, 0, 0);
+      // Header
+      doc.setTextColor(ROSE[0], ROSE[1], ROSE[2]);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(28);
+      doc.text("DENTWISE", 35, 20);
+      doc.setFont("times", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(GRIS_TEXTE[0], GRIS_TEXTE[1], GRIS_TEXTE[2]);
+      doc.text("Carnet de santé confidentiel", 35, 26);
+      doc.line(15, 30, 195, 30);
+
+      // Profil Patient
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(16);
-      doc.text("INFORMATIONS DU PATIENT", 15, 55);
+      doc.setTextColor(NOIR[0], NOIR[1], NOIR[2]);
+      doc.text("INFORMATIONS DU PATIENT", 15, 45);
 
       const bloodGroupLabel = user.bloodGroup ? String(user.bloodGroup).replace(/_/g, " ") : "N/A";
-
       const profileData = [
         ["Nom complet", `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "N/A"],
         ["Pseudo", user.pseudo || "N/A"],
@@ -140,99 +164,51 @@ export function ExportCarnetDialog() {
         ["Poids (kg)", user.weight != null ? String(user.weight) : "N/A"],
         ["Groupe Sanguin", bloodGroupLabel],
         ["Allergies", user.allergies || "Aucune connue"],
-        ["Maladies Chroniques", user.chronicDiseases || "Aucun antécédent"],
-        ["Électrophorèse", user.electrophoresis || "Non renseigné"],
-        ["Vaccins", user.vaccines || "Non renseigné"],
+        ["Maladies", user.chronicDiseases || "Aucun antécédent"]
       ];
 
       autoTable(doc, {
-        startY: 60,
-        head: [["Champ", "Détail"]],
+        startY: 50,
         body: profileData,
-        theme: "striped",
-        headStyles: PDF_TABLE_HEAD,
-        styles: { fontSize: 9 },
+        theme: "plain",
+        styles: { fontSize: 10, font: "times", textColor: GRIS_TEXTE },
+        columnStyles: { 0: { font: "helvetica", fontStyle: "bold", textColor: NOIR } },
       });
 
-      let cursorY = (doc as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 60;
+      let cursorY = (doc as any).lastAutoTable.finalY + 10;
 
-      const treatments = (user.treatments ?? []) as Array<{
-        id: string;
-        createdAt: Date | string;
-        name: string;
-        dosage: string;
-        frequency: string;
-        pathology?: string | null;
-        administrationRoute?: string | null;
-        notes?: string | null;
-        prescribingDoctor?: PdfDoctor | null;
-      }>;
-
+      // Identification Praticiens
+      const treatments = (user.treatments ?? []) as Array<any>;
       const prescriberMap = new Map<string, PdfDoctor>();
-      for (const t of treatments) {
-        const d = t.prescribingDoctor;
-        if (d?.id) prescriberMap.set(d.id, d);
-      }
+      treatments.forEach(t => { if (t.prescribingDoctor?.id) prescriberMap.set(t.prescribingDoctor.id, t.prescribingDoctor); });
       const prescribers = [...prescriberMap.values()];
 
       if (prescribers.length > 0) {
-        cursorY += 12;
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
-        doc.text("IDENTIFICATION DES PRATICIENS PRESCRIPTEURS", 15, cursorY);
-        cursorY += 6;
-
-        const prescriberRows = prescribers.map((d: any) => {
-          const { prenom, nom } = doctorNameParts(d);
-          return [
-            prenom,
-            nom,
-            d.speciality,
-            d.phone,
-            d.practiceAddress?.trim() || "—",
-            formatGenderFr(d.gender),
-          ];
-        });
-
+        doc.text("PRATICIENS PRESCRIPTEURS", 15, cursorY);
         autoTable(doc, {
-          startY: cursorY,
-          head: [["Prénom", "Nom", "Spécialité", "Téléphone", "Adresse cabinet / hôpital", "Sexe"]],
-          body: prescriberRows,
-          theme: "grid",
-          headStyles: PDF_TABLE_HEAD,
-          styles: { fontSize: 8, cellPadding: 2 },
+          startY: cursorY + 5,
+          head: [["Prénom", "Nom", "Spécialité", "Téléphone"]],
+          body: prescribers.map(d => [doctorNameParts(d).prenom, doctorNameParts(d).nom, d.speciality, d.phone]),
+          headStyles: { fillColor: ROSE, font: "helvetica" },
+          styles: { font: "courier", fontSize: 9 }
         });
-        cursorY = (doc as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? cursorY;
+        cursorY = (doc as any).lastAutoTable.finalY + 10;
       }
 
-      cursorY += 14;
-      doc.setFontSize(16);
-      doc.text("HISTORIQUE DES TRAITEMENTS & ORDONNANCES", 15, cursorY);
-
-      const treatmentRows =
-        treatments.length > 0
-          ? treatments.map((t: any, idx: number) => {
-              const hasImage = !!t.prescriptionUrl;
-              return [
-                format(new Date(t.createdAt), "dd/MM/yy"),
-                truncateCell(t.name, 22),
-                truncateCell(t.dosage, 12),
-                truncateCell(t.frequency, 10),
-                truncateCell(t.pathology || "—", 18),
-                truncateCell(t.administrationRoute || "—", 14),
-                doctorShortLabel(t.prescribingDoctor ?? undefined),
-                hasImage ? "🔗 (Voir annexe)" : truncateCell(t.notes || "—", 28),
-              ];
-            })
-          : [["—", "Aucun traitement", "—", "—", "—", "—", "—", "—"]];
-
+      // Historique Traitements
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("HISTORIQUE DES SOINS", 15, cursorY);
       autoTable(doc, {
         startY: cursorY + 5,
-        head: [["Date", "Médicament", "Posologie", "Fréq.", "Pathologie", "Voie", "Prescripteur", "Notes"]],
-        body: treatmentRows,
-        theme: "grid",
-        headStyles: PDF_TABLE_HEAD,
-        styles: { fontSize: 7, cellPadding: 1.5 },
+        head: [["Date", "Médicament", "Posologie", "Fréq.", "Notes"]],
+        body: treatments.map(t => [format(new Date(t.createdAt), "dd/MM/yy"), truncateCell(t.name, 20), t.dosage, t.frequency, truncateCell(t.notes || "-", 25)]),
+        headStyles: { fillColor: ROSE, font: "helvetica" },
+        styles: { font: "courier", fontSize: 9 }
       });
+
 
       // SECTION ANNEXES (Photos d'ordonnances)
       const treatmentsWithImages = treatments.filter((t: any) => !!t.prescriptionUrl);
@@ -301,7 +277,7 @@ export function ExportCarnetDialog() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="pin">Code PIN (4 chiffres min.)</Label>
+            <Label htmlFor="pin">Code PIN</Label>
             <Input
               id="pin"
               type="password"
