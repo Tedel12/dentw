@@ -66,7 +66,7 @@ export function RescheduleModal({
 
     if (res.success) {
       toast.success("Demande de report envoyée !");
-      onClose();
+      onClose(); // This will close the modal
     } else {
       toast.error(res.error || "Une erreur est survenue");
     }

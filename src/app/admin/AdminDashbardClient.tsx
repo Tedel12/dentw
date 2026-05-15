@@ -8,8 +8,9 @@ import Navbar from '@/components/Navbar'
 import { useGetAppointments } from '@/hooks/use-appointment'
 import { useGetDoctors } from '@/hooks/use-doctors'
 import { useUser } from '@clerk/nextjs'
-import { SettingsIcon } from 'lucide-react'
+import { SettingsIcon, ShieldCheck } from 'lucide-react'
 import React from 'react'
+import Link from 'next/link'
 
 const AdminDashbardClient = () => {
 
@@ -48,6 +49,12 @@ const AdminDashbardClient = () => {
               <p className='text-muted-foreground text-sm md:text-base'>
                 Gérez les médecins et supervisez les rendez-vous de votre cabinet.
               </p>
+              <div className='mt-4'>
+                <Link href="/admin/audit" className="inline-flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold border border-white/10 hover:bg-slate-800">
+                    <ShieldCheck className='w-4 h-4 text-primary' />
+                    Voir les Logs d'Audit
+                </Link>
+              </div>
             </div>
           </div>
 

@@ -35,7 +35,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
     }
 
     const handleSave = () => {
-        createDoctorMutation.mutate({...newDoctor }, { onSuccess: handleClose });
+        createDoctorMutation.mutate({...newDoctor }, { onSuccess: () => { handleClose(); onClose(); } });
     }
 
     const handleClose = () => {

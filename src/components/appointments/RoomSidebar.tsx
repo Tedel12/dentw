@@ -43,19 +43,19 @@ export default function RoomSidebar({ appointment, isDoctor }: RoomSidebarProps)
         setIsAccessing(true);
         try {
             const patientId = appointment.userId || appointment.user?.id;
-            const hasAccess = await checkDoctorAccess(patientId, appointment.doctorId || appointment.doctor?.id);
+            const doctorId = appointment.doctorId || appointment.doctor?.id;
+            
+            // Re-check access right before opening
+            const hasAccess = await checkDoctorAccess(patientId, doctorId);
             
             if (!hasAccess) {
-                const res = await requestHealthAccess(patientId, appointment.doctorId || appointment.doctor?.id);
-                if (res.success) {
-                    toast.info("Demande d'accès envoyée.");
-                } else {
-                    toast.error(res.error || "Erreur lors de la demande d'accès");
-                }
+                toast.error("Votre accès a été révoqué ou a expiré.");
+                setIsSidePanelOpen(false);
+                setPatientData(null);
                 return;
             }
 
-            const dataRes = await getPatientHealthData(patientId, appointment.doctorId || appointment.doctor?.id);
+            const dataRes = await getPatientHealthData(patientId, doctorId);
             if (dataRes.success) {
                 setPatientData(dataRes.data);
                 setIsSidePanelOpen(true);

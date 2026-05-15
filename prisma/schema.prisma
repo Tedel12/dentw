@@ -61,6 +61,7 @@ model User {
   healthAccessRequests HealthAccessRequest[]
   doctorProfile        Doctor?
   securityAuditLogs    SecurityAuditLog[]
+  recentPatients       RecentPatient[]
 
   @@map("users")
 }
@@ -102,6 +103,7 @@ model Doctor {
   appointments         Appointment[]
   healthAccessRequests HealthAccessRequest[]
   prescribedTreatments Treatment[]           @relation("PrescribingDoctor")
+  recentPatients       RecentPatient[]
 
   @@map("doctors")
 }
@@ -222,6 +224,21 @@ model HealthAccessRequest {
   doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("health_access_requests")
+}
+
+model RecentPatient {
+  id             String   @id @default(cuid())
+  doctorId       String
+  patientId      String
+  lastAccessedAt DateTime @default(now())
+  
+  doctor         Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, patientId]) 
+  @@index([doctorId, lastAccessedAt])
+
+  @@map("recent_patients")
 }
 
 model SecurityAuditLog {

@@ -16,6 +16,7 @@ import {
   getPatientHealthData,
   getDoctorPatientById,
 } from "@/lib/actions/health";
+import { trackRecentPatient, getRecentPatients } from "@/lib/actions/history";
 import { completeDoctorProfile } from "@/lib/actions/users";
 import { toast } from "sonner";
 import { AddPrescriptionForm } from "@/components/health/AddPrescriptionForm";
@@ -38,6 +39,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
+  const [recentPatients, setRecentPatients] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [patientData, setPatientData] = useState<any>(null);
@@ -137,6 +139,13 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
   const handleSelectPatient = async (p: any, shouldOpenHealth: boolean = false) => {
     setSelectedPatient(p);
     setUrlParams(query, p.id);
+    // Track in history
+    await trackRecentPatient(doctor.id, p.id);
+    
+    // Refresh recent list
+    const res = await getRecentPatients(doctor.id);
+    if (res.success) setRecentPatients(res.patients || []);
+    
     const accessRes = await checkDoctorAccess(p.id, doctor.id);
     setHasAccess(accessRes);
     if (accessRes) {
@@ -152,6 +161,15 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     if (res.success) toast.success("Invitation envoyée !");
     else toast.error(res.error || "Erreur");
   };
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+        if (!doctor?.id) return;
+        const res = await getRecentPatients(doctor.id);
+        if (res.success) setRecentPatients(res.patients || []);
+    };
+    fetchRecent();
+  }, [doctor?.id]);
 
   useEffect(() => {
     const urlQuery = searchParams.get("q") || "";
@@ -298,6 +316,22 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
 
         {!selectedPatient ? (
           <div className="space-y-8 animate-in fade-in duration-700">
+            {/* HISTORIQUE */}
+            {recentPatients.length > 0 && (
+                <div className="space-y-3">
+                    <h3 className="text-xs font-black uppercase text-slate-500 tracking-widest flex items-center gap-2">
+                        <History className="w-4 h-4" /> Patients consultés récemment
+                    </h3>
+                    <div className="flex gap-3 flex-wrap">
+                        {recentPatients.map(p => (
+                            <Button key={p.id} variant="outline" size="sm" className="rounded-full border-primary/20 gap-2" onClick={() => handleSelectPatient(p)}>
+                                <User className="w-4 h-4 text-primary" /> {p.firstName} {p.lastName}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className="flex gap-3 max-w-2xl bg-card/50 backdrop-blur-sm p-2 rounded-2xl border border-primary/10 shadow-sm">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
