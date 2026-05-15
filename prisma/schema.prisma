@@ -56,6 +56,7 @@ model User {
 
   // relationships
   appointments         Appointment[]
+  notifications        Notification[]
   treatments           Treatment[]
   healthAccessRequests HealthAccessRequest[]
   doctorProfile        Doctor?
@@ -109,25 +110,36 @@ enum AppointmentStatus {
  CONFIRMED
  COMPLETED
  CANCELLED
+ REQUESTED_RESCHEDULE
 }
+
+enum RescheduleBy {
+  PATIENT
+  DOCTOR
+}
+
 enum AppointmentType {
   IN_PERSON
   ONLINE
 }
 
 model Appointment {
-  id        String            @id @default(cuid())
-  date      DateTime
-  time      String // store time as string i.e. 14:30
-  duration  Int               @default(30) // duration in minutes
-  price     Float?            @default(0) // Prix payé/dû pour la séance
-  status    AppointmentStatus @default(CONFIRMED)
-  type      AppointmentType   @default(IN_PERSON)
-  notes     String?
-  reason    String? // reason for appointment - teeth cleaning? emergency visit? etc.
-  summary   String? // Résumé de la consultation après la session
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  id               String            @id @default(cuid())
+  date             DateTime
+  time             String // store time as string i.e. 14:30
+  duration         Int               @default(30) // duration in minutes
+  price            Float?            @default(0) // Prix payé/dû pour la séance
+  status           AppointmentStatus @default(CONFIRMED)
+  type             AppointmentType   @default(IN_PERSON)
+  notes            String?
+  reason           String? // reason for appointment - teeth cleaning? emergency visit? etc.
+  summary          String? // Résumé de la consultation après la session
+  proposedDate     DateTime?
+  proposedTime     String?
+  proposedBy       RescheduleBy?
+  rescheduleReason String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   // foreign keys
   userId   String
@@ -138,6 +150,29 @@ model Appointment {
   doctor Doctor? @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@map("appointments")
+}
+
+enum NotificationType {
+  RESCHEDULE_REQUEST
+  RESCHEDULE_RESPONSE
+  APPOINTMENT_CONFIRMED
+  HEALTH_ACCESS
+  GENERAL
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType @default(GENERAL)
+  title     String
+  content   String
+  link      String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 model Treatment {

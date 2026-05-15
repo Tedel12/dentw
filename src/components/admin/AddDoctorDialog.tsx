@@ -54,7 +54,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className='sm:max-w-[500px] max-h-[90vh] overflow-y-auto'>
+            <DialogContent className='sm:max-w-[500px]'>
                 <DialogHeader>
                     <DialogTitle>Ajoutez un docteur</DialogTitle>
                     <DialogDescription>Ajoutez un nouveau docteur à votre cabinet.</DialogDescription>

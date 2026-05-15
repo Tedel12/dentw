@@ -263,6 +263,8 @@ export async function logTreatmentTake(treatmentId: string) {
   }
 }
 
+import { createNotification } from "./notifications";
+
 // Doctor Access Actions
 export async function requestHealthAccess(userId: string, doctorId: string) {
   try {
@@ -297,6 +299,18 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
         doctorId,
         status: AccessStatus.PENDING,
       },
+      include: {
+        doctor: true,
+      }
+    });
+
+    // Notification pour le Patient
+    await createNotification({
+      userId,
+      type: "HEALTH_ACCESS",
+      title: "Demande d'accès médical",
+      content: `Le Dr. ${request.doctor.name} souhaite accéder à votre carnet de santé pour une consultation.`,
+      link: `/dashboard?requestId=${request.id}`,
     });
 
     revalidatePath("/pro"); // Assuming doctors search from here
@@ -314,7 +328,10 @@ export async function respondToAccessRequest(requestId: string, status: "APPROVE
 
     const existingRequest = await prisma.healthAccessRequest.findUnique({
       where: { id: requestId },
-      select: { userId: true },
+      include: { 
+        user: true,
+        doctor: true,
+      },
     });
 
     if (!existingRequest || existingRequest.userId !== authUser.id) {
@@ -333,7 +350,19 @@ export async function respondToAccessRequest(requestId: string, status: "APPROVE
       },
     });
 
+    // Notification pour le Docteur
+    await createNotification({
+      userId: existingRequest.doctor.userId,
+      type: "HEALTH_ACCESS",
+      title: status === "APPROVED" ? "Accès Santé Approuvé" : "Accès Santé Refusé",
+      content: status === "APPROVED" 
+        ? `${existingRequest.user.firstName} ${existingRequest.user.lastName} a approuvé votre demande d'accès au carnet pour 24h.`
+        : `${existingRequest.user.firstName} ${existingRequest.user.lastName} a refusé votre demande d'accès.`,
+      link: status === "APPROVED" ? `/pro/patients?patientId=${existingRequest.userId}&openHealth=true` : "/pro/patients",
+    });
+
     revalidatePath("/dashboard");
+    revalidatePath("/pro/patients");
     return { success: true, request };
   } catch (error) {
     console.error("Error responding to access request:", error);

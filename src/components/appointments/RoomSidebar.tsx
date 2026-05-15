@@ -168,24 +168,34 @@ export default function RoomSidebar({ appointment, isDoctor }: RoomSidebarProps)
             </div>
 
             <Dialog open={showFileDialog} onOpenChange={setShowFileDialog}>
-                <DialogContent className="sm:max-w-[800px] max-h-[95vh] p-0 overflow-y-auto rounded-[2.5rem] border-white/10 bg-[#020617] scrollbar-hide text-white">
-                  {/* Alerte de sécurité insérée ici */}
-                  <div className="bg-amber-500/10 border-b border-amber-500/20 p-4 flex items-center gap-3">
-                      <ShieldAlert className="w-5 h-5 text-amber-500" />
-                      <p className="text-amber-500 text-xs font-bold uppercase tracking-widest">
-                          PROTECTION ACTIVE : Survolez les zones floutées pour afficher les données sensibles.
-                      </p>
-                  </div>
-                  {/* ... reste du contenu du dossier ... */}
-                            <DialogTitle className="text-4xl font-black italic tracking-tighter">
-                                {patientData?.firstName} {patientData?.lastName}
-                            </DialogTitle>
-                        </DialogHeader>
+                            <DialogContent className="sm:max-w-[800px] max-h-[90vh] p-0 rounded-[2.5rem] border-white/10 bg-[#020617] overflow-y-auto text-white">
+                <div className="p-8 bg-primary/10 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
+                    <DialogHeader>
+                        <div className="flex items-center gap-4 mb-2 text-primary font-black uppercase tracking-[0.2em] text-xs">
+                            <ShieldAlert className="size-4" /> Accès Dossier Sécurisé
+                        </div>
+                        <DialogTitle className="text-4xl font-black italic text-white tracking-tighter">
+                            {patientData?.firstName} {patientData?.lastName}
+                        </DialogTitle>
+                    </DialogHeader>
+                </div>
+                <div className="p-8 space-y-10">
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-2">Groupe Sanguin</span>
+                            <span className="text-3xl font-black text-red-500 italic tracking-tighter">{patientData?.bloodGroup?.replace("_POSITIVE", "+").replace("_NEGATIVE", "-") || "N/D"}</span>
+                        </div>
+                        <div className="bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-2">Poids Corporel</span>
+                            <span className="text-3xl font-black text-white italic tracking-tighter">{patientData?.weight || "N/D"} kg</span>
+                        </div>
+                        <div className="bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-2">Âge Patient</span>
+                            <span className="text-3xl font-black text-white italic tracking-tighter">{patientData?.age || "N/D"} ans</span>
+                        </div>
                     </div>
-                    <div className="p-8 overflow-y-auto max-h-[60vh] space-y-10 custom-scrollbar">
-                        {/* Placeholder pour les données */}
-                    </div>
-                </DialogContent>
+                </div>
+            </DialogContent>
             </Dialog>
 
             <Dialog open={showCloseDialog} onOpenChange={setShowCloseDialog}>

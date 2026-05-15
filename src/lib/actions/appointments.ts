@@ -3,7 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { AppointmentType } from "@prisma/client";
+import { AppointmentType, AppointmentStatus } from "@prisma/client";
+
+import { createNotification } from "./notifications";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export async function bookAppointment(data: {
   doctorId: string;
@@ -36,8 +40,30 @@ export async function bookAppointment(data: {
       price: data.price || 0,
     },
     include: {
-      doctor: true,
+      doctor: {
+        include: {
+          user: true
+        }
+      },
     },
+  });
+
+  // Notification pour le Docteur
+  await createNotification({
+    userId: appointment.doctor!.userId,
+    type: "APPOINTMENT_CONFIRMED",
+    title: "Nouveau Rendez-vous",
+    content: `Vous avez un nouveau rendez-vous avec ${user.firstName} ${user.lastName} le ${format(new Date(data.date), "dd MMMM yyyy", { locale: fr })} à ${data.time}.`,
+    link: "/appointments",
+  });
+
+  // Notification pour le Patient
+  await createNotification({
+    userId: user.id,
+    type: "APPOINTMENT_CONFIRMED",
+    title: "Rendez-vous Confirmé",
+    content: `Votre rendez-vous avec Dr. ${appointment.doctor!.name} est confirmé pour le ${format(new Date(data.date), "dd MMMM yyyy", { locale: fr })} à ${data.time}.`,
+    link: "/appointments",
   });
 
   revalidatePath("/appointments");
@@ -48,9 +74,111 @@ export async function bookAppointment(data: {
     date: appointment.date,
     time: appointment.time,
     type: appointment.type,
-    doctorName: appointment.doctor.name,
+    doctorName: appointment.doctor!.name,
     patientEmail: user.email,
   };
+}
+
+export async function requestReschedule(data: {
+  appointmentId: string;
+  newDate: string;
+  newTime: string;
+  reason: string;
+  proposedBy: "PATIENT" | "DOCTOR";
+}) {
+  try {
+    const appointment = await prisma.appointment.update({
+      where: { id: data.appointmentId },
+      data: {
+        status: "REQUESTED_RESCHEDULE",
+        proposedDate: new Date(data.newDate),
+        proposedTime: data.newTime,
+        rescheduleReason: data.reason,
+        proposedBy: data.proposedBy,
+      },
+      include: {
+        user: true,
+        doctor: true,
+      },
+    });
+
+    const recipientId = data.proposedBy === "DOCTOR" ? appointment.userId : appointment.doctor!.userId;
+    const senderName = data.proposedBy === "DOCTOR" ? `Dr. ${appointment.doctor!.name}` : `${appointment.user.firstName} ${appointment.user.lastName}`;
+
+    await createNotification({
+      userId: recipientId,
+      type: "RESCHEDULE_REQUEST",
+      title: "Demande de report",
+      content: `${senderName} souhaite reporter votre rendez-vous au ${format(new Date(data.newDate), "dd MMMM", { locale: fr })} à ${data.newTime}. Motif : ${data.reason}`,
+      link: "/appointments",
+    });
+
+    revalidatePath("/appointments");
+    return { success: true };
+  } catch (error) {
+    console.error("Reschedule request error:", error);
+    return { success: false, error: "Erreur lors de la demande de report" };
+  }
+}
+
+export async function respondToReschedule(appointmentId: string, accept: boolean) {
+  try {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: { doctor: true, user: true },
+    });
+
+    if (!appointment) throw new Error("Rendez-vous non trouvé");
+
+    if (accept) {
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          status: "CONFIRMED",
+          date: appointment.proposedDate!,
+          time: appointment.proposedTime!,
+          proposedDate: null,
+          proposedTime: null,
+          proposedBy: null,
+          rescheduleReason: null,
+        },
+      });
+
+      const recipientId = appointment.proposedBy === "DOCTOR" ? appointment.doctor!.userId : appointment.userId;
+      await createNotification({
+        userId: recipientId,
+        type: "RESCHEDULE_RESPONSE",
+        title: "Report Accepté",
+        content: `La demande de report pour votre rendez-vous du ${format(appointment.proposedDate!, "dd MMMM", { locale: fr })} à ${appointment.proposedTime} a été acceptée.`,
+        link: "/appointments",
+      });
+    } else {
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          status: "CONFIRMED",
+          proposedDate: null,
+          proposedTime: null,
+          proposedBy: null,
+          rescheduleReason: null,
+        },
+      });
+
+      const recipientId = appointment.proposedBy === "DOCTOR" ? appointment.doctor!.userId : appointment.userId;
+      await createNotification({
+        userId: recipientId,
+        type: "RESCHEDULE_RESPONSE",
+        title: "Report Refusé",
+        content: `La demande de report pour votre rendez-vous a été refusée. L'horaire initial est maintenu.`,
+        link: "/appointments",
+      });
+    }
+
+    revalidatePath("/appointments");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Erreur lors de la réponse au report" };
+  }
 }
 
 export async function getUserAppointments() {
@@ -66,12 +194,12 @@ export async function getUserAppointments() {
   const appointments = await prisma.appointment.findMany({
     where: { 
       userId: user.id,
-      status: { in: ["CONFIRMED", "COMPLETED"] } 
+      status: { in: ["CONFIRMED", "COMPLETED", "REQUESTED_RESCHEDULE"] } 
     },
     include: {
       doctor: true,
     },
-    orderBy: { date: "desc" },
+    orderBy: { date: "asc" },
   });
 
   return appointments.map((apt) => ({
@@ -79,10 +207,14 @@ export async function getUserAppointments() {
     date: apt.date,
     time: apt.time,
     reason: apt.reason,
-    doctorName: apt.doctor.name,
-    doctorImageUrl: apt.doctor.imageUrl,
+    doctorName: apt.doctor?.name || "Médecin",
+    doctorImageUrl: apt.doctor?.imageUrl || "/logo.png",
     status: apt.status,
     type: apt.type,
+    proposedDate: apt.proposedDate,
+    proposedTime: apt.proposedTime,
+    proposedBy: apt.proposedBy,
+    rescheduleReason: apt.rescheduleReason,
   }));
 }
 
@@ -165,7 +297,10 @@ export async function getBookedTimeSlots(doctorId: string, date: string) {
 export async function getDoctorAppointments(doctorId: string) {
   try {
     const appointments = await prisma.appointment.findMany({
-      where: { doctorId },
+      where: { 
+        doctorId,
+        status: { in: ["CONFIRMED", "COMPLETED", "REQUESTED_RESCHEDULE"] }
+      },
       include: {
         user: true,
       },

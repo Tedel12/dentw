@@ -44,7 +44,7 @@ function EditDoctorDialog ({ doctor, isOpen, onClose} : EditDoctorDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-       <DialogContent className='sm:max-w-[500px] max-h-[90vh] overflow-y-auto'>
+       <DialogContent className='sm:max-w-[500px]'>
                 <DialogHeader>
                     <DialogTitle>Mettre à jour un médécin</DialogTitle>
                     <DialogDescription>Mettez à jour les informations et le statut du docteur dans votre cabinet.</DialogDescription>

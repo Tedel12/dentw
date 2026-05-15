@@ -9,11 +9,15 @@ import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment
 import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { APPOINTMENT_TYPES, getDoctorAppointmentTypes } from "@/lib/utils";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { useState } from "react";
 import { toast } from "sonner";
-import { VideoIcon, MapPin, Calendar, Clock } from "lucide-react";
+import { VideoIcon, MapPin, Calendar, Clock, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { RescheduleModal } from "./RescheduleModal";
+import { respondToReschedule } from "@/lib/actions/appointments";
 
 export function PatientAppointmentsClient() {
   const [selectedDentistId, setSelectedDentistId] = useState<string | null>(null);
@@ -25,9 +29,32 @@ export function PatientAppointmentsClient() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
 
+  // Pour le report
+  const [rescheduleModal, setRescheduleModal] = useState<{
+    isOpen: boolean;
+    appointmentId: string;
+    date: Date;
+    time: string;
+  }>({
+    isOpen: false,
+    appointmentId: "",
+    date: new Date(),
+    time: "",
+  });
+
   const { data: dentists = [] } = useAvailableDoctors();
   const bookAppointmentMutation = useBookAppointment();
-  const { data: userAppointments = [] } = useUserAppointments();
+  const { data: userAppointments = [], refetch: refetchAppointments } = useUserAppointments();
+
+  const handleResponseToReschedule = async (id: string, accept: boolean) => {
+    const res = await respondToReschedule(id, accept);
+    if (res.success) {
+      toast.success(accept ? "Report accepté !" : "Report refusé.");
+      refetchAppointments();
+    } else {
+      toast.error(res.error || "Une erreur est survenue");
+    }
+  };
 
   const handleSelectDentist = (dentistId: string) => {
     setSelectedDentistId(dentistId);
@@ -47,7 +74,6 @@ export function PatientAppointmentsClient() {
     const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
     const appointmentType = appointmentTypes.find((t) => t.id === selectedType);
 
-    // Extraire les valeurs numériques pour la durée et le prix
     const durationValue = parseInt(appointmentType?.duration || "30");
     const priceValue = parseFloat(appointmentType?.price?.replace(/[^0-9.]/g, '') || "0");
 
@@ -188,13 +214,64 @@ export function PatientAppointmentsClient() {
                         </div>
                     </div>
 
-                    {appointment.type === 'ONLINE' && appointment.status === 'CONFIRMED' && (
-                        <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black italic rounded-xl h-12 shadow-lg shadow-blue-600/20 group">
-                            <Link href={`/appointments/room/${appointment.id}`} className="flex items-center justify-center gap-2">
-                                <VideoIcon className="size-4 group-hover:animate-bounce" />
-                                REJOINDRE L&apos;APPEL
-                            </Link>
-                        </Button>
+                    <div className="grid grid-cols-1 gap-2">
+                        {appointment.type === 'ONLINE' && appointment.status === 'CONFIRMED' && (
+                            <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black italic rounded-xl h-11 shadow-lg shadow-blue-600/20 group">
+                                <Link href={`/appointments/room/${appointment.id}`} className="flex items-center justify-center gap-2">
+                                    <VideoIcon className="size-4 group-hover:animate-bounce" />
+                                    REJOINDRE L&apos;APPEL
+                                </Link>
+                            </Button>
+                        )}
+                        
+                        {appointment.status === 'CONFIRMED' && (
+                            <Button 
+                              variant="outline"
+                              className="w-full border-primary/20 hover:bg-primary/10 text-primary font-bold rounded-xl h-11 gap-2"
+                              onClick={() => setRescheduleModal({
+                                isOpen: true,
+                                appointmentId: appointment.id,
+                                date: new Date(appointment.date),
+                                time: appointment.time
+                              })}
+                            >
+                              <RotateCcw className="w-4 h-4" /> REPORTER
+                            </Button>
+                        )}
+                    </div>
+
+                    {appointment.status === 'REQUESTED_RESCHEDULE' && (
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">Report en attente</p>
+                                <Badge variant="outline" className="text-amber-500 border-amber-500/20 text-[8px] font-black">
+                                    {appointment.proposedBy === 'PATIENT' ? 'VOTRE DEMANDE' : 'DEMANDE REÇUE'}
+                                </Badge>
+                            </div>
+                            <p className="text-xs text-slate-300">
+                                Proposé : <span className="font-bold text-white">{format(new Date(appointment.proposedDate), "dd MMM", { locale: fr })} à {appointment.proposedTime}</span>
+                            </p>
+                            
+                            {appointment.proposedBy === 'DOCTOR' && (
+                                <div className="flex gap-2">
+                                    <Button 
+                                      size="sm" 
+                                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold h-8 text-[10px]"
+                                      onClick={() => handleResponseToReschedule(appointment.id, true)}
+                                    >
+                                        ACCEPTER
+                                    </Button>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      className="flex-1 text-red-400 hover:text-red-500 hover:bg-red-500/10 font-bold h-8 text-[10px]"
+                                      onClick={() => handleResponseToReschedule(appointment.id, false)}
+                                    >
+                                        REFUSER
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
               </div>
@@ -202,7 +279,18 @@ export function PatientAppointmentsClient() {
           </div>
         </div>
       )}
+
+      <RescheduleModal 
+        isOpen={rescheduleModal.isOpen}
+        onClose={() => {
+          setRescheduleModal(prev => ({ ...prev, isOpen: false }));
+          refetchAppointments();
+        }}
+        appointmentId={rescheduleModal.appointmentId}
+        currentDate={rescheduleModal.date}
+        currentTime={rescheduleModal.time}
+        proposedBy="PATIENT"
+      />
     </>
   );
 }
-

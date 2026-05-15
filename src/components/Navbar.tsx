@@ -10,6 +10,7 @@ import { getCurrentUserRole } from "@/lib/actions/users";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PWAInstallPrompt } from "./ui/pwa-install-prompt";
+import { NotificationBell } from "./NotificationBell";
 
 function Navbar() {
   const { user: clerkUser, isLoaded } = useUser();
@@ -193,6 +194,7 @@ function Navbar() {
                 </div>
               </SheetContent>
               </Sheet>
+              <NotificationBell />
               <UserButton />
             </>
           ) : (

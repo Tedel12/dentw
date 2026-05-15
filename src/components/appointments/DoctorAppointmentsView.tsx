@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, Mail, FileText, CheckCircle, XCircle, ShieldAlert, Loader2, CheckCircle2 } from "lucide-react";
+import { 
+  Calendar, Clock, User, Mail, FileText, CheckCircle, XCircle, 
+  ShieldAlert, Loader2, CheckCircle2, RotateCcw, Settings, VideoIcon, MoreVertical,
+  CalendarDays, Trash2
+} from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { checkDoctorAccess, requestHealthAccess, getPatientHealthData } from "@/lib/actions/health";
-import { updateAppointmentStatus } from "@/lib/actions/appointments";
+import { updateAppointmentStatus, respondToReschedule } from "@/lib/actions/appointments";
 import { 
   Dialog, 
   DialogContent, 
@@ -16,11 +20,18 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
-import { Settings, VideoIcon } from "lucide-react";
 import Link from "next/link";
 import { DoctorSettingsClient } from "@/components/admin/DoctorSettingsClient";
+import { RescheduleModal } from "./RescheduleModal";
 
 interface DoctorAppointmentsViewProps {
   appointments: any[];
@@ -32,7 +43,6 @@ export function DoctorAppointmentsView({
   doctorProfile 
 }: DoctorAppointmentsViewProps) {
   const { user: clerkUser } = useUser();
-  // Ne garder que les CONFIRMED ou PENDING pour l'affichage principal
   const [appointments, setAppointments] = useState(
     initialAppointments.filter(apt => apt.status !== "COMPLETED" && apt.status !== "CANCELLED")
   );
@@ -41,6 +51,18 @@ export function DoctorAppointmentsView({
   const [showFileDialog, setShowFileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [currentAppointmentId, setCurrentAppointmentId] = useState<string | null>(null);
+
+  const [rescheduleModal, setRescheduleModal] = useState<{
+    isOpen: boolean;
+    appointmentId: string;
+    date: Date;
+    time: string;
+  }>({
+    isOpen: false,
+    appointmentId: "",
+    date: new Date(),
+    time: "",
+  });
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
@@ -53,10 +75,20 @@ export function DoctorAppointmentsView({
     }
   };
 
+  const handleResponseToReschedule = async (id: string, accept: boolean) => {
+    const res = await respondToReschedule(id, accept);
+    if (res.success) {
+      toast.success(accept ? "Report accepté !" : "Report refusé.");
+      window.location.reload(); 
+    } else {
+      toast.error(res.error || "Une erreur est survenue");
+    }
+  };
+
   const handleViewPatientFile = async (patientId: string, aptId: string) => {
     if (!clerkUser) return;
     
-    const doctorId = initialAppointments[0]?.doctorId;
+    const doctorId = doctorProfile?.id || initialAppointments[0]?.doctorId;
     if (!doctorId) return;
 
     setIsAccessing(true);
@@ -113,7 +145,7 @@ export function DoctorAppointmentsView({
       </div>
 
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto rounded-[2.5rem] border-white/10 bg-[#020617] p-0 custom-scrollbar text-white">
+        <DialogContent className="sm:max-w-[900px] rounded-[2.5rem] border-white/10 bg-[#020617] p-0 custom-scrollbar text-white">
             <div className="p-8">
                 <DoctorSettingsClient doctor={doctorProfile} />
             </div>
@@ -147,21 +179,42 @@ export function DoctorAppointmentsView({
                             <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
                                 <Clock className="size-3" /> {apt.time} ({apt.duration || 30} min)
                             </span>
-                            {apt.price > 0 && (
-                                <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 text-[9px] font-black">
-                                    {apt.price} FCFA
-                                </Badge>
-                            )}
                           </div>
                         </div>
                       </div>
-                      
-                      <div className="flex flex-wrap gap-4 text-xs md:text-sm">
-                        <div className="flex items-center gap-2 text-slate-400 font-medium hover:text-white transition-colors cursor-default max-w-full overflow-hidden">
-                          <div className="shrink-0 p-1.5 bg-white/5 rounded-lg border border-white/5"><Mail className="w-3 md:w-3.5 h-3 md:h-3.5" /></div>
-                          <span className="truncate">{apt.user?.email}</span>
+
+                      {apt.status === 'REQUESTED_RESCHEDULE' && (
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">Report en attente</p>
+                                <Badge variant="outline" className="text-amber-500 border-amber-500/20 text-[8px] font-black">
+                                    {apt.proposedBy === 'DOCTOR' ? 'VOTRE DEMANDE' : 'DEMANDE REÇUE'}
+                                </Badge>
+                            </div>
+                            <p className="text-xs text-slate-300">
+                                Proposé : <span className="font-bold text-white">{format(new Date(apt.proposedDate), "dd MMM", { locale: fr })} à {apt.proposedTime}</span>
+                            </p>
+                            {apt.proposedBy === 'PATIENT' && (
+                                <div className="flex gap-2">
+                                    <Button 
+                                      size="sm" 
+                                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold h-8 text-[10px]"
+                                      onClick={() => handleResponseToReschedule(apt.id, true)}
+                                    >
+                                        ACCEPTER
+                                    </Button>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost"
+                                      className="flex-1 text-red-400 hover:text-red-500 hover:bg-red-500/10 font-bold h-8 text-[10px]"
+                                      onClick={() => handleResponseToReschedule(apt.id, false)}
+                                    >
+                                        REFUSER
+                                    </Button>
+                                </div>
+                            )}
                         </div>
-                      </div>
+                    )}
                     </div>
 
                     <div className="flex flex-col justify-between items-stretch md:items-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
@@ -172,65 +225,89 @@ export function DoctorAppointmentsView({
                       }`}>
                         {apt.status === "CONFIRMED" ? "Confirmé" : 
                          apt.status === "COMPLETED" ? "Terminé" : 
-                         apt.status === "CANCELLED" ? "Annulé" : "En attente"}
+                         apt.status === "CANCELLED" ? "Annulé" : 
+                         apt.status === "REQUESTED_RESCHEDULE" ? "Report proposé" : "En attente"}
                       </Badge>
                       
-                      <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 md:gap-3">
-                        {apt.status !== "CANCELLED" && (
-                            <>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    disabled={isAccessing}
-                                    className="text-primary hover:text-primary hover:bg-primary/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl border border-primary/20"
-                                    onClick={() => handleViewPatientFile(apt.user?.id, apt.id)}
-                                >
-                                {isAccessing && currentAppointmentId === apt.id ? <Loader2 className="mr-2 size-3 animate-spin" /> : <FileText className="mr-2 size-3" />}
-                                Dossier Patient
-                                </Button>
-
-                                {apt.type === "ONLINE" && apt.status === "CONFIRMED" && (
-                                    <Button 
-                                        asChild
-                                        size="sm" 
-                                        className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-blue-900/20"
-                                    >
-                                        <Link href={`/appointments/room/${apt.id}`} className="flex items-center gap-2">
-                                            <VideoIcon className="size-3" /> Rejoindre l'appel
-                                        </Link>
-                                    </Button>
-                                )}
-
-                                {apt.status === "CONFIRMED" && (
-                                    <Button 
-                                        size="sm" 
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-emerald-900/20"
-                                        onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
-                                    >
-                                        <CheckCircle2 className="mr-2 size-3" /> Terminer
-                                    </Button>
-                                )}
-
-                                {apt.status !== "CONFIRMED" && apt.status !== "COMPLETED" && (
-                                    <Button 
-                                        size="sm" 
-                                        className="bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-green-900/20"
-                                        onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
-                                    >
-                                        <CheckCircle className="mr-2 size-3" /> Confirmer
-                                    </Button>
-                                )}
-                                
-                                <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="border-destructive/30 text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl"
-                                    onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
-                                >
-                                    <XCircle className="mr-2 size-3" /> Annuler
-                                </Button>
-                            </>
+                      <div className="flex items-center justify-end gap-2">
+                        {apt.type === "ONLINE" && apt.status === "CONFIRMED" && (
+                            <Button 
+                                asChild
+                                size="sm" 
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] h-10 px-4 rounded-xl shadow-lg shadow-blue-900/20"
+                            >
+                                <Link href={`/appointments/room/${apt.id}`} className="flex items-center gap-2">
+                                    <VideoIcon className="size-3" /> Rejoindre
+                                </Link>
+                            </Button>
                         )}
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className="h-10 w-10 border-white/10 bg-white/5 hover:bg-white/10 rounded-xl">
+                              <MoreVertical className="w-5 h-5 text-primary" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56 bg-card/95 backdrop-blur-md border-primary/20 rounded-2xl p-2 shadow-2xl">
+                            <DropdownMenuItem 
+                              className="rounded-xl py-3 cursor-pointer hover:bg-primary/10 transition-colors"
+                              disabled={isAccessing}
+                              onClick={() => handleViewPatientFile(apt.user?.id, apt.id)}
+                            >
+                              <FileText className="mr-2 size-4 text-primary" />
+                              <span className="font-bold text-white">Dossier Patient</span>
+                            </DropdownMenuItem>
+                            
+                            {apt.status === "CONFIRMED" && (
+                              <>
+                                <DropdownMenuSeparator className="bg-white/5" />
+                                <DropdownMenuItem 
+                                  className="rounded-xl py-3 cursor-pointer hover:bg-emerald-500/10 transition-colors"
+                                  onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
+                                >
+                                  <CheckCircle2 className="mr-2 size-4 text-emerald-500" />
+                                  <span className="font-bold text-emerald-500 uppercase text-[10px] tracking-widest">Terminer</span>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem 
+                                  className="rounded-xl py-3 cursor-pointer hover:bg-amber-500/10 transition-colors"
+                                  onClick={() => setRescheduleModal({
+                                    isOpen: true,
+                                    appointmentId: apt.id,
+                                    date: new Date(apt.date),
+                                    time: apt.time
+                                  })}
+                                >
+                                  <RotateCcw className="mr-2 size-4 text-amber-500" />
+                                  <span className="font-bold text-amber-500 uppercase text-[10px] tracking-widest">Reporter</span>
+                                </DropdownMenuItem>
+                              </>
+                            )}
+
+                            {apt.status === "PENDING" && (
+                              <DropdownMenuItem 
+                                className="rounded-xl py-3 cursor-pointer hover:bg-green-500/10 transition-colors"
+                                onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
+                              >
+                                <CheckCircle className="mr-2 size-4 text-green-500" />
+                                <span className="font-bold text-green-500 uppercase text-[10px] tracking-widest">Confirmer</span>
+                              </DropdownMenuItem>
+                            )}
+
+                            {apt.status !== "CANCELLED" && (
+                              <>
+                                <DropdownMenuSeparator className="bg-white/5" />
+                                <DropdownMenuItem 
+                                  className="rounded-xl py-3 cursor-pointer hover:bg-red-500/10 transition-colors text-red-500"
+                                  onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
+                                >
+                                  <Trash2 className="mr-2 size-4" />
+                                  <span className="font-bold uppercase text-[10px] tracking-widest">Annuler</span>
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </div>
@@ -247,8 +324,20 @@ export function DoctorAppointmentsView({
         )}
       </div>
 
+      <RescheduleModal 
+        isOpen={rescheduleModal.isOpen}
+        onClose={() => {
+          setRescheduleModal(prev => ({ ...prev, isOpen: false }));
+          window.location.reload(); 
+        }}
+        appointmentId={rescheduleModal.appointmentId}
+        currentDate={rescheduleModal.date}
+        currentTime={rescheduleModal.time}
+        proposedBy="DOCTOR"
+      />
+
       <Dialog open={showFileDialog} onOpenChange={setShowFileDialog}>
-        <DialogContent className="sm:max-w-[800px] max-h-[95vh] p-0 overflow-y-auto rounded-[2.5rem] border-white/10 bg-[#020617] scrollbar-hide text-white">
+        <DialogContent className="sm:max-w-[800px] p-0 rounded-[2.5rem] border-white/10 bg-[#020617] scrollbar-hide text-white">
           <div className="p-8 bg-primary/10 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
             <DialogHeader>
                 <div className="flex items-center gap-4 mb-2 text-primary font-black uppercase tracking-[0.2em] text-xs">

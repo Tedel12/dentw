@@ -118,7 +118,7 @@ export default function HealthPage() {
                                 <Edit className="w-4 h-4" />
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[2rem] border-primary/20">
+                            <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-primary/20">
                                 <DialogHeader>
                                 <DialogTitle className="text-2xl font-black italic">Modifier mon profil santé</DialogTitle>
                                 <DialogDescription className="text-muted-foreground">

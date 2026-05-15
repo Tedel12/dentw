@@ -134,7 +134,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     setLoading(false);
   };
 
-  const handleSelectPatient = async (p: any) => {
+  const handleSelectPatient = async (p: any, shouldOpenHealth: boolean = false) => {
     setSelectedPatient(p);
     setUrlParams(query, p.id);
     const accessRes = await checkDoctorAccess(p.id, doctor.id);
@@ -142,6 +142,8 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     if (accessRes) {
       const dataRes = await getPatientHealthData(p.id, doctor.id);
       if (dataRes.success) setPatientData(dataRes.data);
+    } else if (shouldOpenHealth) {
+      toast.info("L'accès au carnet a expiré ou n'est pas encore actif.");
     }
   };
 
@@ -177,11 +179,11 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
           if (patientId) {
             const found = patients.find((p: any) => p.id === patientId);
             if (found) {
-              await handleSelectPatient(found);
+              await handleSelectPatient(found, searchParams.get("openHealth") === "true");
             } else {
               const byIdRes = await getDoctorPatientById(patientId);
               if (!isCancelled && byIdRes.success && byIdRes.patient) {
-                await handleSelectPatient(byIdRes.patient);
+                await handleSelectPatient(byIdRes.patient, searchParams.get("openHealth") === "true");
               }
             }
           }
@@ -190,7 +192,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
       } else if (patientId) {
         const byIdRes = await getDoctorPatientById(patientId);
         if (!isCancelled && byIdRes.success && byIdRes.patient) {
-          await handleSelectPatient(byIdRes.patient);
+          await handleSelectPatient(byIdRes.patient, searchParams.get("openHealth") === "true");
         }
       }
     };
@@ -210,7 +212,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
             <Stethoscope className="mr-2 w-5 h-5" /> Devenir Praticien
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl bg-card border-primary/10 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[500px] rounded-3xl bg-card border-primary/10">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-white">
               <Stethoscope className="text-primary" /> Inscription Praticien
