@@ -22,12 +22,12 @@ const HowItWorks = () => {
           </span>
           <br />
           <span className='bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'>
-            une meilleure santé dentaire.
+            une meilleure santé au quotidien.
           </span>
         </h2>
 
         <p className='text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed'>
-          Notre processus simplifié rend les soins dentaires accessibles, pratiques et sans stress pour tous.
+          Un parcours simple pour vos rendez-vous médicaux et votre carnet de santé, partout au Bénin.
         </p>
       </div>
 
@@ -51,7 +51,7 @@ const HowItWorks = () => {
               </div>
 
               <h3 className='text-2xl font-bold mb-4 text-center'>Poser une question</h3>
-              <p>Discutez avec notre assistant IA à propos des questions dentaires. Obtenez des réponses à propos des symptômes, traitements et les soins oraux.</p>
+              <p>Discutez avec notre assistant IA : symptômes courants, prévention, observance des traitements — sans diagnostic médical.</p>
 
               {/* Feature Pills */}
               <div className='flex flex-wrap gap-2 justify-center'>
@@ -79,7 +79,7 @@ const HowItWorks = () => {
               </div>
 
               <h3 className='text-2xl font-bold mb-4 text-center'>Carnet de Santé Digital</h3>
-              <p className='text-muted-foreground text-center leading-relaxed mb-6'>Synchronisez vos antécédents, allergies et traitements. Un dossier dentaire complet, organisé et sécurisé, accessible en un clic.</p>
+              <p className='text-muted-foreground text-center leading-relaxed mb-6'>Synchronisez vos antécédents, allergies et traitements. Un dossier médical complet, organisé et sécurisé, accessible en un clic.</p>
 
               {/* Feature Pills */}
               <div className='flex flex-wrap gap-2 justify-center'>
@@ -107,7 +107,7 @@ const HowItWorks = () => {
               </div>
 
               <h3 className='text-2xl font-bold mb-4 text-center'>Consultation & Suivi</h3>
-              <p>Partagez votre carnet avec nos dentistes certifiés lors de vos rendez-vous. Recevez des ordonnances directement dans votre historique.</p>
+              <p>Partagez votre carnet avec des praticiens vérifiés lors de vos rendez-vous. Recevez des ordonnances directement dans votre historique.</p>
 
               {/* Feature Pills */}
               <div className='flex flex-wrap gap-2 justify-center'>

@@ -23,6 +23,7 @@ import { logSecurityEvent } from "@/lib/actions/security";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatGenderFr } from "@/lib/utils";
+import { APP_NAME } from "@/lib/brand";
 
 /** Rose « santé » : bandeau + en-têtes de tableaux (RGB) */
 const PDF_ROSE_PRIMARY: [number, number, number] = [214, 91, 138];
@@ -143,7 +144,7 @@ export function ExportCarnetDialog() {
       doc.setTextColor(ROSE[0], ROSE[1], ROSE[2]);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(28);
-      doc.text("DENTWISE", 35, 20);
+      doc.text(APP_NAME.toUpperCase(), 35, 20);
       doc.setFont("times", "normal");
       doc.setFontSize(11);
       doc.setTextColor(GRIS_TEXTE[0], GRIS_TEXTE[1], GRIS_TEXTE[2]);

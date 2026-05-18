@@ -26,11 +26,11 @@ function PricingSection() {
             </span>
             <br />
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              plan dentaire IA
+              plan santé IA
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Prenez rendez-vous gratuitement et passez à la version premium pour des consultations IA illimitées. Idéal pour un suivi dentaire continu.
+            Prenez rendez-vous gratuitement et passez à la version premium pour des consultations IA illimitées. Idéal pour un suivi médical continu.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ function PricingSection() {
                     <span className="text-4xl font-bold">0 FCFA</span>
                     <span className="text-muted-foreground mb-1">/mois</span>
                   </div>
-                  <p className="text-muted-foreground">Prise de rendez-vous dentaire essentielle</p>
+                  <p className="text-muted-foreground">Prise de rendez-vous médicale essentielle</p>
                 </div>
                 <SignUpButton mode="modal">
                   <Button className="w-full py-3 bg-gradient-to-r from-muted to-muted/80 text-foreground rounded-xl font-semibold">
@@ -61,7 +61,7 @@ function PricingSection() {
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm">Trouver des dentistes dans votre région</span>
+                    <span className="text-sm">Trouver des praticiens dans votre région</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
@@ -113,7 +113,7 @@ function PricingSection() {
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm">Guidance et conseils dentaires IA</span>
+                    <span className="text-sm">Guidance et conseils santé IA</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
@@ -163,7 +163,7 @@ function PricingSection() {
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm">Analyse dentaire avancée IA</span>
+                    <span className="text-sm">Accompagnement santé avancé IA</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
@@ -179,7 +179,7 @@ function PricingSection() {
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm">Carnet de santé dentaire illimité</span>
+                    <span className="text-sm">Carnet de santé numérique illimité</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircleIcon className="w-5 h-5 text-primary mt-0.5 shrink-0" />

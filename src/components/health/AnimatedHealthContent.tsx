@@ -126,7 +126,7 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
         <div className="mt-4 p-4 bg-black/40 rounded-2xl border border-white/5 shadow-inner">
             <p className="text-sm text-slate-300 font-bold leading-relaxed italic">
                 {isTreatment 
-                    ? (item.notes || "Traitement prescrit pour votre suivi dentaire.")
+                    ? (item.notes || "Traitement prescrit pour votre suivi médical.")
                     : (item.summary || "Consultation archivée dans votre carnet numérique.")
                 }
             </p>

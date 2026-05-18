@@ -282,14 +282,39 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
       },
     });
 
+    const existingRequest = await prisma.healthAccessRequest.findFirst({
+      where: {
+        userId,
+        doctorId,
+      },
+    });
+
     if (existingRequest) {
-      if (existingRequest.status === AccessStatus.APPROVED) {
-         // Check if expired
-         if (!existingRequest.expiresAt || existingRequest.expiresAt > new Date()) {
-            return { success: false, error: "Access already granted" };
-         }
-      } else {
-        return { success: false, error: "Request already pending" };
+      if (existingRequest.status === AccessStatus.PENDING) {
+        return { success: false, error: "Request already pending for this doctor." };
+      } else if (existingRequest.status === AccessStatus.APPROVED) {
+        if (existingRequest.expiresAt && existingRequest.expiresAt > new Date()) {
+          return { success: false, error: "Access already granted and not expired." };
+        } else {
+          // If approved but expired, we can potentially update it or create a new one.
+          // For now, let's treat it as if no active request exists and proceed to create/update.
+          // Or, update the existing one to PENDING to avoid duplicates if business logic allows.
+          await prisma.healthAccessRequest.update({
+            where: { id: existingRequest.id },
+            data: { status: AccessStatus.PENDING, expiresAt: null, createdAt: new Date() },
+          });
+          // No need to create a new one, we just updated the old one to PENDING
+          // We can notify the patient again here if needed.
+          return { success: true, request: existingRequest }; // Return the updated request
+        }
+      } else if (existingRequest.status === AccessStatus.REJECTED || existingRequest.status === AccessStatus.EXPIRED) {
+         // If rejected or expired, we can simply update the existing one to PENDING.
+         await prisma.healthAccessRequest.update({
+            where: { id: existingRequest.id },
+            data: { status: AccessStatus.PENDING, expiresAt: null, createdAt: new Date() },
+          });
+         // We can notify the patient again here if needed.
+         return { success: true, request: existingRequest }; // Return the updated request
       }
     }
 

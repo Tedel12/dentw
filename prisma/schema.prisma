@@ -62,6 +62,7 @@ model User {
   doctorProfile        Doctor?
   securityAuditLogs    SecurityAuditLog[]
   recentPatients       RecentPatient[]
+  qrTokens             QRToken[]
 
   @@map("users")
 }
@@ -130,7 +131,7 @@ model Appointment {
   date             DateTime
   time             String // store time as string i.e. 14:30
   duration         Int               @default(30) // duration in minutes
-  price            Float?            @default(0) // Prix payé/dû pour la séance
+  price            Float? // Prix payé/dû pour la séance. Sera défini par le docteur.
   status           AppointmentStatus @default(CONFIRMED)
   type             AppointmentType   @default(IN_PERSON)
   notes            String?
@@ -223,6 +224,7 @@ model HealthAccessRequest {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, doctorId])
   @@map("health_access_requests")
 }
 
@@ -239,6 +241,18 @@ model RecentPatient {
   @@index([doctorId, lastAccessedAt])
 
   @@map("recent_patients")
+}
+
+model QRToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("qr_tokens")
 }
 
 model SecurityAuditLog {

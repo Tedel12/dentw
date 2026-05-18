@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MicIcon, ShieldIcon, CalendarIcon } from "lucide-react";
+import { MicIcon, ShieldIcon, CalendarIcon, HeartPulse } from "lucide-react";
 
 function FeatureCards() {
   return (
@@ -23,7 +23,7 @@ function FeatureCards() {
           </div>
           <div className="flex items-start gap-3">
             <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-            <span className="text-sm">Posez des questions par rapport à la santé dentaire et les traîtements.</span>
+            <span className="text-sm">Posez des questions sur votre santé et vos traitements.</span>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
@@ -42,11 +42,11 @@ function FeatureCards() {
         <CardHeader className="relative">
           <CardTitle className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl flex items-center justify-center">
-              <ShieldIcon className="h-5 w-5 text-primary" />
+              <HeartPulse className="h-5 w-5 text-primary" />
             </div>
             Fonctionnalités
           </CardTitle>
-          <CardDescription>Des capacités avancées en matière de soins dentaires.</CardDescription>
+          <CardDescription>Des capacités avancées pour votre suivi de santé.</CardDescription>
         </CardHeader>
         <CardContent className="relative space-y-4">
           <div className="flex items-center p-3 bg-muted/30 rounded-xl">

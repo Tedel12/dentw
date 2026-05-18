@@ -4,6 +4,7 @@ import { ChevronLeftIcon, VideoIcon, MapPin, ShieldCheck, Wallet, CalendarDays, 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import DoctorInfo from "./DoctorInfo";
 import { useAvailableDoctors } from "@/hooks/use-doctors";
+import { APP_NAME } from "@/lib/brand";
 
 interface BookingConfirmationStepProps {
   selectedDentistId: string;
@@ -112,7 +113,7 @@ function BookingConfirmationStep({
                     <ShieldCheck className="size-6 text-primary" />
                 </div>
                 <p className="text-xs text-slate-300 font-medium leading-relaxed">
-                    En confirmant, vous acceptez les conditions de service de Dentwise. Un email de confirmation vous sera envoyé instantanément.
+                    En confirmant, vous acceptez les conditions de service de {APP_NAME}. Un email de confirmation vous sera envoyé instantanément.
                 </p>
             </div>
         </div>

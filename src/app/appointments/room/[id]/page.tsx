@@ -33,7 +33,7 @@ export default async function VideoRoomPage({ params }: RoomPageProps) {
     ? `${appointment.user.firstName || ""} ${appointment.user.lastName || ""}`.trim() || "Patient"
     : `Dr. ${appointment.doctor.name}`;
 
-  const roomName = `dentwise-consult-${appointment.id}`;
+  const roomName = `benin-sante-consult-${appointment.id}`;
 
   return (
     <div className="min-h-screen bg-[#020617] text-white overflow-hidden h-screen flex flex-col">

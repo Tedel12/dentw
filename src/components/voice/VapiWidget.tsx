@@ -1,7 +1,10 @@
 "use client";
 
 import { vapi } from "@/lib/vapi";
+import { APP_NAME } from "@/lib/brand";
+import { VAPI_ASSISTANT_OVERRIDES } from "@/lib/vapi-prompt";
 import { useUser } from "@clerk/nextjs";
+import { HeartPulse } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
@@ -92,7 +95,9 @@ function VapiWidget() {
         setMessages([]);
         setCallEnded(false);
 
-        await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID);
+        const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+        if (!assistantId) throw new Error("Assistant Vapi non configuré");
+        await vapi.start(assistantId, VAPI_ASSISTANT_OVERRIDES);
       } catch (error) {
         // console.log("Failed to start call", error);
         setConnecting(false);
@@ -108,10 +113,10 @@ function VapiWidget() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold font-mono">
           <span>Parlez à votre </span>
-          <span className="text-primary uppercase">Assistant IA Dentaire</span>
+          <span className="text-primary uppercase">Assistant santé IA</span>
         </h1>
         <p className="text-muted-foreground mt-2">
-          Ayez une conversation vocale avec votre assistant IA pour un accompagnement et des conseils structur&s.
+          Conversation vocale pour orientation, prévention et conseils généraux — sans diagnostic médical.
         </p>
       </div>
 
@@ -155,18 +160,12 @@ function VapiWidget() {
 
               <div className="relative w-full h-full rounded-full bg-card flex items-center justify-center border border-border overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-primary/5"></div>
-                <Image
-                  src="/logo.png"
-                  alt="AI Dental Assistant"
-                  width={80}
-                  height={80}
-                  className="w-20 h-20 object-contain"
-                />
+                <HeartPulse className="w-14 h-14 text-primary relative z-10" />
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-foreground">DentWise IA</h2>
-            <p className="text-sm text-muted-foreground mt-1">Assistant Dentaire</p>
+            <h2 className="text-xl font-bold text-foreground">{APP_NAME} IA</h2>
+            <p className="text-sm text-muted-foreground mt-1">Assistante santé</p>
 
             {/* SPEAKING INDICATOR */}
             <div
@@ -231,7 +230,7 @@ function VapiWidget() {
             {messages.map((msg, index) => (
               <div key={index} className="message-item animate-in fade-in duration-300">
                 <div className="font-semibold text-xs text-muted-foreground mb-1">
-                  {msg.role === "assistant" ? "DentWise IA" : "Vous"}:
+                  {msg.role === "assistant" ? `${APP_NAME} IA` : "Vous"}:
                 </div>
                 <p className="text-foreground">{msg.content}</p>
               </div>
@@ -240,7 +239,7 @@ function VapiWidget() {
             {callEnded && (
               <div className="message-item animate-in fade-in duration-300">
                 <div className="font-semibold text-xs text-primary mb-1">Système:</div>
-                <p className="text-foreground">Appel terminé. Merci d'avour utilisé Dentwise IA!</p>
+                <p className="text-foreground">Appel terminé. Merci d&apos;avoir utilisé {APP_NAME} IA !</p>
               </div>
             )}
           </div>

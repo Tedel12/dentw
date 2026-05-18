@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { addTreatment, addTreatmentsBatch, type TreatmentLineInput } from "@/lib/actions/health";
 import { toast } from "sonner";
+import { APP_NAME } from "@/lib/brand";
 import { Pill, Clock, Calendar, FileText, Send, Plus, Trash2, Camera, Sparkles, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -184,7 +185,7 @@ function PatientSinglePrescriptionForm({
                   {isScanning ? (
                     <>
                       <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                      <p className="text-primary font-black italic uppercase tracking-widest text-xs">Scan IA Dentwise en cours...</p>
+                      <p className="text-primary font-black italic uppercase tracking-widest text-xs">Scan IA {APP_NAME} en cours...</p>
                     </>
                   ) : (
                     <>
@@ -201,7 +202,7 @@ function PatientSinglePrescriptionForm({
                 <Camera className="w-10 h-10 text-white/20 group-hover:text-primary/50 transition-colors" />
                 <div className="text-center px-4">
                   <p className="text-sm font-bold text-white/60">Scanner votre ordonnance</p>
-                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-1">L'IA Dentwise extraira les données</p>
+                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-1">L&apos;IA {APP_NAME} extraira les données</p>
                 </div>
               </>
             )}
@@ -305,7 +306,7 @@ function PatientSinglePrescriptionForm({
               <FormItem>
                 <FormLabel>Pathologie / motif (optionnel)</FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: Infection dentaire" {...field} />
+                  <Input placeholder="ex: Infection urinaire" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -555,7 +556,7 @@ function DoctorBatchPrescriptionForm({
                     <FormItem className="md:col-span-2">
                       <FormLabel>Pathologie / motif traité *</FormLabel>
                       <FormControl>
-                        <Input placeholder="ex: Abcès dentaire, gingivite…" {...f} />
+                        <Input placeholder="ex: Paludisme, hypertension…" {...f} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

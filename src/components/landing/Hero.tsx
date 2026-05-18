@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import React, { useRef } from "react";
 import { CalendarIcon, Stethoscope, Mic, ShieldCheck } from "lucide-react";
+import { APP_NAME, APP_REGION } from "@/lib/brand";
 import { motion, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { StarrySky } from "../ui/starry-sky";
 
@@ -50,7 +51,7 @@ const Hero = () => {
             <div className="space-y-4 md:space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 backdrop-blur-md mx-auto lg:mx-0">
                 <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Intelligence Dentaire</span>
+                <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Santé connectée {APP_REGION}</span>
               </div>
 
               <h1 className="text-4xl md:text-7xl lg:text-8xl font-black leading-[1] tracking-tighter italic">
@@ -60,7 +61,7 @@ const Hero = () => {
               </h1>
 
               <p className="text-base md:text-xl text-slate-400 max-w-lg leading-relaxed font-medium mx-auto lg:mx-0">
-                Découvrez l'assistant vocal qui comprend vos besoins. Gérez votre santé dentaire avec une précision chirurgicale.
+                {APP_NAME} : rendez-vous médicaux, carnet de santé numérique et assistant vocal pour vos soins de santé au quotidien.
               </p>
             </div>
 

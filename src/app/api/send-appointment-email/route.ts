@@ -1,5 +1,6 @@
 import AppointmentConfirmationEmail from "@/components/emails/AppointmentConfirmationEmail";
 import resend from "@/lib/resend";
+import { APP_NAME } from "@/lib/brand";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -28,9 +29,9 @@ export async function POST(request: Request) {
 
     // Envoi de l'email
     const { data, error } = await resend.emails.send({
-      from: "DentWise <no-reply@resend.dev>",
+      from: `${APP_NAME} <no-reply@resend.dev>`,
       to: [userEmail],
-      subject: "Confirmation de rendez-vous - DentWise",
+      subject: `Confirmation de rendez-vous - ${APP_NAME}`,
       react: AppointmentConfirmationEmail({
         doctorName,
         appointmentDate,

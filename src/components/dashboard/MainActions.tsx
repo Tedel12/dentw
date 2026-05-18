@@ -50,7 +50,7 @@ export default function MainActions({ role }: { role: string }) {
               </div>
               <div>
                 <h3 className="text-lg md:text-xl font-black mb-1">Assistant vocal IA</h3>
-                <p className="text-xs md:text-sm text-muted-foreground">Conseils dentaires par appels vocaux</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Conseils santé par appels vocaux</p>
               </div>
             </div>
 
@@ -130,14 +130,14 @@ export default function MainActions({ role }: { role: string }) {
                 </div>
                 <div>
                     <h3 className="text-xl font-black mb-1">Prendre rendez-vous</h3>
-                    <p className="text-sm text-muted-foreground">Planifiez avec des dentistes vérifiés</p>
+                    <p className="text-sm text-muted-foreground">Planifiez avec des praticiens vérifiés</p>
                 </div>
                 </div>
 
                 <div className="space-y-4 flex-1">
                 <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-                    <span className="text-sm font-medium">Professionnels dentaires vérifiés</span>
+                    <span className="text-sm font-medium">Professionnels de santé vérifiés</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full group-hover:scale-150 transition-transform duration-300"></div>

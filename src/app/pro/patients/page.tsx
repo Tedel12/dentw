@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
+import { APP_NAME } from "@/lib/brand";
 import { Stethoscope, ShieldAlert, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -62,7 +63,7 @@ export default async function DoctorPatientsPage() {
             <div className="space-y-2">
               <h1 className="text-2xl font-bold italic">Accès Réservé</h1>
               <p className="text-muted-foreground">
-                Cet espace est strictement réservé aux professionnels de santé enregistrés sur Dentwise.
+                Cet espace est strictement réservé aux professionnels de santé enregistrés sur {APP_NAME}.
               </p>
             </div>
             
@@ -105,7 +106,7 @@ export default async function DoctorPatientsPage() {
               <p className="text-muted-foreground">
                 {isRejected 
                   ? "Votre profil de praticien a été rejeté par l'administration. Veuillez contacter le support pour plus d'informations."
-                  : "Votre compte est en attente de validation par l'administration de Dentwise. Cette étape garantit la sécurité des données de santé."}
+                  : `Votre compte est en attente de validation par l'administration de ${APP_NAME}. Cette étape garantit la sécurité des données de santé.`}
               </p>
             </div>
             

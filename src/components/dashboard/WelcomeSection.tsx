@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
 import { FadeIn } from "../ui/motion-wrapper";
+import { APP_NAME } from "@/lib/brand";
 
 interface WelcomeSectionProps {
   role?: string;
@@ -29,7 +30,7 @@ export default async function WelcomeSection({ role }: WelcomeSectionProps) {
             <p className="text-muted-foreground max-w-lg leading-relaxed text-sm md:text-base">
               {role === 'DOCTOR' 
                 ? "Gérez vos consultations du jour et suivez le parcours de santé de vos patients."
-                : "Votre assistant IA DentWise surveille votre santé bucco-dentaire. Que souhaitez-vous faire aujourd'hui ?"}
+                : `Votre assistant ${APP_NAME} vous accompagne au quotidien. Que souhaitez-vous faire aujourd'hui ?`}
             </p>
           </div>
         </div>
@@ -38,7 +39,7 @@ export default async function WelcomeSection({ role }: WelcomeSectionProps) {
           <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping opacity-20"></div>
           <Image 
             src="/logo.png" 
-            alt="DentWise" 
+            alt={APP_NAME} 
             width={64} 
             height={64} 
             className="w-12 h-12 md:w-16 md:h-16 relative z-10 drop-shadow-2xl animate-in slide-in-from-right-8 duration-1000" 

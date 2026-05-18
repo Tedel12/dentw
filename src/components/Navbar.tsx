@@ -4,6 +4,7 @@ import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { CalendarIcon, HomeIcon, MenuIcon, Shield, Sparkles, Stethoscope, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { APP_NAME } from "@/lib/brand";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCurrentUserRole } from "@/lib/actions/users";
@@ -51,8 +52,8 @@ function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center h-full gap-3">
         <div className="flex items-center gap-3 md:gap-8">
           <Link href={clerkUser ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo DentWise" width={32} height={32} className="w-11" />
-            {!clerkUser && <span className="font-bold text-lg hidden sm:inline">Dentwise</span>}
+            <Image src="/logo.png" alt={`Logo ${APP_NAME}`} width={32} height={32} className="w-11" />
+            {!clerkUser && <span className="font-bold text-lg hidden sm:inline">{APP_NAME}</span>}
           </Link>
 
           <div className="hidden md:flex items-center gap-4 lg:gap-6">

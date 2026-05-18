@@ -1,7 +1,7 @@
 import { getUserAppointmentStats } from "@/lib/actions/appointments";
 import { currentUser } from "@clerk/nextjs/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { BrainIcon, MessageSquareIcon } from "lucide-react";
+import { HeartPulse, MessageSquareIcon } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -14,10 +14,10 @@ async function DentalHealthOverview() {
     <Card className="lg:col-span-2 w-full overflow-hidden">
       <CardHeader className="p-4 md:p-6">
         <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-          <BrainIcon className="size-5 text-primary" />
-          Votre santé dentaire
+          <HeartPulse className="size-5 text-primary" />
+          Votre santé
         </CardTitle>
-        <CardDescription className="text-xs md:text-sm">Suivez votre parcours de soins dentaires</CardDescription>
+        <CardDescription className="text-xs md:text-sm">Suivez votre parcours de soins médicaux</CardDescription>
       </CardHeader>
       <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
@@ -50,7 +50,7 @@ async function DentalHealthOverview() {
               <div>
                 <h4 className="font-black text-primary mb-1 italic uppercase tracking-tighter">Prêt à commencer ?</h4>
                 <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
-                  Prenez votre premier rendez-vous ou essayez notre assistant vocal IA pour des conseils dentaires instantanés.
+                  Prenez votre premier rendez-vous ou essayez notre assistant vocal IA pour des conseils de santé généraux.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

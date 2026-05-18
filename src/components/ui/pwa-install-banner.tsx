@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Smartphone, ArrowRight, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./button";
+import { APP_NAME } from "@/lib/brand";
 
 export function PWAInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -97,7 +98,7 @@ export function PWAInstallBanner() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-black text-sm uppercase tracking-tighter truncate">
-                   {isIOS ? "Installez Dentwise" : "Application Dentwise"}
+                   {isIOS ? `Installez ${APP_NAME}` : `Application ${APP_NAME}`}
                 </p>
                 <p className="text-white/80 text-[10px] font-medium leading-tight line-clamp-1">
                   Accédez à vos soins même sans réseau.

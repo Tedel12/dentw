@@ -20,7 +20,7 @@ function CTA() {
 
               <h2 className="text-3xl md:text-4xl font-bold leading-tight">
                 <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Votre santé dentaire
+                  Votre santé
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -71,7 +71,7 @@ function CTA() {
 
                 <Image
                   src="/cta.png"
-                  alt="Assistant IA DentWise"
+                  alt="Assistant IA Benin Santé"
                   width={300}
                   height={300}
                   className="relative w-80 h-auto drop-shadow-xl hover:scale-105 transition-transform duration-500"

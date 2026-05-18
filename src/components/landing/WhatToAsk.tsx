@@ -17,11 +17,11 @@ function WhatToAsk() {
             </span>
             <br />
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              tout ce qui concerne le dentaire
+              votre santé au quotidien
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Des questions simples aux préoccupations complexes, notre IA fournit des conseils de niveau expert basés sur des milliers de cas dentaires réels
+            Fièvre, paludisme, hypertension, traitements chroniques : notre IA vous oriente avec des conseils généraux — sans poser de diagnostic
           </p>
         </div>
 
@@ -41,12 +41,12 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "J'ai mal à une dent quand je mords"
+                          "J'ai de la fièvre depuis hier"
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          Obtenez des conseils immédiats sur la gestion de la douleur, les causes possibles et quand consulter un dentiste en urgence
+                          Conseils sur l'hydratation, le repos et quand consulter un praticien ou vous rendre aux urgences
                         </p>
                         <div className="flex gap-2 mt-3">
                           <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
@@ -72,12 +72,12 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "Combien coûte un blanchiment des dents ?"
+                          "Comment prendre correctement mes médicaments ?"
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          Comparez les options de traitement, les fourchettes de prix et trouvez la meilleure solution de blanchiment adaptée à votre budget
+                          Rappels sur les horaires de prise, l'observance et l'importance de suivre l'ordonnance de votre médecin
                         </p>
                         <div className="flex gap-2 mt-3">
                           <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
@@ -103,12 +103,12 @@ function WhatToAsk() {
                     <div className="space-y-3 flex-1">
                       <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
                         <p className="font-semibold text-primary">
-                          "Quand devrais-je remplacer mon plombage ?"
+                          "Quels signes doivent m'inquiéter pour mon diabète ?"
                         </p>
                       </div>
                       <div className="bg-muted/30 rounded-2xl p-4">
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          Découvrez la durée de vie d'un plombage, les signes d'usure et des conseils sur le moment de le remplacer
+                          Orientation sur les signes d'alerte courants et la nécessité d'un suivi médical régulier
                         </p>
                         <div className="flex gap-2 mt-3">
                           <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">

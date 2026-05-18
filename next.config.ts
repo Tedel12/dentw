@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const path = require("node:path");
+const projectRoot = __dirname;
+
 const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: false, // On l'active pour que l'utilisateur puisse tester même en dev
+  // PWA uniquement en production : évite le conflit Webpack + Turbopack et la RAM en dev
+  disable: process.env.NODE_ENV !== "production",
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
@@ -112,10 +117,13 @@ const withPWA = require("next-pwa")({
 });
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: projectRoot,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: "images.unsplash.com" },

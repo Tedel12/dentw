@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import { APP_NAME, APP_SUPPORT_EMAIL } from "@/lib/brand";
 
 interface AppointmentConfirmationEmailProps {
   doctorName: string;
@@ -37,7 +38,7 @@ function AppointmentConfirmationEmail({
   return (
     <Html>
       <Head />
-      <Preview>Votre rendez-vous dentaire a été confirmé</Preview>
+      <Preview>Votre rendez-vous médical a été confirmé</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={logoContainer}>
@@ -45,10 +46,10 @@ function AppointmentConfirmationEmail({
               src="https://i.ibb.co.com/tRy6cC2/logo.png"
               width="50"
               height="50"
-              alt="DentWise"
+              alt={APP_NAME}
               style={logo}
             />
-            <Text style={logoText}>DentWise</Text>
+            <Text style={logoText}>{APP_NAME}</Text>
           </Section>
 
           <Heading style={h1}>Rendez-vous confirmé ! </Heading>
@@ -56,7 +57,7 @@ function AppointmentConfirmationEmail({
           <Text style={text}>Bonjour,</Text>
 
           <Text style={text}>
-            Votre rendez-vous dentaire a été réservé avec succès. Voici les détails :
+            Votre rendez-vous médical a été réservé avec succès. Voici les détails :
           </Text>
 
           <Section style={appointmentDetails}>
@@ -85,7 +86,7 @@ function AppointmentConfirmationEmail({
 
             <Text style={detailLabel}>Lieu</Text>
             <Text style={detailValue}>
-                {isOnline ? "Salle virtuelle Dentwise" : "Centre Dentaire"}
+                {isOnline ? `Salle virtuelle ${APP_NAME}` : "Centre de soins"}
             </Text>
           </Section>
 
@@ -110,11 +111,11 @@ function AppointmentConfirmationEmail({
           <Text style={footer}>
             Cordialement,
             <br />
-            L’équipe DentWise
+            L’équipe {APP_NAME}
           </Text>
 
           <Text style={footerText}>
-            Pour toute question, veuillez nous contacter à support@dentwise.com
+            Pour toute question, veuillez nous contacter à {APP_SUPPORT_EMAIL}
           </Text>
         </Container>
       </Body>

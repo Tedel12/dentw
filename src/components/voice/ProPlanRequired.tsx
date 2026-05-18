@@ -23,7 +23,7 @@ function ProPlanRequired() {
                 <div>
                   <h1 className="text-4xl font-bold mb-2">Accès à l’assistant vocal requis</h1>
                   <p className="text-muted-foreground">
-                    Passez à AI Pro ou AI Basic pour débloquer des consultations vocales illimitées avec notre assistant dentaire IA.
+                    Passez à AI Pro ou AI Basic pour débloquer des consultations vocales illimitées avec notre assistante santé IA.
                   </p>
                 </div>
               </div>
@@ -46,7 +46,7 @@ function ProPlanRequired() {
 
             <h3 className="text-2xl font-bold mb-4">Mise à niveau requise</h3>
             <p className="text-muted-foreground mb-6">
-              La fonction d’assistant vocal est disponible uniquement pour les abonnés AI Pro et AI Basic. Obtenez des conseils dentaires instantanés grâce à des conversations vocales naturelles.
+              La fonction d’assistant vocal est disponible uniquement pour les abonnés AI Pro et AI Basic. Obtenez des conseils de santé généraux grâce à des conversations vocales naturelles.
             </p>
 
             <div className="space-y-4 mb-6">
@@ -56,7 +56,7 @@ function ProPlanRequired() {
               </div>
               <div className="flex items-center gap-3 justify-center">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-sm">Conseils dentaires professionnels</span>
+                <span className="text-sm">Orientation santé professionnelle</span>
               </div>
               <div className="flex items-center gap-3 justify-center">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>

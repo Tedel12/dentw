@@ -1,4 +1,6 @@
-export const metadata = { title: "Politique de Confidentialité" };
+import { APP_NAME } from "@/lib/brand";
+
+export const metadata = { title: `Politique de Confidentialité — ${APP_NAME}` };
 
 export default function PrivacyPolicy() {
   return (
@@ -7,7 +9,7 @@ export default function PrivacyPolicy() {
       
       <section className="space-y-4 mb-8">
         <h2 className="text-2xl font-bold text-white">1. Données de santé</h2>
-        <p>Vos données sont chiffrées. Dentwise agit comme un coffre-fort numérique dont vous êtes le seul détenteur de la clé (PIN).</p>
+        <p>Vos données sont chiffrées. {APP_NAME} agit comme un coffre-fort numérique dont vous êtes le seul détenteur de la clé (PIN).</p>
       </section>
 
       <section className="space-y-4 mb-8">

@@ -1,46 +1,24 @@
 {
-  "name": "Dentwise IA",
-  "short_name": "Dentwise",
-  "description": "Votre assistant dentaire intelligent et carnet de santé numérique.",
-  "id": "/",
+  "name": "Benin Santé",
+  "short_name": "Benin Santé",
+  "description": "Rendez-vous médicaux et carnet de santé numérique au Bénin.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#e78a53",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "categories": ["medical", "health"],
-  "screenshots": [
-    {
-      "src": "/screenshot-for-readme.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      "purpose": "any maskable"
     }
   ]
 }

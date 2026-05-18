@@ -24,9 +24,9 @@ async function ProPage() {
                             </div>
 
                             <div>
-                                <h1 className="text-4xl font-black mb-2">Accédez à des soins dentaires IA premium</h1>
+                                <h1 className="text-4xl font-black mb-2">Accédez à l&apos;assistant santé IA premium</h1>
                                 <p className="text-muted-foreground">
-                                    Ayez des consultations AI illimitées, des fonctionnalités avancées, et un accompagnement prioritaire pour faire passer votre santé dentaire au niveau supérieur.
+                                    Consultations IA illimitées, fonctionnalités avancées et accompagnement prioritaire pour votre suivi de santé au Bénin.
                                 </p>
                             </div>
                         </div>
@@ -44,7 +44,7 @@ async function ProPage() {
                     <div className="text-center space-y-4">
                         <h2 className="text-3xl font-bold">Choisissez votre plan</h2>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
-                            Sélectionner le plan parfait pour vos besoins dentaire. Tout les plans inclus un accès sécurisé et cryptage au niveau bancaire.
+                            Sélectionnez le plan adapté à vos besoins. Tous les plans incluent un accès sécurisé et un chiffrement de niveau bancaire.
                         </p>
                     </div>
 

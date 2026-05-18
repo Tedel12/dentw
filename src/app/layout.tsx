@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import UserSync from "@/components/UserSync";
 import TanStackProvider from "@/components/providers/TanStackProvider";
 import { Toaster } from "sonner";
+import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dentwise IA",
-  description: "Votre assistant vocal pour de meilleurs soins dentaires",
+  title: `${APP_NAME} — Santé connectée`,
+  description: APP_TAGLINE,
   manifest: "/manifest.json",
   icons: {
     icon: "/logo.png",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Dentwise",
+    title: APP_NAME,
   },
   formatDetection: {
     telephone: false,
@@ -65,7 +66,7 @@ export default function RootLayout({
           }
         }}
       >
-        <html lang="en">
+        <html lang="fr">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased dark bg-[#020617] text-white overflow-x-hidden min-h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]`}
         >

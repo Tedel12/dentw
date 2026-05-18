@@ -68,7 +68,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor='new-speciality'>Spécialité *</Label>
-                            <Input id='new-speciality' value={newDoctor.speciality} onChange={(e) => setNewDoctor({ ...newDoctor, speciality: e.target.value })} placeholder='Dentiste general' />
+                            <Input id='new-speciality' value={newDoctor.speciality} onChange={(e) => setNewDoctor({ ...newDoctor, speciality: e.target.value })} placeholder='Médecine générale' />
                         </div>
                     </div>
 

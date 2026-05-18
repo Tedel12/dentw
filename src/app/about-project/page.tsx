@@ -22,6 +22,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { APP_NAME, APP_REGION } from "@/lib/brand";
 
 const techStack = [
   { name: "Next.js 15", icon: <Rocket className="text-white" />, desc: "Framework React ultra-rapide avec App Router et Turbopack." },
@@ -33,10 +34,10 @@ const techStack = [
 ];
 
 const milestones = [
-  { title: "La Vision", date: "Janvier 2026", desc: "L'idée est née d'un constat simple : la peur du dentiste et la perte d'informations médicales freinent les soins." },
-  { title: "Développement IA", date: "Février 2026", desc: "Intégration des modèles LLM pour créer un assistant capable de comprendre les douleurs dentaires." },
-  { title: "Sécurité HDS", date: "Mars 2026", desc: "Mise en place du système de certification des médecins et du chiffrage des carnets de santé." },
-  { title: "Lancement PWA", date: "Avril 2026", desc: "Dentwise devient une application installable, accessible partout, même hors-ligne." },
+  { title: "La Vision", date: "Janvier 2026", desc: `Constat : files d'attente, perte d'ordonnances et faible suivi des traitements chroniques ${APP_REGION}.` },
+  { title: "Développement IA", date: "Février 2026", desc: "Assistant vocal pour orientation santé, prévention et rappels — sans diagnostic médical." },
+  { title: "Sécurité", date: "Mars 2026", desc: "Certification des praticiens et protection du carnet de santé numérique." },
+  { title: "Lancement PWA", date: "Avril 2026", desc: `${APP_NAME} devient une application installable, accessible partout, même hors-ligne.` },
 ];
 
 export default function AboutProject() {
@@ -55,13 +56,13 @@ export default function AboutProject() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20 mb-8">
               <Sparkles className="size-4 text-primary animate-pulse" />
-              <span className="text-xs font-black uppercase tracking-widest text-primary">Le Projet Dentwise</span>
+              <span className="text-xs font-black uppercase tracking-widest text-primary">Le Projet {APP_NAME}</span>
             </div>
             <h1 className="text-5xl md:text-7xl lg:text-9xl font-black italic tracking-tighter mb-8 leading-none">
-              RÉINVENTER LA <br/> <span className="text-primary">SANTÉ DENTAIRE</span>
+              RÉINVENTER LA <br/> <span className="text-primary">SANTÉ AU BÉNIN</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
-                Dentwise n'est pas seulement un carnet de santé numérique. C'est un écosystème intelligent conçu pour briser les barrières entre le patient et le praticien grâce à l'IA.
+                {APP_NAME} réunit carnet de santé numérique, rendez-vous médicaux et accompagnement IA pour un parcours de soins plus fluide.
             </p>
           </motion.div>
         </div>
@@ -76,10 +77,10 @@ export default function AboutProject() {
                 viewport={{ once: true }}
                 className="space-y-8"
             >
-                <h2 className="text-4xl font-black italic tracking-tight">Pourquoi Dentwise ?</h2>
+                <h2 className="text-4xl font-black italic tracking-tight">Pourquoi {APP_NAME} ?</h2>
                 <div className="space-y-6">
                     <p className="text-slate-400 text-lg leading-relaxed">
-                        Chaque année, des millions de personnes évitent les soins dentaires par peur ou manque d'organisation. Les informations médicales sont souvent éparpillées, et les urgences sont mal gérées.
+                        Les patients perdent leurs ordonnances, oublient leurs traitements et peinent à organiser leurs consultations. Les informations médicales sont souvent éparpillées.
                     </p>
                     <div className="grid gap-6">
                         <div className="flex gap-4 p-6 bg-background rounded-3xl border border-white/5 hover:border-primary/30 transition-all group">
@@ -88,7 +89,7 @@ export default function AboutProject() {
                             </div>
                             <div>
                                 <h4 className="font-black uppercase tracking-widest text-xs text-primary mb-1">Assistance IA Vocale</h4>
-                                <p className="text-sm text-slate-400 font-medium">Parler à un assistant qui connaît votre historique pour un pré-diagnostic rapide.</p>
+                                <p className="text-sm text-slate-400 font-medium">Parler à une assistante pour orientation, prévention et rappels — sans remplacer un médecin.</p>
                             </div>
                         </div>
                         <div className="flex gap-4 p-6 bg-background rounded-3xl border border-white/5 hover:border-emerald-500/30 transition-all group">
@@ -228,7 +229,7 @@ const access = await prisma.access.findFirst({
             >
                 <div className="bg-[#020617] px-12 py-16 rounded-[2.4rem] space-y-8">
                     <h2 className="text-5xl font-black italic tracking-tighter">PRÊT À TESTER ?</h2>
-                    <p className="text-slate-400 max-w-md mx-auto">Rejoignez l'aventure Dentwise et découvrez le futur des soins dentaires.</p>
+                    <p className="text-slate-400 max-w-md mx-auto">Rejoignez {APP_NAME} et découvrez le futur des soins de santé numériques au Bénin.</p>
                     <div className="flex flex-col sm:flex-row justify-center gap-6">
                         <Link href="/dashboard">
                             <Button size="lg" className="h-14 px-10 font-black italic rounded-xl w-full sm:w-auto">

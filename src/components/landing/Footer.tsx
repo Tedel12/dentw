@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { APP_NAME, APP_SUPPORT_EMAIL } from "@/lib/brand";
 
 function Footer() {
   return (
@@ -10,15 +11,15 @@ function Footer() {
             <div className="flex items-center gap-2">
               <Image
                 src="/logo.png"
-                alt="Logo DentWise"
+                alt={`Logo ${APP_NAME}`}
                 width={32}
                 height={32}
                 className="w-8 h-8"
               />
-              <span className="font-bold text-xl tracking-tight text-white italic">DentWise</span>
+              <span className="font-bold text-xl tracking-tight text-white italic">{APP_NAME}</span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              L'IA qui réinvente vos soins dentaires. Technologie de pointe, sécurité absolue.
+              Rendez-vous médicaux et carnet de santé numérique au Bénin. Technologie sécurisée, accessible à tous.
             </p>
           </div>
 
@@ -47,7 +48,7 @@ function Footer() {
             <h4 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">Support</h4>
             <ul className="space-y-3 text-sm text-slate-400">
               <li>
-                <a href="mailto:contact@dentwise.ai" className="hover:text-primary transition-colors">
+                <a href={`mailto:${APP_SUPPORT_EMAIL}`} className="hover:text-primary transition-colors">
                   Contactez-nous
                 </a>
               </li>
@@ -83,7 +84,7 @@ function Footer() {
 
         <div className="border-t border-white/5 mt-12 pt-8 text-center">
           <p className="text-xs text-slate-500 font-medium">
-            &copy; 2026 DentWise. Conçu avec précision pour votre santé bucco-dentaire.
+            &copy; 2026 {APP_NAME}. Plateforme de santé numérique au Bénin.
           </p>
         </div>
       </div>

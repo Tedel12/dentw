@@ -1,4 +1,5 @@
 import { useAvailableDoctors } from "@/hooks/use-doctors";
+import { DEFAULT_SPECIALITY } from "@/lib/brand";
 import Image from "next/image";
 
 function DoctorInfo({ doctorId }: { doctorId: string }) {
@@ -19,7 +20,7 @@ function DoctorInfo({ doctorId }: { doctorId: string }) {
       <div>
         <h3 className="font-medium">{doctor.name}</h3>
         <p className="text-sm text-muted-foreground">
-          {doctor.speciality || "Dentisterie générale"}
+          {doctor.speciality || DEFAULT_SPECIALITY}
         </p>
       </div>
     </div>

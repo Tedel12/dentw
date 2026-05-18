@@ -1,4 +1,9 @@
 import { useAvailableDoctors } from "@/hooks/use-doctors";
+import {
+  APP_CLINIC_FALLBACK,
+  DEFAULT_PRACTITIONER_BIO,
+  DEFAULT_SPECIALITY,
+} from "@/lib/brand";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import Image from "next/image";
 import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
@@ -55,7 +60,7 @@ function DoctorSelectionStep({
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-lg md:text-xl font-black text-white italic truncate">{dentist.name}</CardTitle>
                   <CardDescription className="text-primary font-black uppercase tracking-widest text-[10px] truncate">
-                    {dentist.speciality || "Dentisterie générale"}
+                    {dentist.speciality || DEFAULT_SPECIALITY}
                   </CardDescription>
                   <div className="flex items-center gap-3 mt-2">
                     <div className="flex items-center gap-1 bg-amber-400/10 px-2 py-0.5 rounded-lg border border-amber-400/20">
@@ -74,7 +79,7 @@ function DoctorSelectionStep({
               <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                     <MapPinIcon className="w-3.5 h-3.5 text-primary" />
-                    <span className="truncate">{dentist.practiceAddress || "DentWise Clinic"}</span>
+                    <span className="truncate">{dentist.practiceAddress || APP_CLINIC_FALLBACK}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                     <PhoneIcon className="w-3.5 h-3.5 text-primary" />
@@ -83,8 +88,7 @@ function DoctorSelectionStep({
               </div>
               
               <p className="text-xs text-slate-400 font-medium italic line-clamp-2 leading-relaxed">
-                {dentist.bio ||
-                  "Expert en soins dentaires modernes et préventifs pour toute la famille."}
+                {dentist.bio || DEFAULT_PRACTITIONER_BIO}
               </p>
 
               <div className="pt-4 border-t border-white/5 flex items-center justify-between">

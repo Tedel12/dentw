@@ -7,6 +7,7 @@ import { HealthAccessNotifications } from "@/components/dashboard/HealthAccessNo
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
+import { QRCodeAccess } from "@/components/dashboard/QRCodeAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -58,10 +59,14 @@ async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-12 pb-20 max-w-[1600px] mx-auto">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <WelcomeSection role={user.role} />
+                <QRCodeAccess />
+              </div>
+              
               <Suspense fallback={<div>Chargement...</div>}>
                 <HealthAccessNotifications requests={user.healthAccessRequests as any} />
               </Suspense>
-              <WelcomeSection role={user.role} />
 
               <div className="w-full">
                   <MainActions role={user.role} />

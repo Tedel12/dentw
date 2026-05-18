@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
-  Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope
+  Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode
 } from "lucide-react";
 import {
   searchPatient,
@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { QRScanner } from "@/components/pro/QRScanner";
 
 interface DoctorPatientsClientProps {
   isInitialPatient: boolean;
@@ -243,7 +244,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Votre Spécialité *</Label>
-                <Input className="bg-muted/20 border-primary/10" placeholder="ex: Chirurgien Dentiste" value={doctorForm.speciality} onChange={e => setDoctorForm({...doctorForm, speciality: e.target.value})} />
+                <Input className="bg-muted/20 border-primary/10" placeholder="ex: Médecine générale, Cardiologie" value={doctorForm.speciality} onChange={e => setDoctorForm({...doctorForm, speciality: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <Label>Numéro de Licence (RPPS) *</Label>
@@ -312,6 +313,18 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
             </h1>
             <p className="text-muted-foreground font-medium">Bienvenue, Dr. {doctor?.name} | {doctor?.speciality}</p>
           </div>
+          
+          {!selectedPatient && (
+             <QRScanner onSuccess={(patientId) => {
+                const bootstrapScan = async () => {
+                    const byIdRes = await getDoctorPatientById(patientId);
+                    if (byIdRes.success && byIdRes.patient) {
+                        await handleSelectPatient(byIdRes.patient, true);
+                    }
+                };
+                bootstrapScan();
+             }} />
+          )}
         </div>
 
         {!selectedPatient ? (

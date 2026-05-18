@@ -172,7 +172,7 @@ export default function HealthPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="text-2xl font-black text-green-400 italic">Vérifié</div>
-                                    <p className="text-[10px] text-green-500/70 mt-1 uppercase font-bold tracking-tighter">Standard de santé HDS</p>
+                                    <p className="text-[10px] text-green-500/70 mt-1 uppercase font-bold tracking-tighter">Données de santé protégées</p>
                                 </div>
                                 <Zap className="w-10 h-10 text-green-500 opacity-20 animate-pulse" />
                             </div>

@@ -1,4 +1,4 @@
-import { MicIcon } from "lucide-react";
+import { HeartPulse, MicIcon } from "lucide-react";
 
 function WelcomeSection() {
   return (
@@ -9,16 +9,16 @@ function WelcomeSection() {
           <span className="text-sm font-medium text-primary">L'assistant vocal est prêt</span>
         </div>
         <div>
-          <h1 className="text-4xl font-bold mb-2">IA d'Aassistant vocal</h1>
+          <h1 className="text-4xl font-bold mb-2">Assistante santé vocale</h1>
           <p className="text-muted-foreground">
-            Parlez à votre assistant dentaire IA grâce à des commandes vocales naturelles. Obtenez des conseils instantanés et un accompagnement professionnel.
+            Parlez à votre assistante santé IA grâce à des commandes vocales naturelles. Orientation, prévention et conseils généraux — sans diagnostic médical.
           </p>
         </div>
       </div>
 
       <div className="hidden lg:block">
         <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
-          <MicIcon className="w-16 h-16 text-primary" />
+          <HeartPulse className="w-16 h-16 text-primary" />
         </div>
       </div>
     </div>
