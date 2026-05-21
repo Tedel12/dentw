@@ -1,146 +1,74 @@
-import { MessageCircleIcon, MessageSquareIcon } from "lucide-react";
-import Image from "next/image";
+"use client";
 
-function WhatToAsk() {
+import { Activity, Brain, Clock, ShieldCheck } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+
+const questions = [
+  {
+    q: "Quels sont les premiers signes de l'hypertension ?",
+    icon: Activity,
+    color: "text-red-500",
+  },
+  {
+    q: "Comment mieux dormir naturellement ?",
+    icon: Brain,
+    color: "text-blue-500",
+  },
+  {
+    q: "Quelle est la durée moyenne d'un traitement antibiotique ?",
+    icon: Clock,
+    color: "text-amber-500",
+  },
+  {
+    q: "Comment protéger mes données de santé ?",
+    icon: ShieldCheck,
+    color: "text-emerald-500",
+  }
+];
+
+const WhatToAsk = () => {
   return (
-    <section className="relative py-8 px-6 overflow-hidden bg-gradient-to-b from-background to-muted/20">
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* En-tête */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full border border-primary/10 backdrop-blur-sm mb-6">
-            <MessageCircleIcon className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Conversations propulsées par l'IA</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
-            <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Posez des questions sur
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              votre santé au quotidien
-            </span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Fièvre, paludisme, hypertension, traitements chroniques : notre IA vous oriente avec des conseils généraux — sans poser de diagnostic
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Côté gauche - Exemples de chat interactif */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold mb-8">Questions fréquentes auxquelles notre IA répond :</h3>
-
-              {/* Bulle de chat 1 */}
-              <div className="group relative">
-                <div className="bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl rounded-3xl p-6 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                      <MessageSquareIcon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-3 flex-1">
-                      <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
-                        <p className="font-semibold text-primary">
-                          "J'ai de la fièvre depuis hier"
-                        </p>
-                      </div>
-                      <div className="bg-muted/30 rounded-2xl p-4">
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          Conseils sur l'hydratation, le repos et quand consulter un praticien ou vous rendre aux urgences
-                        </p>
-                        <div className="flex gap-2 mt-3">
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Réponse instantanée
-                          </span>
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Soulagement de la douleur
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+    <section className="py-24 bg-slate-950">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+                <div className="space-y-4">
+                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Interagir avec l'IA</h2>
+                    <p className="text-3xl md:text-5xl font-black italic text-white tracking-tighter uppercase leading-[1.1]">
+                        UNE ASSISTANCE <br /> 
+                        <span className="text-primary">MÉDICALE</span> <br /> 
+                        À TOUTE HEURE.
+                    </p>
                 </div>
-              </div>
-
-              {/* Bulle de chat 2 */}
-              <div className="group relative">
-                <div className="bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl rounded-3xl p-6 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                      <MessageSquareIcon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-3 flex-1">
-                      <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
-                        <p className="font-semibold text-primary">
-                          "Comment prendre correctement mes médicaments ?"
-                        </p>
-                      </div>
-                      <div className="bg-muted/30 rounded-2xl p-4">
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          Rappels sur les horaires de prise, l'observance et l'importance de suivre l'ordonnance de votre médecin
-                        </p>
-                        <div className="flex gap-2 mt-3">
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Analyse des coûts
-                          </span>
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Options de traitement
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bulle de chat 3 */}
-              <div className="group relative">
-                <div className="bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl rounded-3xl p-6 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                      <MessageSquareIcon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="space-y-3 flex-1">
-                      <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10">
-                        <p className="font-semibold text-primary">
-                          "Quels signes doivent m'inquiéter pour mon diabète ?"
-                        </p>
-                      </div>
-                      <div className="bg-muted/30 rounded-2xl p-4">
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          Orientation sur les signes d'alerte courants et la nécessité d'un suivi médical régulier
-                        </p>
-                        <div className="flex gap-2 mt-3">
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Soins préventifs
-                          </span>
-                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                            Entretien
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <p className="text-slate-400 font-medium leading-relaxed max-w-md">
+                    Notre assistant vocal IA est entraîné pour répondre à vos questions de santé courantes, vous orienter vers le bon spécialiste et vous aider à comprendre vos constantes médicales.
+                </p>
             </div>
-          </div>
 
-          {/* Côté droit - Illustration IA */}
-          <div className="bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-xl rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-500">
-            <div className="flex items-center justify-center h-full">
-              <Image
-                src="/confused.png"
-                alt="Assistant IA"
-                width={500}
-                height={500}
-                className="w-full h-auto max-w-lg object-contain"
-              />
+            <div className="grid gap-4">
+                {questions.map((item, index) => (
+                    <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <Card className="bg-white/5 border-white/5 hover:border-primary/30 transition-all cursor-default rounded-2xl overflow-hidden group">
+                            <CardContent className="p-6 flex items-center gap-4">
+                                <div className="p-3 rounded-xl bg-white/5 group-hover:bg-primary/10 transition-colors">
+                                    <item.icon className={`size-5 ${item.color}`} />
+                                </div>
+                                <p className="text-sm md:text-base font-bold text-slate-200">{item.q}</p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                ))}
             </div>
-          </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
 export default WhatToAsk;

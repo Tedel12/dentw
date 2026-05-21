@@ -569,7 +569,7 @@ function DoctorBatchPrescriptionForm({
                     <FormItem className="md:col-span-2">
                       <FormLabel>Voie d&apos;administration *</FormLabel>
                       <FormControl>
-                        <Input placeholder="ex: Orale, sous-gingivale, topique…" {...f} />
+                        <Input placeholder="ex: Orale, intramusculaire, topique…" {...f} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

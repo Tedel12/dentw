@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { MessageSquareIcon, CalendarIcon, Stethoscope } from "lucide-react";
+import { MessageSquareIcon, CalendarIcon, HeartPulse } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -87,7 +87,7 @@ export default function MainActions({ role }: { role: string }) {
           <CardContent className="relative p-8 flex flex-col h-full">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 shadow-lg shadow-primary/20">
-                <Stethoscope className="w-8 h-8 text-white" />
+                <HeartPulse className="w-8 h-8 text-white" />
               </div>
               <div>
                 <h3 className="text-xl font-black mb-1 text-primary">Carnet de Santé</h3>
@@ -110,7 +110,7 @@ export default function MainActions({ role }: { role: string }) {
               <Button
                 className="w-full bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white font-black py-6 rounded-2xl transition-all duration-500 group-hover:-translate-y-1 shadow-sm"
               >
-                <Stethoscope className="mr-2 h-5 w-5" />
+                <HeartPulse className="mr-2 h-5 w-5" />
                 {role === 'DOCTOR' ? 'Accéder aux RDV' : 'Accéder au carnet'}
               </Button>
             </Link>

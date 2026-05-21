@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { CalendarIcon, HomeIcon, MenuIcon, Shield, Sparkles, Stethoscope, Users } from "lucide-react";
+import { CalendarIcon, HomeIcon, MenuIcon, Shield, Sparkles, HeartPulse, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/lib/brand";
@@ -25,7 +25,7 @@ function Navbar() {
         return;
       }
 
-      const cacheKey = `dentwise-role-${clerkUser.id}`;
+      const cacheKey = `beninsante-role-${clerkUser.id}`;
       const cachedRole = sessionStorage.getItem(cacheKey);
       if (cachedRole === "PATIENT" || cachedRole === "DOCTOR") {
         setRole(cachedRole);
@@ -76,7 +76,7 @@ function Navbar() {
                       href="/dashboard/health"
                       className={linkClass("/dashboard/health")}
                     >
-                      <Stethoscope className="w-4 h-4" />
+                      <HeartPulse className="w-4 h-4" />
                       <span className="hidden lg:inline">Mon Carnet</span>
                     </Link>
                     <Link
@@ -160,7 +160,7 @@ function Navbar() {
                             href="/dashboard/health"
                             className={`${linkClass("/dashboard/health")} p-3 rounded-xl hover:bg-muted`}
                           >
-                            <Stethoscope className="w-4 h-4" />
+                            <HeartPulse className="w-4 h-4" />
                             <span>Mon Carnet</span>
                           </Link>
                         </SheetClose>

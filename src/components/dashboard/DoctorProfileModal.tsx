@@ -1,6 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { 
+  HeartPulse, ShieldCheck, MapPin, 
+  Phone, UserCheck, Info, Calendar, Clock,
+  Stethoscope, Mail, ShieldAlert
+} from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -11,55 +16,30 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ShieldCheck, 
-  ShieldAlert, 
-  MapPin, 
-  Stethoscope, 
-  Phone, 
-  Mail, 
-  Info,
-  Calendar,
-  Clock,
-  UserCheck
-} from "lucide-react";
-import { formatGenderFr } from "@/lib/utils";
+import { APP_NAME } from "@/lib/brand";
 
 interface DoctorProfileModalProps {
+  doctor: any;
   isOpen: boolean;
   onClose: () => void;
-  doctor: any;
   onApprove: () => void;
   onReject: () => void;
   isProcessing: boolean;
 }
 
-export function DoctorProfileModal({ 
-  isOpen, 
-  onClose, 
-  doctor, 
-  onApprove, 
+export function DoctorProfileModal({
+  doctor,
+  isOpen,
+  onClose,
+  onApprove,
   onReject,
-  isProcessing 
+  isProcessing,
 }: DoctorProfileModalProps) {
   if (!doctor) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px] bg-slate-900 border-white/10 text-white p-0 rounded-3xl">
-        {/* Header avec Photo */}
-        <div className="relative h-32 bg-gradient-to-br from-primary/20 to-blue-600/20 shrink-0 rounded-t-3xl">
-          <div className="absolute -bottom-8 left-6">
-            <div className="relative">
-              <img 
-                src={doctor.imageUrl || "/hero.png"} 
-                alt={doctor.name} 
-                className="w-20 h-20 rounded-2xl object-cover border-4 border-slate-900 shadow-2xl"
-              />
-            </div>
-          </div>
-        </div>
-
+      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-white/10 bg-[#020617] text-white rounded-[2.5rem] shadow-2xl">
         <div className="pt-12 px-6 pb-6 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
           <div className="space-y-1">
             <h2 className="text-2xl font-black italic tracking-tighter">Dr. {doctor.name}</h2>
@@ -141,17 +121,17 @@ export function DoctorProfileModal({
           </div>
         </div>
 
-        <DialogFooter className="px-6 pb-6 gap-2 sm:justify-center bg-slate-900 shrink-0">
-          <Button 
-            variant="ghost" 
-            className="flex-1 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl h-10 text-xs font-bold"
+        <DialogFooter className="p-6 bg-white/5 gap-3">
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-xl h-12 font-bold text-slate-400 hover:text-white hover:bg-white/5"
             onClick={onReject}
             disabled={isProcessing}
           >
             REFUSER
           </Button>
-          <Button 
-            className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl h-10 text-xs font-black italic shadow-lg shadow-primary/20"
+          <Button
+            className="flex-1 bg-primary hover:bg-primary/90 text-white font-black italic rounded-xl h-12 shadow-lg shadow-primary/20"
             onClick={onApprove}
             disabled={isProcessing}
           >

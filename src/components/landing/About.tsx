@@ -1,81 +1,67 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { ShieldCheck, Target, Users, Zap } from "lucide-react";
-import { APP_NAME, APP_REGION } from "@/lib/brand";
+import { Activity, Brain, ShieldCheck, Zap } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { APP_NAME } from "@/lib/brand";
 
 const features = [
   {
-    icon: <Target className="w-8 h-8 text-primary" />,
-    title: "Notre Mission",
-    description: `Faciliter l'accès aux soins de santé ${APP_REGION} grâce à une plateforme numérique simple, sécurisée et accessible sur smartphone.`,
+    title: "Carnet de Santé Digital",
+    description: `Centralisez tout votre historique médical : allergies, antécédents et traitements, accessible 24h/24 en toute sécurité.`,
+    icon: Activity,
+    color: "text-primary",
+    bg: "bg-primary/10",
   },
   {
-    icon: <ShieldCheck className="w-8 h-8 text-primary" />,
-    title: "Sécurité Maximale",
-    description:
-      "Vos données de santé sont protégées. Chiffrement, consentement explicite et accès temporaire pour les praticiens que vous autorisez.",
+    title: "IA Médicale Vocale",
+    description: "Interagissez avec notre assistant vocal intelligent pour obtenir des conseils de premier niveau et comprendre vos symptômes.",
+    icon: Brain,
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
   },
   {
-    icon: <Users className="w-8 h-8 text-primary" />,
-    title: "Humain & IA",
-    description:
-      "L'IA ne remplace pas le médecin. Elle vous oriente et prépare votre consultation pour un suivi plus efficace.",
+    title: "Protection des Données",
+    description: "Vos données de santé sont cryptées et protégées. Vous seul décidez quel praticien peut consulter votre dossier.",
+    icon: ShieldCheck,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
   },
   {
-    icon: <Zap className="w-8 h-8 text-primary" />,
-    title: "Innovation Continue",
-    description:
-      "Assistant vocal, rappels de traitements et carnet numérique pour un parcours de soins plus fluide.",
-  },
+    title: "Prise de RDV Instantanée",
+    description: "Trouvez les meilleurs praticiens près de chez vous et réservez votre consultation en quelques clics.",
+    icon: Zap,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+  }
 ];
 
-export const About = () => {
+export function About() {
   return (
-    <section id="about" className="py-16 md:py-24 bg-[#020617] relative overflow-hidden">
-      <motion.div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12 md:mb-16 space-y-4"
-        >
-          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px] md:text-sm">
-            À propos de {APP_NAME}
-          </h2>
-          <h3 className="text-3xl md:text-5xl font-black italic text-white tracking-tighter leading-tight">
-            LA SANTÉ NUMÉRIQUE <br className="hidden md:block" /> POUR TOUS
-          </h3>
-          <p className="text-slate-400 max-w-2xl mx-auto text-base md:text-lg">
-            {APP_NAME} réunit prise de rendez-vous, carnet de santé personnel et accompagnement
-            intelligent pour améliorer le suivi médical {APP_REGION}.
+    <section id="about" className="py-24 relative overflow-hidden bg-slate-950">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Pourquoi nous choisir ?</h2>
+          <p className="text-3xl md:text-5xl font-black italic text-white tracking-tighter">
+            REPENSER LA SANTÉ <br className="hidden md:block" /> AU BÉNIN.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {features.map((f, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -10 }}
-              className="p-6 md:p-8 bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-primary/30 transition-all group"
-            >
-              <motion.div
-                className="mb-6 bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-              >
-                {f.icon}
-              </motion.div>
-              <h4 className="text-xl font-black text-white mb-3 italic tracking-tight">{f.title}</h4>
-              <p className="text-slate-400 text-sm leading-relaxed">{f.description}</p>
-            </motion.div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, i) => (
+            <Card key={i} className="bg-white/5 border-white/5 rounded-[2.5rem] overflow-hidden hover:border-primary/30 transition-all duration-500 group">
+              <CardContent className="p-8 space-y-6">
+                <div className={`size-14 rounded-2xl ${feature.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
+                  <feature.icon className={`size-7 ${feature.color}`} />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-black text-white italic">{feature.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                    {feature.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
-        </motion.div>
-      </motion.div>
-
-      <div className="absolute top-1/2 left-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -z-10" />
+        </div>
+      </div>
     </section>
   );
-};
+}

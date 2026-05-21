@@ -1,25 +1,49 @@
 "use client";
 
-import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
-import BookingConfirmationStep from "@/components/appointments/BookingConfirmationStep";
-import DoctorSelectionStep from "@/components/appointments/DoctorSelectionStep";
-import ProgressSteps from "@/components/appointments/ProgressSteps";
-import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
-import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment";
-import { useAvailableDoctors } from "@/hooks/use-doctors";
+import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { 
+  Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar, RefreshCcw, Video
+} from "lucide-react";
+import {
+  searchPatient,
+  requestHealthAccess,
+  checkDoctorAccess,
+  getPatientHealthData,
+  getDoctorPatientById,
+  getHealthAccessRequest,
+} from "@/lib/actions/health";
+import { trackRecentPatient, getRecentPatients } from "@/lib/actions/history";
+import { completeDoctorProfile } from "@/lib/actions/users";
+import { toast } from "sonner";
+import { AddPrescriptionForm } from "@/components/health/AddPrescriptionForm";
+import { BlurData } from "@/components/ui/blur-data";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useState } from "react";
-import { toast } from "sonner";
-import { VideoIcon, MapPin, Calendar, Clock, RotateCcw } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { RescheduleModal } from "./RescheduleModal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { QRScanner } from "@/components/pro/QRScanner";
+import { CONTRACT_TEMPLATE } from "@/lib/contract-template";
+import jsPDF from "jspdf";
+import { APP_NAME } from "@/lib/brand";
+import ProgressSteps from "@/components/appointments/ProgressSteps";
+import DoctorSelectionStep from "@/components/appointments/DoctorSelectionStep";
+import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
+import BookingConfirmationStep from "@/components/appointments/BookingConfirmationStep";
+import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment";
+import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { respondToReschedule } from "@/lib/actions/appointments";
+import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
 
 export function PatientAppointmentsClient() {
-  const [selectedDentistId, setSelectedDentistId] = useState<string | null>(null);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [reason, setReason] = useState("");
@@ -41,7 +65,7 @@ export function PatientAppointmentsClient() {
     time: "",
   });
 
-  const { data: dentists = [] } = useAvailableDoctors();
+  const { data: doctors = [] } = useAvailableDoctors();
   const bookAppointmentMutation = useBookAppointment();
   const { data: userAppointments = [], refetch: refetchAppointments } = useUserAppointments();
 
@@ -55,8 +79,8 @@ export function PatientAppointmentsClient() {
     }
   };
 
-  const handleSelectDentist = (dentistId: string) => {
-    setSelectedDentistId(dentistId);
+  const handleSelectDoctor = (doctorId: string) => {
+    setSelectedDoctorId(doctorId);
     setSelectedDate("");
     setSelectedTime("");
     setReason("");
@@ -64,16 +88,16 @@ export function PatientAppointmentsClient() {
   };
 
   const handleBookAppointment = async () => {
-    if (!selectedDentistId || !selectedDate || !selectedTime || !reason) {
+    if (!selectedDoctorId || !selectedDate || !selectedTime || !reason) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
-    const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
+    const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
 
     bookAppointmentMutation.mutate(
       {
-        doctorId: selectedDentistId,
+        doctorId: selectedDoctorId,
         date: selectedDate,
         time: selectedTime,
         reason: reason,
@@ -102,7 +126,7 @@ export function PatientAppointmentsClient() {
             });
           } catch (error) {}
           setShowConfirmationModal(true);
-          setSelectedDentistId(null);
+          setSelectedDoctorId(null);
           setSelectedDate("");
           setSelectedTime("");
           setReason("");
@@ -117,22 +141,22 @@ export function PatientAppointmentsClient() {
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 text-white tracking-tight">Prendre un rendez-vous</h1>
-        <p className="text-muted-foreground font-medium">Trouvez et prenez rendez-vous avec nos praticiens certifiés.</p>
+        <p className="text-muted-foreground font-medium">Trouvez et prenez rendez-vous avec nos praticiens certifiés sur Benin Santé.</p>
       </div>
 
       <ProgressSteps currentStep={currentStep} />
 
       {currentStep === 1 && (
         <DoctorSelectionStep
-          selectedDentistId={selectedDentistId}
+          selectedDoctorId={selectedDoctorId}
           onContinue={() => setCurrentStep(2)}
-          onSelectDentist={handleSelectDentist}
+          onSelectDoctor={handleSelectDoctor}
         />
       )}
 
-      {currentStep === 2 && selectedDentistId && (
+      {currentStep === 2 && selectedDoctorId && (
         <TimeSelectionStep
-          selectedDentistId={selectedDentistId}
+          selectedDoctorId={selectedDoctorId}
           selectedDate={selectedDate}
           selectedTime={selectedTime}
           reason={reason}
@@ -146,9 +170,9 @@ export function PatientAppointmentsClient() {
         />
       )}
 
-      {currentStep === 3 && selectedDentistId && (
+      {currentStep === 3 && selectedDoctorId && (
         <BookingConfirmationStep
-          selectedDentistId={selectedDentistId}
+          selectedDoctorId={selectedDoctorId}
           selectedDate={selectedDate}
           selectedTime={selectedTime}
           reason={reason}
@@ -160,138 +184,96 @@ export function PatientAppointmentsClient() {
         />
       )}
 
-      {bookedAppointment && (
-        <AppointmentConfirmationModal
-          open={showConfirmationModal}
-          onOpenChange={setShowConfirmationModal}
-          appointmentDetails={{
-            doctorName: bookedAppointment.doctorName,
-            appointmentDate: format(new Date(bookedAppointment.date), "EEEE, MMMM d, yyyy"),
-            appointmentTime: bookedAppointment.time,
-            userEmail: bookedAppointment.patientEmail,
-          }}
-        />
-      )}
+      {/* Mes Rendez-vous Section */}
+      <div className="mt-20 space-y-8">
+        <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Calendar className="size-5 text-primary" />
+            </div>
+            <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">Mes Rendez-vous</h2>
+        </div>
 
-      {userAppointments.length > 0 && (
-        <div className="mt-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black italic text-white">Mes rendez-vous à venir</h2>
-            <div className="h-[2px] flex-1 mx-6 bg-primary/10 hidden md:block"></div>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {userAppointments.length === 0 ? (
+          <Card className="bg-slate-900/40 border-white/5 rounded-3xl p-12 text-center border-dashed border-2">
+            <p className="text-slate-500 font-medium italic">Vous n'avez pas encore de rendez-vous programmé.</p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {userAppointments.map((appointment: any) => (
-              <div key={appointment.id} className="group bg-slate-900/40 border border-white/5 rounded-3xl p-6 backdrop-blur-md shadow-xl hover:border-primary/40 transition-all duration-300">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <img src={appointment.doctorImageUrl} alt={appointment.doctorName} className="size-14 rounded-2xl object-cover ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all" />
-                    <div>
-                      <p className="font-black text-white">{appointment.doctorName}</p>
-                      <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{appointment.reason}</p>
-                    </div>
-                  </div>
-                  <div className={`p-2 rounded-xl border ${appointment.type === 'ONLINE' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-primary/10 border-primary/20 text-primary'}`}>
-                    {appointment.type === 'ONLINE' ? <VideoIcon className="size-5" /> : <MapPin className="size-5" />}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3 bg-black/20 p-3 rounded-2xl border border-white/5">
-                        <div className="flex-1 flex items-center gap-2">
-                            <Calendar className="size-4 text-primary" />
-                            <span className="text-sm font-bold text-slate-300">{format(new Date(appointment.date), "dd MMM yyyy")}</span>
-                        </div>
-                        <div className="w-[1px] h-4 bg-white/10" />
-                        <div className="flex-1 flex items-center justify-end gap-2">
-                            <Clock className="size-4 text-primary" />
-                            <span className="text-sm font-black text-white">{appointment.time}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between bg-black/20 p-3 rounded-2xl border border-white/5">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Honoraires</span>
-                        <span className={`text-sm font-black ${appointment.price > 0 ? 'text-emerald-400' : 'text-amber-400 italic'}`}>
-                            {appointment.price > 0 ? `${appointment.price} FCFA` : 'À définir'}
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2">
-                        {appointment.type === 'ONLINE' && appointment.status === 'CONFIRMED' && (
-                            <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black italic rounded-xl h-11 shadow-lg shadow-blue-600/20 group">
-                                <Link href={`/appointments/room/${appointment.id}`} className="flex items-center justify-center gap-2">
-                                    <VideoIcon className="size-4 group-hover:animate-bounce" />
-                                    REJOINDRE L&apos;APPEL
-                                </Link>
-                            </Button>
-                        )}
-                        
-                        {appointment.status === 'CONFIRMED' && (
-                            <Button 
-                              variant="outline"
-                              className="w-full border-primary/20 hover:bg-primary/10 text-primary font-bold rounded-xl h-11 gap-2"
-                              onClick={() => setRescheduleModal({
-                                isOpen: true,
-                                appointmentId: appointment.id,
-                                date: new Date(appointment.date),
-                                time: appointment.time
-                              })}
-                            >
-                              <RotateCcw className="w-4 h-4" /> REPORTER
-                            </Button>
-                        )}
-                    </div>
-
-                    {appointment.status === 'REQUESTED_RESCHEDULE' && (
-                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">Report en attente</p>
-                                <Badge variant="outline" className="text-amber-500 border-amber-500/20 text-[8px] font-black">
-                                    {appointment.proposedBy === 'PATIENT' ? 'VOTRE DEMANDE' : 'DEMANDE REÇUE'}
-                                </Badge>
+                <Card key={appointment.id} className="bg-slate-900/40 border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm group hover:border-primary/30 transition-all duration-500 shadow-xl">
+                    <div className="p-6 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <Badge className={`${
+                                appointment.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' : 
+                                appointment.status === 'CANCELLED' ? 'bg-red-500/10 text-red-500' : 
+                                'bg-primary/10 text-primary'
+                            } border-none font-black uppercase text-[10px] tracking-widest px-3`}>
+                                {appointment.status === 'COMPLETED' ? 'Terminé' : appointment.status === 'CANCELLED' ? 'Annulé' : 'Confirmé'}
+                            </Badge>
+                            <div className="flex items-center gap-2 text-slate-500">
+                                {appointment.type === 'ONLINE' ? <Video className="size-4 text-blue-400" /> : <MapPin className="size-4 text-amber-400" />}
+                                <span className="text-[10px] font-black uppercase tracking-widest">{appointment.type === 'ONLINE' ? 'Vidéo' : 'Cabinet'}</span>
                             </div>
-                            <p className="text-xs text-slate-300">
-                                Proposé : <span className="font-bold text-white">{format(new Date(appointment.proposedDate), "dd MMM", { locale: fr })} à {appointment.proposedTime}</span>
-                            </p>
-                            
-                            {appointment.proposedBy === 'DOCTOR' && (
-                                <div className="flex gap-2">
-                                    <Button 
-                                      size="sm" 
-                                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold h-8 text-[10px]"
-                                      onClick={() => handleResponseToReschedule(appointment.id, true)}
-                                    >
-                                        ACCEPTER
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <div className="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-primary/20 transition-all">
+                                <User className="size-7 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-white italic tracking-tight uppercase">{appointment.doctorName}</h3>
+                                <p className="text-xs text-slate-500 font-medium italic">"{appointment.reason}"</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-black/20 p-3 rounded-2xl border border-white/5 flex items-center gap-3">
+                                <Calendar className="size-4 text-primary" />
+                                <span className="text-sm font-black text-white">{format(new Date(appointment.date), "dd MMM", { locale: fr })}</span>
+                            </div>
+                            <div className="bg-black/20 p-3 rounded-2xl border border-white/5 flex items-center gap-3">
+                                <Clock className="size-4 text-primary" />
+                                <span className="text-sm font-black text-white">{appointment.time}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between bg-black/20 p-3 rounded-2xl border border-white/5">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Honoraires</span>
+                            <span className={`text-sm font-black ${appointment.price > 0 ? 'text-emerald-400' : 'text-amber-400 italic'}`}>
+                                {appointment.price > 0 ? `${appointment.price} FCFA` : 'À définir'}
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2">
+                            {appointment.status === 'CONFIRMED' && (
+                                <>
+                                    {appointment.type === 'ONLINE' && (
+                                        <Link href={`/appointments/room/${appointment.id}`} className="w-full">
+                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 h-11 rounded-xl font-black italic gap-2 shadow-lg shadow-blue-500/20">
+                                                <Video className="size-4" /> REJOINDRE L'APPEL
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    <Button variant="outline" className="w-full h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl font-bold gap-2">
+                                        <RefreshCcw className="size-4 text-primary" /> REPROGRAMMER
                                     </Button>
-                                    <Button 
-                                      size="sm" 
-                                      variant="ghost"
-                                      className="flex-1 text-red-400 hover:text-red-500 hover:bg-red-500/10 font-bold h-8 text-[10px]"
-                                      onClick={() => handleResponseToReschedule(appointment.id, false)}
-                                    >
-                                        REFUSER
-                                    </Button>
-                                </div>
+                                </>
                             )}
                         </div>
-                    )}
-                </div>
-              </div>
+                    </div>
+                </Card>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      <RescheduleModal 
-        isOpen={rescheduleModal.isOpen}
-        onClose={() => {
-          setRescheduleModal(prev => ({ ...prev, isOpen: false }));
-          refetchAppointments();
-        }}
-        appointmentId={rescheduleModal.appointmentId}
-        currentDate={rescheduleModal.date}
-        currentTime={rescheduleModal.time}
-        proposedBy="PATIENT"
+      <AppointmentConfirmationModal 
+        isOpen={showConfirmationModal}
+        onClose={() => setShowConfirmationModal(false)}
+        appointment={bookedAppointment}
       />
     </>
   );
 }
+
+import { RefreshCcw as RefreshCcwIcon, MapPin as MapPinIcon } from "lucide-react";

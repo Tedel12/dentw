@@ -10,7 +10,7 @@ import { HealthConsentModal } from "@/components/health/HealthConsentModal";
 import { 
   Activity, 
   History, 
-  Stethoscope, 
+  HeartPulse, 
   Droplet, 
   AlertTriangle,
   Clock,
@@ -109,7 +109,7 @@ export default function HealthPage() {
                         <Card className="border-primary/20 shadow-xl shadow-primary/5 overflow-hidden rounded-[2rem]">
                         <CardHeader className="flex flex-row items-center justify-between pb-4 bg-primary/5">
                             <CardTitle className="flex items-center gap-2 font-black uppercase tracking-tighter text-primary">
-                            <Stethoscope className="w-5 h-5" />
+                            <HeartPulse className="w-5 h-5" />
                             Profil Médical
                             </CardTitle>
                             <Dialog>

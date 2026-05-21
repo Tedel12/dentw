@@ -63,6 +63,10 @@ export async function completeDoctorProfile(data: {
   gender: Gender;
   licenseNumber: string;
   workplaceType: string;
+  practiceAddress: string;
+  professionalCardUrl?: string;
+  cipCardUrl?: string;
+  signedContractUrl?: string;
   imageUrl?: string;
 }) {
   const clerkUser = await currentUser();
@@ -73,6 +77,7 @@ export async function completeDoctorProfile(data: {
     const bio = data.bio?.trim();
     const phone = data.phone?.trim();
     const licenseNumber = data.licenseNumber?.trim();
+    const practiceAddress = data.practiceAddress?.trim();
 
     if (!speciality || speciality.length < 2) {
       return { success: false, error: "La specialite est requise" };
@@ -85,6 +90,9 @@ export async function completeDoctorProfile(data: {
     }
     if (!licenseNumber || licenseNumber.length < 5) {
       return { success: false, error: "Un numero de licence valide est requis pour verification" };
+    }
+    if (!practiceAddress || practiceAddress.length < 5) {
+      return { success: false, error: "L'adresse du cabinet est requise" };
     }
 
     const user = await prisma.user.findUnique({
@@ -100,11 +108,15 @@ export async function completeDoctorProfile(data: {
         bio,
         phone,
         licenseNumber,
+        practiceAddress,
         workplaceType: data.workplaceType,
         gender: data.gender,
         clerkId: clerkUser.id,
+        professionalCardUrl: data.professionalCardUrl,
+        cipCardUrl: data.cipCardUrl,
+        signedContractUrl: data.signedContractUrl,
         name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || user.email,
-        verificationStatus: "PENDING", // Always reset to pending on update if someone tries to cheat
+        verificationStatus: "PENDING",
       },
       create: {
         userId: user.id,
@@ -115,9 +127,13 @@ export async function completeDoctorProfile(data: {
         speciality,
         bio,
         licenseNumber,
+        practiceAddress,
         workplaceType: data.workplaceType,
         imageUrl: data.imageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`,
         gender: data.gender,
+        professionalCardUrl: data.professionalCardUrl,
+        cipCardUrl: data.cipCardUrl,
+        signedContractUrl: data.signedContractUrl,
         verificationStatus: "PENDING",
       }
     });

@@ -8,7 +8,7 @@ import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 
 interface TimeSelectionStepProps {
-  selectedDentistId: string;
+  selectedDoctorId: string;
   selectedDate: string;
   selectedTime: string;
   reason: string;
@@ -29,15 +29,15 @@ function TimeSelectionStep({
   onReasonChange,
   onModeChange,
   selectedDate,
-  selectedDentistId,
+  selectedDoctorId,
   selectedTime,
   reason,
   selectedMode,
 }: TimeSelectionStepProps) {
-  const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDentistId, selectedDate);
+  const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDoctorId, selectedDate);
   const { data: dentists = [] } = useAvailableDoctors();
   
-  const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
+  const selectedDoctor = dentists.find((d: any) => d.id === selectedDoctorId);
 
   const availableDates = getNext14Days();
   const availableTimeSlots = getAvailableTimeSlots(
@@ -115,7 +115,7 @@ function TimeSelectionStep({
                 </Label>
                 <Textarea
                     id="appointment-reason"
-                    placeholder="Décrivez brièvement le motif de votre consultation (ex: 'Échographie de grossesse', 'Contrôle annuel', 'Douleur dentaire')."
+                    placeholder="Décrivez brièvement le motif de votre consultation (ex: 'Contrôle annuel', 'Fièvre persistante', 'Suivi de traitement')."
                     value={reason}
                     onChange={(e) => onReasonChange(e.target.value)}
                     className="min-h-[100px] border-white/5 bg-slate-900/40 focus-visible:ring-primary/50"

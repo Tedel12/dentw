@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
-  Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode
+  Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
+  FileText, Upload, MapPin, Download, AlertCircle, Clock
 } from "lucide-react";
 import {
   searchPatient,
@@ -29,6 +30,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { QRScanner } from "@/components/pro/QRScanner";
+import { CONTRACT_TEMPLATE } from "@/lib/contract-template";
+import jsPDF from "jspdf";
+import { APP_NAME } from "@/lib/brand";
 
 interface DoctorPatientsClientProps {
   isInitialPatient: boolean;
@@ -52,12 +56,16 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
   const initializedFromUrl = useRef(false);
 
   const [doctorForm, setDoctorForm] = useState({ 
-    speciality: "", 
-    bio: "", 
-    phone: "", 
-    gender: "MALE" as any,
-    licenseNumber: "",
-    workplaceType: "Cabinet Privé"
+    speciality: doctor?.speciality || "", 
+    bio: doctor?.bio || "", 
+    phone: doctor?.phone || "", 
+    gender: (doctor?.gender || "MALE") as any,
+    licenseNumber: doctor?.licenseNumber || "",
+    workplaceType: doctor?.workplaceType || "Cabinet Privé",
+    practiceAddress: doctor?.practiceAddress || "",
+    professionalCardUrl: doctor?.professionalCardUrl || "",
+    cipCardUrl: doctor?.cipCardUrl || "",
+    signedContractUrl: doctor?.signedContractUrl || ""
   });
 
   const setUrlParams = (nextQuery: string, patientId?: string | null) => {
@@ -86,33 +94,85 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
       .replace("_", "");
   };
 
+  const generateContractPDF = () => {
+    const doc = new jsPDF();
+    const margin = 20;
+    let y = 20;
+    
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(CONTRACT_TEMPLATE.title, margin, y, { maxWidth: 170 });
+    y += 20;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const introLines = doc.splitTextToSize(CONTRACT_TEMPLATE.introduction, 170);
+    doc.text(introLines, margin, y);
+    y += introLines.length * 5 + 10;
+    
+    doc.setFont("helvetica", "bold");
+    doc.text("PREAMBULE", margin, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    const preambleLines = doc.splitTextToSize(CONTRACT_TEMPLATE.preamble, 170);
+    doc.text(preambleLines, margin, y);
+    y += preambleLines.length * 5 + 10;
+    
+    CONTRACT_TEMPLATE.articles.forEach(art => {
+        if (y > 250) { doc.addPage(); y = 20; }
+        doc.setFont("helvetica", "bold");
+        doc.text(`ARTICLE ${art.id} : ${art.title}`, margin, y);
+        y += 7;
+        doc.setFont("helvetica", "normal");
+        const contentLines = doc.splitTextToSize(art.content, 170);
+        doc.text(contentLines, margin, y);
+        y += contentLines.length * 5 + 10;
+    });
+    
+    y += 10;
+    doc.text(CONTRACT_TEMPLATE.footer, margin, y);
+    y += 15;
+    doc.text("Signature du Praticien (Précédée de 'Lu et approuvé')", margin, y);
+    y += 10;
+    doc.rect(margin, y, 60, 30);
+    
+    doc.save(`Contrat_BeninSante_${new Date().getTime()}.pdf`);
+    toast.success("Contrat généré ! Veuillez le signer et l'uploader.");
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        setDoctorForm(prev => ({ ...prev, [field]: reader.result as string }));
+        toast.success(`Fichier chargé !`);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleBecomeDoctor = async () => {
     const speciality = doctorForm.speciality.trim();
     const phone = doctorForm.phone.trim();
     const bio = doctorForm.bio.trim();
     const licenseNumber = doctorForm.licenseNumber.trim();
+    const practiceAddress = doctorForm.practiceAddress.trim();
 
-    if (!speciality) {
-      toast.error("La specialite est obligatoire");
+    if (!speciality || !phone || !licenseNumber || !bio || !practiceAddress) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
-    if (!phone || phone.length < 8) {
-      toast.error("Veuillez saisir un numero professionnel valide");
-      return;
-    }
-    if (!bio || bio.length < 10) {
-      toast.error("La biographie doit contenir au moins 10 caracteres");
-      return;
-    }
-    if (!licenseNumber) {
-      toast.error("Le numero de licence est requis pour verification");
-      return;
+    
+    if (!doctorForm.professionalCardUrl || !doctorForm.cipCardUrl || !doctorForm.signedContractUrl) {
+        toast.error("Veuillez uploader tous les documents de vérification requis");
+        return;
     }
 
     setIsSubmittingDoctorProfile(true);
     const res = await completeDoctorProfile(doctorForm);
     if (res.success) {
-      toast.success("Demande envoyée ! Votre profil est en cours de validation par l'admin.");
+      toast.success("Demande d'inscription envoyée ! L'administrateur va vérifier vos pièces.");
       setTimeout(() => {
         window.location.reload();
       }, 2500);
@@ -178,6 +238,130 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     else toast.error(res.error || "Erreur");
   };
 
+  const renderDoctorForm = () => (
+    <>
+      <div className="grid gap-5 py-4 text-white max-h-[60vh] overflow-y-auto custom-scrollbar px-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase font-black tracking-widest text-primary">Spécialité *</Label>
+            <Input className="bg-muted/10 border-white/10" placeholder="ex: Médecine générale" value={doctorForm.speciality} onChange={e => setDoctorForm({...doctorForm, speciality: e.target.value})} />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase font-black tracking-widest text-primary">N° Licence / Ordre *</Label>
+            <Input className="bg-muted/10 border-white/10" placeholder="Ex: 1000123" value={doctorForm.licenseNumber} onChange={e => setDoctorForm({...doctorForm, licenseNumber: e.target.value})} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+            <Label className="text-[10px] uppercase font-black tracking-widest text-primary">Adresse du Cabinet / Clinique *</Label>
+            <div className="relative">
+                <Input className="bg-muted/10 border-white/10 pl-10" placeholder="Cotonou, Avenue de la Paix..." value={doctorForm.practiceAddress} onChange={e => setDoctorForm({...doctorForm, practiceAddress: e.target.value})} />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-primary" />
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase font-black tracking-widest text-primary">Téléphone Pro *</Label>
+            <Input className="bg-muted/10 border-white/10" placeholder="+229 ..." value={doctorForm.phone} onChange={e => setDoctorForm({...doctorForm, phone: e.target.value})} />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-[10px] uppercase font-black tracking-widest text-primary">Type de Structure</Label>
+            <Select onValueChange={v => setDoctorForm({...doctorForm, workplaceType: v})} defaultValue={doctorForm.workplaceType || "Cabinet Privé"}>
+              <SelectTrigger className="bg-muted/10 border-white/10"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Cabinet Privé">Cabinet Privé</SelectItem>
+                <SelectItem value="Clinique">Clinique</SelectItem>
+                <SelectItem value="Centre de Santé Public">Hôpital / CSP</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-4 border-t border-white/10">
+            <h4 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
+                <ShieldCheck className="size-4 text-primary" /> Pièces Justificatives
+            </h4>
+            
+            <div className="grid grid-cols-1 gap-3">
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                            <FileText className="size-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-white">Carte Professionnelle</p>
+                            <p className="text-[10px] text-slate-500">Scan recto-verso obligatoire</p>
+                        </div>
+                    </div>
+                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
+                        <Upload className={`size-4 ${doctorForm.professionalCardUrl ? 'text-green-400' : 'text-primary'}`} />
+                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleFileUpload(e, 'professionalCardUrl')} />
+                    </label>
+                </div>
+
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                            <AlertCircle className="size-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-white">Certificat CIP (Bénin)</p>
+                            <p className="text-[10px] text-slate-500">Justificatif d'identité nationale</p>
+                        </div>
+                    </div>
+                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
+                        <Upload className={`size-4 ${doctorForm.cipCardUrl ? 'text-green-400' : 'text-primary'}`} />
+                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleFileUpload(e, 'cipCardUrl')} />
+                    </label>
+                </div>
+
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                <ShieldCheck className="size-4" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-bold text-white">Contrat Benin Santé</p>
+                                <p className="text-[10px] text-slate-500">À télécharger, signer et uploader</p>
+                            </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={generateContractPDF} className="h-8 text-primary hover:bg-primary/10 rounded-lg">
+                            <Download className="size-3 mr-2" /> MODÈLE
+                        </Button>
+                    </div>
+                    <label className="cursor-pointer w-full bg-white/5 border border-dashed border-white/20 hover:bg-white/10 p-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                        <Upload className={`size-4 ${doctorForm.signedContractUrl ? 'text-green-400' : 'text-primary'}`} />
+                        <span className="text-[10px] font-bold text-slate-400">
+                            {doctorForm.signedContractUrl ? "CONTRAT CHARGÉ" : "Uploader le contrat signé"}
+                        </span>
+                        <input type="file" className="hidden" accept="image/*,application/pdf" onChange={(e) => handleFileUpload(e, 'signedContractUrl')} />
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <Label className="text-[10px] uppercase font-black tracking-widest text-primary">Biographie / Présentation</Label>
+          <Textarea placeholder="Présentez votre parcours aux futurs patients..." className="h-24 resize-none bg-muted/10 border-white/10 rounded-xl" value={doctorForm.bio} onChange={e => setDoctorForm({...doctorForm, bio: e.target.value})} />
+        </div>
+        <p className="text-xs text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10 italic">
+          Note : Votre accès sera débloqué après vérification manuelle de vos pièces par l'admin.
+        </p>
+      </div>
+      <DialogFooter>
+        <Button
+          onClick={handleBecomeDoctor}
+          className="w-full h-12 font-bold shadow-lg"
+          disabled={isSubmittingDoctorProfile}
+        >
+          {isSubmittingDoctorProfile ? "Validation..." : "Valider mon profil professionnel"}
+        </Button>
+      </DialogFooter>
+    </>
+  );
+
   useEffect(() => {
     const fetchRecent = async () => {
         if (!doctor?.id) return;
@@ -239,6 +423,61 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
   }, [doctor?.id, isInitialPatient, searchParams]);
 
   if (isInitialPatient) {
+    if (doctor?.verificationStatus === "PENDING") {
+      return (
+        <div className="w-full space-y-6">
+          <div className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-[2rem] text-center space-y-4 animate-pulse">
+            <Clock className="w-12 h-12 text-amber-500 mx-auto" />
+            <div className="space-y-1">
+              <h2 className="text-xl font-black text-white italic">EXAMEN EN COURS</h2>
+              <p className="text-slate-400 text-sm font-medium leading-relaxed">
+                Votre demande d'inscription est en cours d'étude par notre équipe de modération.
+              </p>
+            </div>
+          </div>
+          <div className="p-4 bg-white/5 rounded-2xl text-[11px] text-slate-500 text-left border border-white/5">
+             <p className="font-bold text-primary mb-1 uppercase tracking-widest">Processus de sécurité</p>
+             <p>Nous vérifions manuellement votre numéro de licence RPPS, votre certificat CIP ainsi que votre contrat signé pour garantir l'intégrité de la plateforme {APP_NAME}.</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (doctor?.verificationStatus === "REJECTED") {
+      return (
+        <div className="w-full space-y-6">
+          <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-[2rem] text-center space-y-4">
+            <ShieldAlert className="w-12 h-12 text-red-500 mx-auto" />
+            <div className="space-y-1">
+              <h2 className="text-xl font-black text-white italic">PROFIL REJETÉ</h2>
+              <p className="text-slate-400 text-sm font-medium leading-relaxed">
+                Votre demande n'a pas pu être validée. Cela peut être dû à une pièce illisible ou une information erronée.
+              </p>
+            </div>
+          </div>
+          
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+                <Button className="w-full h-14 bg-white/10 hover:bg-white/20 text-white font-black italic rounded-2xl shadow-xl">
+                    CORRIGER MON DOSSIER
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px] rounded-3xl bg-[#020617] border-white/10">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-white">
+                  <Stethoscope className="text-primary" /> Correction de Profil
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Mettez à jour vos informations pour une nouvelle tentative de validation.
+                </DialogDescription>
+              </DialogHeader>
+              {renderDoctorForm()}
+            </DialogContent>
+          </Dialog>
+        </div>
+      );
+    }
+
     return (
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogTrigger asChild>
@@ -246,7 +485,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
             <Stethoscope className="mr-2 w-5 h-5" /> Devenir Praticien
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl bg-card border-primary/10">
+        <DialogContent className="sm:max-w-[500px] rounded-3xl bg-[#020617] border-white/10">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-white">
               <Stethoscope className="text-primary" /> Inscription Praticien
@@ -255,63 +494,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
               Remplissez vos informations professionnelles pour accéder à l'espace de gestion.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-5 py-4 text-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Votre Spécialité *</Label>
-                <Input className="bg-muted/20 border-primary/10" placeholder="ex: Médecine générale, Cardiologie" value={doctorForm.speciality} onChange={e => setDoctorForm({...doctorForm, speciality: e.target.value})} />
-              </div>
-              <div className="space-y-2">
-                <Label>Numéro de Licence (RPPS) *</Label>
-                <Input className="bg-muted/20 border-primary/10" placeholder="Ex: 10001234567" value={doctorForm.licenseNumber} onChange={e => setDoctorForm({...doctorForm, licenseNumber: e.target.value})} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Téléphone Pro *</Label>
-                <Input className="bg-muted/20 border-primary/10" placeholder="+229 ..." value={doctorForm.phone} onChange={e => setDoctorForm({...doctorForm, phone: e.target.value})} />
-              </div>
-              <div className="space-y-2">
-                <Label>Lieu d'exercice</Label>
-                <Select onValueChange={v => setDoctorForm({...doctorForm, workplaceType: v})} defaultValue="Cabinet Privé">
-                  <SelectTrigger className="bg-muted/20 border-primary/10"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Cabinet Privé">Cabinet Privé</SelectItem>
-                    <SelectItem value="Clinique">Clinique</SelectItem>
-                    <SelectItem value="Hôpital">Hôpital</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Genre</Label>
-              <Select onValueChange={v => setDoctorForm({...doctorForm, gender: v as any})} defaultValue="MALE">
-                <SelectTrigger className="bg-muted/20 border-primary/10"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MALE">Homme</SelectItem>
-                  <SelectItem value="FEMALE">Femme</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Biographie / Présentation</Label>
-              <Textarea placeholder="Présentez votre parcours..." className="h-24 resize-none bg-muted/20 border-primary/10" value={doctorForm.bio} onChange={e => setDoctorForm({...doctorForm, bio: e.target.value})} />
-            </div>
-            <p className="text-xs text-muted-foreground bg-primary/5 p-3 rounded-xl border border-primary/10 italic">
-              Note : Votre accès sera débloqué après vérification manuelle de votre licence par l'admin.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handleBecomeDoctor}
-              className="w-full h-12 font-bold shadow-lg"
-              disabled={isSubmittingDoctorProfile}
-            >
-              {isSubmittingDoctorProfile ? "Validation..." : "Valider mon profil professionnel"}
-            </Button>
-          </DialogFooter>
+          {renderDoctorForm()}
         </DialogContent>
       </Dialog>
     );

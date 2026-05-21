@@ -4,7 +4,7 @@ import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import React, { useRef } from "react";
-import { CalendarIcon, Stethoscope, Mic, ShieldCheck } from "lucide-react";
+import { CalendarIcon, HeartPulse, Mic, ShieldCheck } from "lucide-react";
 import { APP_NAME, APP_REGION } from "@/lib/brand";
 import { motion, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { StarrySky } from "../ui/starry-sky";
@@ -55,9 +55,9 @@ const Hero = () => {
               </div>
 
               <h1 className="text-4xl md:text-7xl lg:text-8xl font-black leading-[1] tracking-tighter italic">
-                <span className="block">VOS SOINS,</span>
-                <span className="text-primary drop-shadow-[0_0_20px_rgba(231,138,83,0.5)]">PROPULSÉS</span>
-                <span className="block text-white/90 font-light not-italic tracking-normal text-3xl md:text-6xl mt-2">PAR L'IA.</span>
+                <span className="block text-white/90 font-light not-italic tracking-normal text-3xl md:text-6xl mb-2">VOTRE SANTÉ,</span>
+                <span className="text-primary drop-shadow-[0_0_20px_rgba(231,138,83,0.5)] uppercase">PROTÉGÉE</span>
+                <span className="block text-white/90 font-light not-italic tracking-normal text-3xl md:text-6xl mt-2 italic">PAR L'IA.</span>
               </h1>
 
               <p className="text-base md:text-xl text-slate-400 max-w-lg leading-relaxed font-medium mx-auto lg:mx-0">
@@ -68,7 +68,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <SignUpButton mode="modal">
                 <Button className="h-14 md:h-16 px-6 md:px-10 text-base md:text-lg font-black italic rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl transition-all w-full sm:w-auto" size="lg">
-                  <Stethoscope className="mr-2 size-5" />
+                  <HeartPulse className="mr-2 size-5" />
                   CARNET DE SANTÉ
                 </Button>
               </SignUpButton>
@@ -95,7 +95,7 @@ const Hero = () => {
             >
               <Image 
                 src="/hero.png" 
-                alt="AI Assistant" 
+                alt="AI Health Assistant" 
                 width={500} 
                 height={500} 
                 className="relative z-20 drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] w-full h-auto"
@@ -124,7 +124,7 @@ const Hero = () => {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 className="absolute -right-8 md:-right-12 top-0 z-30 size-16 md:size-24 bg-primary/20 backdrop-blur-md rounded-[1.5rem] md:rounded-[2rem] border border-primary/30 flex items-center justify-center shadow-inner"
               >
-                <Stethoscope className="text-white size-8 md:size-12" />
+                <HeartPulse className="text-white size-8 md:size-12" />
               </motion.div>
 
             </motion.div>

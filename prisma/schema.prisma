@@ -95,6 +95,8 @@ model Doctor {
   licenseNumber       String             @unique
   verificationStatus  VerificationStatus @default(PENDING)
   professionalCardUrl String? // Image/PDF scan
+  cipCardUrl          String? // Certificat d'Identification Personnelle
+  signedContractUrl   String? // Contrat signé
   workplaceType       String? // Cabinet, Hôpital, etc.
 
   createdAt DateTime @default(now())

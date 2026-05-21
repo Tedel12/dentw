@@ -1,142 +1,74 @@
-import { SignUpButton } from '@clerk/nextjs'
-import { ArrowRightIcon, Stethoscope, ZapIcon } from 'lucide-react'
-import Image from 'next/image'
-import React from 'react'
-import { Button } from '../ui/button'
+"use client";
+
+import { Activity, Calendar, HeartPulse, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+
+const steps = [
+  {
+    title: "Créez votre Carnet",
+    description: "Inscrivez-vous et renseignez vos informations de santé de base en quelques secondes.",
+    icon: Activity,
+    color: "bg-blue-500",
+  },
+  {
+    title: "Consultez l'Assistant IA",
+    description: "Posez vos questions de santé à notre assistant vocal IA disponible à tout moment.",
+    icon: HeartPulse,
+    color: "bg-primary",
+  },
+  {
+    title: "Prenez RDV",
+    description: "Choisissez un praticien certifié et réservez votre créneau en ligne ou en cabinet.",
+    icon: Calendar,
+    color: "bg-emerald-500",
+  },
+  {
+    title: "Suivi Sécurisé",
+    description: "Retrouvez vos ordonnances et autorisez vos médecins à consulter votre historique.",
+    icon: ShieldCheck,
+    color: "bg-violet-500",
+  }
+];
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className='relative py-32 px-6 outline-hidden z-10 max-w-7xl mx-auto'>
-
-      {/* HEADER */}
-
-      <div className='text-center mb-20'>
-        <div className='inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full border border-primary/10 backdrop-blur-sm mb-6'>
-          <ZapIcon className='size-4 text-primary' />
-          <span className='text-sm font-medium text-primary'>Simple processus</span>
+    <section id="how-it-works" className="py-24 bg-[#020617] relative">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary">Le Parcours Patient</h2>
+          <p className="text-3xl md:text-5xl font-black italic text-white tracking-tighter">COMMENT ÇA MARCHE ?</p>
         </div>
 
-        <h2 className='text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight'>
-          <span className='bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent'>
-            Trois étapes pour
-          </span>
-          <br />
-          <span className='bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'>
-            une meilleure santé au quotidien.
-          </span>
-        </h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 relative">
+            {/* Ligne de connexion (Desktop) */}
+            <div className="hidden lg:block absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -z-10" />
 
-        <p className='text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed'>
-          Un parcours simple pour vos rendez-vous médicaux et votre carnet de santé, partout au Bénin.
-        </p>
-      </div>
-
-      {/* STEPS */}
-      <div className='relative'>
-        {/* CONNECTION LINE */}
-        <div className='absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent transform -translate-y-1/2 hidden lg:block'></div>
-
-        <div className='grid lg:grid-cols-3 gap-12 lg:gap-8'>
-          {/* STEP 1 */}
-          <div className='relative group'>
-            <div className='relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10'>
-              {/* Step Number */}
-              <div className='absolute -top-4 left-8 w-8 h-8 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shadow-lg'>
-                1
-              </div>
-
-              {/* ICON */}
-              <div className='w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 mb-6'>
-                <Image src="/audio.png" width={40} height={40} className='w-14' alt='woice chat' />
-              </div>
-
-              <h3 className='text-2xl font-bold mb-4 text-center'>Poser une question</h3>
-              <p>Discutez avec notre assistant IA : symptômes courants, prévention, observance des traitements — sans diagnostic médical.</p>
-
-              {/* Feature Pills */}
-              <div className='flex flex-wrap gap-2 justify-center'>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Disponible 24/7
-                </span>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Réponse instantanée
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* STEP 2 */}
-          <div className='relative group'>
-            <div className='relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10'>
-              {/* Step Number */}
-              <div className='absolute -top-4 left-8 w-8 h-8 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shadow-lg'>
-                2
-              </div>
-
-              {/* ICON */}
-              <div className='w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 mb-6'>
-                <Stethoscope className="w-10 h-10 text-primary" />
-              </div>
-
-              <h3 className='text-2xl font-bold mb-4 text-center'>Carnet de Santé Digital</h3>
-              <p className='text-muted-foreground text-center leading-relaxed mb-6'>Synchronisez vos antécédents, allergies et traitements. Un dossier médical complet, organisé et sécurisé, accessible en un clic.</p>
-
-              {/* Feature Pills */}
-              <div className='flex flex-wrap gap-2 justify-center'>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Souveraineté des données
-                </span>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Historique complet
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* STEP 3 */}
-          <div className='relative group'>
-            <div className='relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10'>
-              {/* Step Number */}
-              <div className='absolute -top-4 left-8 w-8 h-8 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shadow-lg'>
-                3
-              </div>
-
-              {/* ICON */}
-              <div className='w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 mb-6'>
-                <Image src="/calendar.png" width={40} height={40} className='w-14' alt='calendar' />
-              </div>
-
-              <h3 className='text-2xl font-bold mb-4 text-center'>Consultation & Suivi</h3>
-              <p>Partagez votre carnet avec des praticiens vérifiés lors de vos rendez-vous. Recevez des ordonnances directement dans votre historique.</p>
-
-              {/* Feature Pills */}
-              <div className='flex flex-wrap gap-2 justify-center'>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Accès temporaire
-                </span>
-                <span className='px-3 py-1 bg-primary/10 text-primary text-xs rounded-full'>
-                  Suivi post-soins
-                </span>
-              </div>
-            </div>
-          </div>
-
-
-
+            {steps.map((step, index) => (
+                <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex flex-col items-center text-center space-y-6 group"
+                >
+                    <div className={`size-20 rounded-[2rem] ${step.color} flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:scale-110 transition-transform duration-500 relative`}>
+                        <div className="absolute -top-2 -right-2 size-8 bg-slate-900 rounded-full flex items-center justify-center border border-white/10 text-xs font-black">
+                            0{index + 1}
+                        </div>
+                        <step.icon className="size-8 text-white" />
+                    </div>
+                    <div className="space-y-3">
+                        <h3 className="text-xl font-black text-white italic">{step.title}</h3>
+                        <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                            {step.description}
+                        </p>
+                    </div>
+                </motion.div>
+            ))}
         </div>
-      </div>
-
-      {/* BOTTOM CTA */}
-      <div className='text-center mt-16'>
-        <SignUpButton mode='modal'>
-          <Button size="lg">
-            <ArrowRightIcon className='mr-2 size-5' />
-            Commencer maintenant
-          </Button>
-        </SignUpButton>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default HowItWorks
+export default HowItWorks;

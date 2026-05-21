@@ -13,11 +13,11 @@ async function DentalHealthOverview() {
   return (
     <Card className="lg:col-span-2 w-full overflow-hidden">
       <CardHeader className="p-4 md:p-6">
-        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-black italic tracking-tight">
           <HeartPulse className="size-5 text-primary" />
-          Votre santé
+          Votre Santé
         </CardTitle>
-        <CardDescription className="text-xs md:text-sm">Suivez votre parcours de soins médicaux</CardDescription>
+        <CardDescription className="text-xs md:text-sm font-medium">Suivez votre parcours de soins médicaux sur Benin Santé</CardDescription>
       </CardHeader>
       <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
@@ -49,7 +49,7 @@ async function DentalHealthOverview() {
             <div className="space-y-3">
               <div>
                 <h4 className="font-black text-primary mb-1 italic uppercase tracking-tighter">Prêt à commencer ?</h4>
-                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed font-medium">
                   Prenez votre premier rendez-vous ou essayez notre assistant vocal IA pour des conseils de santé généraux.
                 </p>
               </div>

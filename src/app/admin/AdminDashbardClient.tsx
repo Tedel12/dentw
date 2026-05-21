@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar'
 import { useGetAppointments } from '@/hooks/use-appointment'
 import { useGetDoctors } from '@/hooks/use-doctors'
 import { useUser } from '@clerk/nextjs'
-import { SettingsIcon, ShieldCheck } from 'lucide-react'
+import { HeartPulse, ShieldCheck } from 'lucide-react'
 import React from 'react'
 import Link from 'next/link'
 
@@ -60,7 +60,7 @@ const AdminDashbardClient = () => {
 
           <div className='hidden lg:block'>
             <div className='w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center'>
-              <SettingsIcon className='w-16 h-16 text-primary' />
+              <HeartPulse className='w-16 h-16 text-primary' />
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Activity, Pill, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,37 +12,47 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AddPrescriptionForm } from "@/components/health/AddPrescriptionForm";
+import { AddPrescriptionForm } from "./AddPrescriptionForm";
 
 interface AddTreatmentDialogProps {
   patientId: string;
 }
 
 export function AddTreatmentDialog({ patientId }: AddTreatmentDialogProps) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 shadow-lg hover:shadow-primary/20">
-          <Plus className="w-4 h-4" /> Ajouter un traitement
+        <Button className="bg-primary hover:bg-primary/90 text-white font-black italic rounded-xl gap-2 shadow-lg shadow-primary/20">
+          <Plus className="size-4" />
+          AJOUTER UN TRAITEMENT
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Ajouter un traitement</DialogTitle>
-          <DialogDescription>
-            Ajoutez une nouvelle prescription ou un traitement a votre carnet de sante.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[600px] bg-[#020617] border-white/10 text-white rounded-[2rem] p-0 overflow-hidden">
+        <DialogHeader className="p-8 bg-white/5 border-b border-white/5">
+          <div className="flex items-center gap-4">
+            <div className="size-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+              <Pill className="size-6 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-2xl font-black italic tracking-tighter">Nouveau Traitement</DialogTitle>
+              <DialogDescription className="text-slate-400 font-medium">
+                Enregistrez une ordonnance ou un soin dans votre carnet digital.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <AddPrescriptionForm
-          patientId={patientId}
-          onSuccess={async () => {
-            setOpen(false);
-            router.refresh();
-          }}
-        />
+        <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <AddPrescriptionForm
+            patientId={patientId}
+            onSuccess={async () => {
+                setOpen(false);
+                router.refresh();
+            }}
+            />
+        </div>
       </DialogContent>
     </Dialog>
   );

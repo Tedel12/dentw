@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { useGetDoctors } from '@/hooks/use-doctors'
-import { EditIcon, MailIcon, PhoneIcon, PlusIcon, StethoscopeIcon, CheckIcon, XIcon, ShieldCheckIcon, ShieldAlertIcon, Clock } from 'lucide-react'
+import { EditIcon, MailIcon, PhoneIcon, PlusIcon, HeartPulse, CheckIcon, XIcon, ShieldCheckIcon, ShieldAlertIcon, Clock } from 'lucide-react'
 import { Button } from '../ui/button'
 import Image from 'next/image'
 import { Badge } from '../ui/badge'
@@ -62,10 +62,10 @@ const DoctorsManagement = () => {
             <CardHeader className='flex items-center justify-between'>
                 <div>
                     <CardTitle className='flex items-center gap-2'>
-                        <StethoscopeIcon className='size-5 text-primary' />
-                        Gestion des docteurs
+                        <HeartPulse className='size-5 text-primary' />
+                        Gestion des praticiens
                     </CardTitle>
-                    <CardDescription>Gérez et supervisez tous les médecins de votre cabinet.</CardDescription>
+                    <CardDescription>Gérez et supervisez tous les praticiens certifiés sur Benin Santé.</CardDescription>
                 </div>
 
                 <Button onClick={() => setIsAddDialogOpen(true)} className='bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/100'>
