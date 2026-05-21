@@ -78,6 +78,7 @@ model Doctor {
   phone           String
   speciality      String
   practiceAddress String?
+  cabinetInfo     String?
   bio             String?
   imageUrl        String
   gender          Gender

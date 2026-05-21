@@ -59,12 +59,12 @@ export const formatPhoneNumber = (value: string): string => {
 };
 
 //  ai generated
-export const getNext5Days = () => {
+export const getNext14Days = () => {
   const dates = [];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 14; i++) {
     const date = new Date(tomorrow);
     date.setDate(date.getDate() + i);
     dates.push(date.toISOString().split("T")[0]);
@@ -91,19 +91,3 @@ export const getAvailableTimeSlots = (start = "09:00", end = "18:00", duration =
 
   return slots;
 };
-
-export const getDoctorAppointmentTypes = (basePrice: number = 3000) => {
-  return [
-    { id: "checkup", name: "Contrôle de routine", duration: "60 min", price: `${basePrice * 1.5} FCFA` },
-    { id: "followup", name: "Suivi médical", duration: "45 min", price: `${basePrice * 2} FCFA` },
-    { id: "consultation", name: "Consultation simple", duration: "30 min", price: `${basePrice} FCFA` },
-    { id: "emergency", name: "Consultation d'urgence", duration: "30 min", price: `${basePrice * 2.5} FCFA` },
-  ];
-};
-
-export const APPOINTMENT_TYPES = [
-  { id: "checkup", name: "Contrôle de routine", duration: "60 min", price: "2000 FCFA" },
-  { id: "followup", name: "Suivi médical", duration: "45 min", price: "5000 FCFA" },
-  { id: "consultation", name: "Consultation", duration: "30 min", price: "3000 FCFA" },
-  { id: "emergency", name: "Consultation d'urgence", duration: "30 min", price: "7000 FCFA" },
-];

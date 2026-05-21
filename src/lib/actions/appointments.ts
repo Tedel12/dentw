@@ -13,7 +13,7 @@ export async function bookAppointment(data: {
   doctorId: string;
   date: string;
   time: string;
-  reason?: string;
+  reason: string;
   type?: AppointmentType;
   duration?: number;
   price?: number;
@@ -37,7 +37,7 @@ export async function bookAppointment(data: {
       status: "CONFIRMED",
       type: data.type || "IN_PERSON",
       duration: data.duration || 30,
-      price: data.price || 0,
+      price: data.price ?? 0,
     },
     include: {
       doctor: {
@@ -211,6 +211,7 @@ export async function getUserAppointments() {
     doctorImageUrl: apt.doctor?.imageUrl || "/logo.png",
     status: apt.status,
     type: apt.type,
+    price: apt.price,
     proposedDate: apt.proposedDate,
     proposedTime: apt.proposedTime,
     proposedBy: apt.proposedBy,
@@ -218,13 +219,25 @@ export async function getUserAppointments() {
   }));
 }
 
-export async function completeAppointment({ id, summary }: { id: string; summary?: string }) {
+export async function completeAppointment({ 
+  id, 
+  summary, 
+  price, 
+  duration 
+}: { 
+  id: string; 
+  summary?: string; 
+  price?: number; 
+  duration?: number; 
+}) {
   try {
     const appointment = await prisma.appointment.update({
       where: { id },
       data: { 
         status: "COMPLETED",
-        summary: summary?.trim() || "Consultation terminée."
+        summary: summary?.trim() || "Consultation terminée.",
+        price: price ?? undefined,
+        duration: duration ?? undefined,
       },
     });
     

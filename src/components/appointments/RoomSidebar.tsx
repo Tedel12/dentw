@@ -19,6 +19,7 @@ import {
     DialogDescription, DialogFooter 
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,8 @@ export default function RoomSidebar({ appointment, isDoctor }: RoomSidebarProps)
     const [showFileDialog, setShowFileDialog] = useState(false);
     const [showCloseDialog, setShowCloseDialog] = useState(false);
     const [summary, setSummary] = useState("");
+    const [price, setPrice] = useState("");
+    const [duration, setDuration] = useState(appointment?.duration?.toString() || "30");
     const [isCompleting, setIsCompleting] = useState(false);
 
     const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
@@ -78,7 +81,9 @@ export default function RoomSidebar({ appointment, isDoctor }: RoomSidebarProps)
         try {
             const res = await completeAppointment({ 
                 id: appointment.id, 
-                summary: isDoctor ? summary : "Session terminée par le patient." 
+                summary: isDoctor ? summary : "Session terminée par le patient.",
+                price: parseFloat(price) || 0,
+                duration: parseInt(duration) || 30
             });
             if (res.success) {
                 toast.success("Consultation clôturée avec succès");
@@ -202,15 +207,51 @@ export default function RoomSidebar({ appointment, isDoctor }: RoomSidebarProps)
                 <DialogContent className="rounded-[2rem] bg-slate-900 border-white/10 text-white max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-black italic">Clôturer la séance</DialogTitle>
+                        <DialogDescription className="text-slate-400">
+                            Saisissez les détails finaux de la consultation.
+                        </DialogDescription>
                     </DialogHeader>
                     {isDoctor && (
-                        <div className="py-4 space-y-3">
-                            <label className="text-xs font-black uppercase tracking-widest text-primary/80">Résumé</label>
-                            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} />
+                        <div className="py-4 space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-primary/80">Montant de la consultation (FCFA)</label>
+                                <Input 
+                                    type="number" 
+                                    placeholder="Ex: 5000" 
+                                    value={price} 
+                                    onChange={(e) => setPrice(e.target.value)}
+                                    className="bg-white/5 border-white/10 rounded-xl"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-primary/80">Durée effective (minutes)</label>
+                                <Input 
+                                    type="number" 
+                                    value={duration} 
+                                    onChange={(e) => setDuration(e.target.value)}
+                                    className="bg-white/5 border-white/10 rounded-xl"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-primary/80">Résumé Médical</label>
+                                <Textarea 
+                                    value={summary} 
+                                    onChange={(e) => setSummary(e.target.value)}
+                                    placeholder="Résumé des soins prodigués..."
+                                    className="bg-white/5 border-white/10 rounded-xl min-h-[100px]"
+                                />
+                            </div>
                         </div>
                     )}
-                    <DialogFooter>
-                        <Button onClick={handleCompleteSession}>CONFIRMER & ARCHIVER</Button>
+                    <DialogFooter className="gap-2">
+                        <Button variant="ghost" onClick={() => setShowCloseDialog(false)} className="rounded-xl font-bold text-slate-400 hover:text-white">ANNULER</Button>
+                        <Button 
+                            onClick={handleCompleteSession}
+                            disabled={isCompleting || (isDoctor && !price)}
+                            className="bg-primary hover:bg-primary/90 text-white font-black italic rounded-xl px-6"
+                        >
+                            {isCompleting ? "CLÔTURE..." : "CONFIRMER & ARCHIVER"}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -22,8 +22,8 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
           <tr>
             <th className="px-6 py-4 text-left">Date</th>
             <th className="px-6 py-4 text-left">Action</th>
-            <th className="px-6 py-4 text-left">Utilisateur</th>
-            <th className="px-6 py-4 text-left">Cible ID</th>
+            <th className="px-6 py-4 text-left">Patient / Cible</th>
+            <th className="px-6 py-4 text-left">Effectué par</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-white/5 text-slate-300">
@@ -36,7 +36,7 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
               <td className="px-6 py-4">
                 {log.user.firstName} {log.user.lastName} <span className="text-slate-500 text-xs">({log.user.email})</span>
               </td>
-              <td className="px-6 py-4 text-xs font-mono text-slate-500">{log.targetId}</td>
+              <td className="px-6 py-4 text-xs font-bold text-emerald-400">{log.accessedBy}</td>
             </tr>
           ))}
         </tbody>

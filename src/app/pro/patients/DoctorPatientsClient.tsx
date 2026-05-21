@@ -15,6 +15,7 @@ import {
   checkDoctorAccess,
   getPatientHealthData,
   getDoctorPatientById,
+  getHealthAccessRequest,
 } from "@/lib/actions/health";
 import { trackRecentPatient, getRecentPatients } from "@/lib/actions/history";
 import { completeDoctorProfile } from "@/lib/actions/users";
@@ -45,6 +46,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [patientData, setPatientData] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmittingDoctorProfile, setIsSubmittingDoctorProfile] = useState(false);
   const initializedFromUrl = useRef(false);
@@ -149,17 +151,30 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     
     const accessRes = await checkDoctorAccess(p.id, doctor.id);
     setHasAccess(accessRes);
+
     if (accessRes) {
       const dataRes = await getPatientHealthData(p.id, doctor.id);
       if (dataRes.success) setPatientData(dataRes.data);
-    } else if (shouldOpenHealth) {
-      toast.info("L'accès au carnet a expiré ou n'est pas encore actif.");
+    } else {
+      // Check for pending/rejected requests
+      const requestRes = await getHealthAccessRequest(p.id, doctor.id);
+      if (requestRes.success && requestRes.request) {
+        setRequestStatus(requestRes.request.status);
+      } else {
+        setRequestStatus(null);
+      }
+      if (shouldOpenHealth) {
+        toast.info("L'accès au carnet a expiré ou n'est pas encore actif.");
+      }
     }
   };
 
   const handleRequestAccess = async (patientId: string) => {
     const res = await requestHealthAccess(patientId, doctor.id);
-    if (res.success) toast.success("Invitation envoyée !");
+    if (res.success) {
+      toast.success("Invitation envoyée !");
+      setRequestStatus("PENDING");
+    }
     else toast.error(res.error || "Erreur");
   };
 
@@ -407,8 +422,14 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
               </div>
 
               {!hasAccess ? (
-                <Button onClick={() => handleRequestAccess(selectedPatient.id)} size="lg" className="h-14 px-8 rounded-2xl gap-3 text-lg font-bold shadow-xl shadow-primary/10">
-                  <ShieldAlert className="w-6 h-6" /> Demander l'accès au carnet
+                <Button 
+                    onClick={() => handleRequestAccess(selectedPatient.id)} 
+                    size="lg" 
+                    className="h-14 px-8 rounded-2xl gap-3 text-lg font-bold shadow-xl shadow-primary/10"
+                    disabled={requestStatus === 'PENDING' || requestStatus === 'REJECTED'}
+                >
+                  <ShieldAlert className="w-6 h-6" /> 
+                  {requestStatus === 'PENDING' || requestStatus === 'REJECTED' ? "Demande en attente" : "Demander l'accès au carnet"}
                 </Button>
               ) : (
                 <div className="flex items-center gap-3 text-green-400 bg-green-500/10 px-6 py-3 rounded-2xl border border-green-500/20 font-black">

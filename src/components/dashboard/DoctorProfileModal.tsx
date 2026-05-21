@@ -60,19 +60,83 @@ export function DoctorProfileModal({
           </div>
         </div>
 
-        <div className="pt-12 px-6 pb-6 space-y-4 overflow-y-auto max-h-[60vh]">
-          <div>
-            <h2 className="text-xl font-black italic">Dr. {doctor.name}</h2>
-            <p className="text-primary text-xs font-bold uppercase tracking-widest">{doctor.speciality}</p>
+        <div className="pt-12 px-6 pb-6 space-y-6 overflow-y-auto max-h-[70vh] custom-scrollbar">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black italic tracking-tighter">Dr. {doctor.name}</h2>
+            <div className="flex items-center gap-2">
+                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-2 py-0.5">
+                    {doctor.speciality}
+                </Badge>
+                {doctor.verificationStatus === 'VERIFIED' && (
+                    <div className="flex items-center gap-1 text-emerald-400 text-[10px] font-bold">
+                        <ShieldCheck className="size-3" /> CERTIFIÉ
+                    </div>
+                )}
+            </div>
           </div>
 
-          <div className="text-sm text-slate-300 leading-relaxed">
-            Le Dr. {doctor.name} souhaite accéder à votre carnet de santé digital pour assurer votre suivi médical.
+          <div className="grid grid-cols-2 gap-4">
+             <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Téléphone</p>
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+                    <Phone className="size-3 text-primary" />
+                    {doctor.phone}
+                </div>
+             </div>
+             <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Honoraires de base</p>
+                <div className="flex items-center gap-2 text-xs font-black text-emerald-400">
+                    <Stethoscope className="size-3" />
+                    {doctor.basePrice ? `${doctor.basePrice} FCFA` : "À définir"}
+                </div>
+             </div>
           </div>
 
-          <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
-            <p className="text-[10px] text-amber-200/80 leading-relaxed">
-              En autorisant, le praticien pourra consulter vos données de santé pendant 24 heures.
+          <div className="space-y-4 text-sm text-slate-300">
+            <div className="flex items-start gap-3">
+                <Calendar className="size-4 text-primary shrink-0 mt-0.5" />
+                <div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Disponibilités</p>
+                    <p className="font-medium text-slate-200 text-xs">{doctor.availableDays || "Lundi - Vendredi"}</p>
+                    <p className="text-[10px] text-slate-500 italic mt-0.5">
+                        <Clock className="size-3 inline mr-1" />
+                        {doctor.workingHoursStart} - {doctor.workingHoursEnd}
+                    </p>
+                </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+                <MapPin className="size-4 text-primary shrink-0 mt-0.5" />
+                <div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cabinet / Lieu de travail</p>
+                    <p className="font-medium text-slate-200">{doctor.practiceAddress || "Adresse non renseignée"}</p>
+                    <p className="text-[10px] text-slate-500 italic mt-0.5">{doctor.workplaceType || "Pratique libérale"}</p>
+                </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+                <UserCheck className="size-4 text-primary shrink-0 mt-0.5" />
+                <div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Numéro d'Ordre / Licence</p>
+                    <p className="font-mono font-bold text-slate-200">{doctor.licenseNumber}</p>
+                </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+                <Info className="size-4 text-primary shrink-0 mt-0.5" />
+                <div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">À propos du praticien</p>
+                    <p className="italic leading-relaxed">
+                        {doctor.bio || "Aucune description fournie par le praticien."}
+                    </p>
+                </div>
+            </div>
+          </div>
+
+          <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-start gap-3">
+            <ShieldAlert className="size-5 text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-[11px] text-amber-200/90 leading-relaxed font-medium">
+              <strong>Sécurité :</strong> En autorisant, ce praticien pourra consulter vos antécédents, traitements et constantes pendant <strong>24 heures</strong>. L'accès sera automatiquement révoqué ensuite.
             </p>
           </div>
         </div>

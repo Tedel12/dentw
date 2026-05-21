@@ -11,14 +11,15 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
-import { checkDoctorAccess, requestHealthAccess, getPatientHealthData } from "@/lib/actions/health";
-import { updateAppointmentStatus, respondToReschedule } from "@/lib/actions/appointments";
+import { checkDoctorAccess, requestHealthAccess, getPatientHealthData, getHealthAccessRequest } from "@/lib/actions/health";
+import { updateAppointmentStatus, respondToReschedule, completeAppointment } from "@/lib/actions/appointments";
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
   DialogTitle,
-  DialogDescription
+  DialogDescription,
+  DialogFooter
 } from "@/components/ui/dialog";
 import { 
   DropdownMenu, 
@@ -32,6 +33,9 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { DoctorSettingsClient } from "@/components/admin/DoctorSettingsClient";
 import { RescheduleModal } from "./RescheduleModal";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 
 interface DoctorAppointmentsViewProps {
   appointments: any[];
@@ -50,7 +54,15 @@ export function DoctorAppointmentsView({
   const [isAccessing, setIsAccessing] = useState(false);
   const [showFileDialog, setShowFileDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const [currentAppointmentId, setCurrentAppointmentId] = useState<string | null>(null);
+
+  // Pour la complétion
+  const [completionData, setCompletionData] = useState({
+    price: "",
+    summary: "",
+    duration: "30"
+  });
 
   const [rescheduleModal, setRescheduleModal] = useState<{
     isOpen: boolean;
@@ -66,12 +78,47 @@ export function DoctorAppointmentsView({
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
+      if (status === "COMPLETED") {
+        setCurrentAppointmentId(id);
+        const apt = appointments.find(a => a.id === id);
+        setCompletionData({
+            price: "",
+            summary: "",
+            duration: apt?.duration?.toString() || "30"
+        });
+        setShowCompleteDialog(true);
+        return;
+      }
+
       await updateAppointmentStatus({ id, status: status as any });
       setAppointments(prev => prev.map(apt => apt.id === id ? { ...apt, status } : apt));
       toast.success(status === "CONFIRMED" ? "Rendez-vous confirmé" : "Rendez-vous annulé");
       if (showFileDialog) setShowFileDialog(false);
     } catch (error) {
       toast.error("Erreur lors de la mise à jour");
+    }
+  };
+
+  const handleFinalizeCompletion = async () => {
+    if (!currentAppointmentId) return;
+
+    try {
+        const res = await completeAppointment({
+            id: currentAppointmentId,
+            price: parseFloat(completionData.price) || 0,
+            summary: completionData.summary,
+            duration: parseInt(completionData.duration) || 30
+        });
+
+        if (res.success) {
+            toast.success("Consultation clôturée avec succès");
+            setAppointments(prev => prev.filter(apt => apt.id !== currentAppointmentId));
+            setShowCompleteDialog(false);
+        } else {
+            toast.error("Erreur lors de la clôture");
+        }
+    } catch (error) {
+        toast.error("Une erreur est survenue");
     }
   };
 
@@ -98,6 +145,20 @@ export function DoctorAppointmentsView({
       const hasAccess = await checkDoctorAccess(patientId, doctorId);
       
       if (!hasAccess) {
+        // Check if there is already a request
+        const requestRes = await getHealthAccessRequest(patientId, doctorId);
+        if (requestRes.success && requestRes.request) {
+            if (requestRes.request.status === 'PENDING') {
+                toast.info("Une demande d'accès est déjà en attente de validation par le patient.");
+                setIsAccessing(false);
+                return;
+            } else if (requestRes.request.status === 'REJECTED') {
+                toast.error("Le patient a refusé votre demande d'accès au dossier.");
+                setIsAccessing(false);
+                return;
+            }
+        }
+
         const res = await requestHealthAccess(patientId, doctorId);
         if (res.success) {
           toast.info("Demande d'accès envoyée au patient. Vous pourrez voir le dossier dès qu'il l'aura validée.");
@@ -434,6 +495,70 @@ export function DoctorAppointmentsView({
                     </Button>
                 </div>
             </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
+        <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-white/10 bg-[#020617] text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black italic">Clôturer la consultation</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Saisissez le montant final et un résumé de la consultation pour le patient.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-6 space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-[10px] font-black uppercase tracking-widest text-primary">Montant de la consultation (FCFA)</Label>
+              <Input 
+                id="price"
+                type="number"
+                placeholder="Ex: 5000"
+                value={completionData.price}
+                onChange={(e) => setCompletionData({...completionData, price: e.target.value})}
+                className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duration" className="text-[10px] font-black uppercase tracking-widest text-primary">Durée effective (minutes)</Label>
+              <Input 
+                id="duration"
+                type="number"
+                placeholder="30"
+                value={completionData.duration}
+                onChange={(e) => setCompletionData({...completionData, duration: e.target.value})}
+                className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="summary" className="text-[10px] font-black uppercase tracking-widest text-primary">Résumé / Note médicale</Label>
+              <Textarea 
+                id="summary"
+                placeholder="Résumé des soins prodigués..."
+                value={completionData.summary}
+                onChange={(e) => setCompletionData({...completionData, summary: e.target.value})}
+                className="bg-white/5 border-white/10 rounded-xl min-h-[120px] focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-3">
+            <Button 
+                variant="ghost" 
+                onClick={() => setShowCompleteDialog(false)}
+                className="flex-1 rounded-xl h-12 font-bold text-slate-400 hover:text-white"
+            >
+                ANNULER
+            </Button>
+            <Button 
+                onClick={handleFinalizeCompletion}
+                className="flex-1 bg-primary hover:bg-primary/90 text-white font-black italic rounded-xl h-12 shadow-lg shadow-primary/20"
+                disabled={!completionData.price}
+            >
+                VALIDER & CLÔTURER
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -89,12 +89,20 @@ export function HealthAccessNotifications({ requests }: HealthAccessNotification
                     variant="outline"
                     size="sm" 
                     className="flex-1 border-white/5 bg-white/5 hover:bg-white/10 text-white rounded-xl h-9 text-xs font-bold gap-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRequest(request);
+                    }}
                 >
                     <Eye className="w-3 h-3" /> VOIR PROFIL
                 </Button>
                 <Button 
                     size="sm" 
                     className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl h-9 text-xs font-black italic gap-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRequest(request);
+                    }}
                 >
                     RÉPONDRE
                 </Button>

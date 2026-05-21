@@ -1,19 +1,21 @@
 import { useBookedTimeSlots } from "@/hooks/use-appointment";
 import { useAvailableDoctors } from "@/hooks/use-doctors";
-import { getDoctorAppointmentTypes, getAvailableTimeSlots, getNext5Days } from "@/lib/utils";
+import { getAvailableTimeSlots, getNext14Days } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon, ClockIcon, VideoIcon, MapPin } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 
 interface TimeSelectionStepProps {
   selectedDentistId: string;
   selectedDate: string;
   selectedTime: string;
-  selectedType: string;
+  reason: string;
   selectedMode: "IN_PERSON" | "ONLINE";
   onDateChange: (date: string) => void;
   onTimeChange: (time: string) => void;
-  onTypeChange: (type: string) => void;
+  onReasonChange: (reason: string) => void;
   onModeChange: (mode: "IN_PERSON" | "ONLINE") => void;
   onBack: () => void;
   onContinue: () => void;
@@ -24,12 +26,12 @@ function TimeSelectionStep({
   onContinue,
   onDateChange,
   onTimeChange,
-  onTypeChange,
+  onReasonChange,
   onModeChange,
   selectedDate,
   selectedDentistId,
   selectedTime,
-  selectedType,
+  reason,
   selectedMode,
 }: TimeSelectionStepProps) {
   const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDentistId, selectedDate);
@@ -37,18 +39,15 @@ function TimeSelectionStep({
   
   const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
 
-  const availableDates = getNext5Days();
+  const availableDates = getNext14Days();
   const availableTimeSlots = getAvailableTimeSlots(
     selectedDoctor?.workingHoursStart || "09:00",
     selectedDoctor?.workingHoursEnd || "18:00",
     selectedDoctor?.consultationDuration || 30
   );
 
-  const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
-
   const handleDateSelect = (date: string) => {
     onDateChange(date);
-    // réinitialiser l’heure lorsque la date change
     onTimeChange("");
   };
 
@@ -109,30 +108,18 @@ function TimeSelectionStep({
                 </div>
             </div>
 
-            {/* sélection du type de rendez-vous */}
+            {/* Champ pour le motif du rendez-vous */}
             <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/80">Type de soin</h3>
-            <div className="space-y-3">
-                {appointmentTypes.map((type: any) => (
-                <Card
-                    key={type.id}
-                    className={`cursor-pointer transition-all duration-300 border-white/5 bg-slate-900/40 hover:border-primary/30 ${
-                    selectedType === type.id ? "ring-2 ring-primary bg-primary/5" : ""
-                    }`}
-                    onClick={() => onTypeChange(type.id)}
-                >
-                    <CardContent className="p-4">
-                    <div className="flex justify-between items-center">
-                        <div>
-                        <h4 className="font-bold text-sm">{type.name}</h4>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1">{type.duration}</p>
-                        </div>
-                        <span className="font-black text-primary italic">{type.price}</span>
-                    </div>
-                    </CardContent>
-                </Card>
-                ))}
-            </div>
+                <Label htmlFor="appointment-reason" className="text-xs font-black uppercase tracking-[0.2em] text-primary/80">
+                    Motif de votre rendez-vous
+                </Label>
+                <Textarea
+                    id="appointment-reason"
+                    placeholder="Décrivez brièvement le motif de votre consultation (ex: 'Échographie de grossesse', 'Contrôle annuel', 'Douleur dentaire')."
+                    value={reason}
+                    onChange={(e) => onReasonChange(e.target.value)}
+                    className="min-h-[100px] border-white/5 bg-slate-900/40 focus-visible:ring-primary/50"
+                />
             </div>
         </div>
 
@@ -200,7 +187,7 @@ function TimeSelectionStep({
       <div className="flex justify-end pt-8 border-t border-white/5">
         <Button 
             onClick={onContinue} 
-            disabled={!selectedType || !selectedDate || !selectedTime}
+            disabled={!reason || !selectedDate || !selectedTime}
             className="rounded-2xl h-14 px-8 font-black italic bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 disabled:opacity-20 transition-all"
         >
             Vérifier le rendez-vous

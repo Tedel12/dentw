@@ -59,14 +59,8 @@ export function NotificationBell() {
   const handleAction = async (notif: any, action: "ACCEPT" | "REJECT") => {
     try {
       if (notif.type === "RESCHEDULE_REQUEST") {
-        // On suppose que le link contient l'ID du RDV ou qu'on peut l'extraire
-        // Pour faire simple ici, on va rediriger vers la page dédiée si besoin
-        // Mais l'idéal est d'avoir l'ID direct. 
-        // Amélioration: Stocker l'ID de la ressource dans la notification
         toast.info("Redirection vers le rendez-vous...");
         router.push(notif.link || "/dashboard");
-      } else if (notif.type === "HEALTH_ACCESS") {
-        router.push("/dashboard/health");
       }
       await handleMarkAsRead(notif.id);
       setIsOpen(false);

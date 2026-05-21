@@ -264,6 +264,7 @@ export async function logTreatmentTake(treatmentId: string) {
 }
 
 import { createNotification } from "./notifications";
+import { logSecurityEvent } from "./security";
 
 // Doctor Access Actions
 export async function requestHealthAccess(userId: string, doctorId: string) {
@@ -273,15 +274,7 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // Check if a pending or approved request already exists
-    const existingRequest = await prisma.healthAccessRequest.findFirst({
-      where: {
-        userId,
-        doctorId,
-        status: { in: [AccessStatus.PENDING, AccessStatus.APPROVED] },
-      },
-    });
-
+    // Check if a request already exists
     const existingRequest = await prisma.healthAccessRequest.findFirst({
       where: {
         userId,
@@ -431,10 +424,19 @@ export async function getOwnHealthData() {
 
 export async function getPatientHealthData(patientId: string, doctorId: string) {
   try {
+    const authUser = await getAuthenticatedDbUser();
     const hasAccess = await checkDoctorAccess(patientId, doctorId);
-    if (!hasAccess) {
+    if (!hasAccess || !authUser) {
       return { success: false, error: "Access denied" };
     }
+
+    // Log this access for security audit
+    await logSecurityEvent({
+      userId: patientId,
+      accessedBy: `${authUser.firstName} ${authUser.lastName} (Dr. ${authUser.doctorProfile?.name})`,
+      action: "VIEW_HEALTH_DATA",
+      targetId: patientId,
+    });
 
     const patient = await prisma.user.findUnique({
       where: { id: patientId },
@@ -462,6 +464,27 @@ export async function getPatientHealthData(patientId: string, doctorId: string) 
     return { success: true, data: patient };
   } catch (error) {
     return { success: false, error: "Failed to fetch patient data" };
+  }
+}
+
+export async function getHealthAccessRequest(userId: string, doctorId: string) {
+  try {
+    const authUser = await getAuthenticatedDbUser();
+    if (!authUser || authUser.role !== "DOCTOR" || authUser.doctorProfile?.id !== doctorId) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const request = await prisma.healthAccessRequest.findFirst({
+      where: {
+        userId,
+        doctorId,
+      },
+    });
+
+    return { success: true, request };
+  } catch (error) {
+    console.error("Error fetching access request:", error);
+    return { success: false, error: "Failed to fetch access request" };
   }
 }
 

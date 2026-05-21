@@ -7,7 +7,6 @@ import ProgressSteps from "@/components/appointments/ProgressSteps";
 import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
 import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment";
 import { useAvailableDoctors } from "@/hooks/use-doctors";
-import { APPOINTMENT_TYPES, getDoctorAppointmentTypes } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
@@ -23,7 +22,7 @@ export function PatientAppointmentsClient() {
   const [selectedDentistId, setSelectedDentistId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const [selectedType, setSelectedType] = useState("");
+  const [reason, setReason] = useState("");
   const [selectedMode, setSelectedMode] = useState<"IN_PERSON" | "ONLINE">("IN_PERSON");
   const [currentStep, setCurrentStep] = useState(1);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -60,32 +59,27 @@ export function PatientAppointmentsClient() {
     setSelectedDentistId(dentistId);
     setSelectedDate("");
     setSelectedTime("");
-    setSelectedType("");
+    setReason("");
     setSelectedMode("IN_PERSON");
   };
 
   const handleBookAppointment = async () => {
-    if (!selectedDentistId || !selectedDate || !selectedTime) {
+    if (!selectedDentistId || !selectedDate || !selectedTime || !reason) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
     const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
-    const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
-    const appointmentType = appointmentTypes.find((t) => t.id === selectedType);
-
-    const durationValue = parseInt(appointmentType?.duration || "30");
-    const priceValue = parseFloat(appointmentType?.price?.replace(/[^0-9.]/g, '') || "0");
 
     bookAppointmentMutation.mutate(
       {
         doctorId: selectedDentistId,
         date: selectedDate,
         time: selectedTime,
-        reason: appointmentType?.name,
+        reason: reason,
         type: selectedMode,
-        duration: durationValue,
-        price: priceValue,
+        duration: selectedDoctor?.consultationDuration || 30,
+        price: 0, // Sera fixé par le docteur plus tard
       },
       {
         onSuccess: async (appointment) => {
@@ -99,9 +93,9 @@ export function PatientAppointmentsClient() {
                 doctorName: appointment.doctorName,
                 appointmentDate: format(new Date(appointment.date), "EEEE, MMMM d, yyyy"),
                 appointmentTime: appointment.time,
-                appointmentType: appointmentType?.name,
-                duration: appointmentType?.duration,
-                price: appointmentType?.price,
+                appointmentType: reason,
+                duration: `${selectedDoctor?.consultationDuration || 30} min`,
+                price: "À définir",
                 mode: selectedMode,
                 roomId: appointment.id
               }),
@@ -111,7 +105,7 @@ export function PatientAppointmentsClient() {
           setSelectedDentistId(null);
           setSelectedDate("");
           setSelectedTime("");
-          setSelectedType("");
+          setReason("");
           setCurrentStep(1);
         },
         onError: (error) => toast.error(`Erreur : ${error.message}`),
@@ -141,13 +135,13 @@ export function PatientAppointmentsClient() {
           selectedDentistId={selectedDentistId}
           selectedDate={selectedDate}
           selectedTime={selectedTime}
-          selectedType={selectedType}
+          reason={reason}
           selectedMode={selectedMode}
           onBack={() => setCurrentStep(1)}
           onContinue={() => setCurrentStep(3)}
           onDateChange={setSelectedDate}
           onTimeChange={setSelectedTime}
-          onTypeChange={setSelectedType}
+          onReasonChange={setReason}
           onModeChange={setSelectedMode}
         />
       )}
@@ -157,7 +151,7 @@ export function PatientAppointmentsClient() {
           selectedDentistId={selectedDentistId}
           selectedDate={selectedDate}
           selectedTime={selectedTime}
-          selectedType={selectedType}
+          reason={reason}
           selectedMode={selectedMode}
           isBooking={bookAppointmentMutation.isPending}
           onBack={() => setCurrentStep(2)}
@@ -212,6 +206,13 @@ export function PatientAppointmentsClient() {
                             <Clock className="size-4 text-primary" />
                             <span className="text-sm font-black text-white">{appointment.time}</span>
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-between bg-black/20 p-3 rounded-2xl border border-white/5">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Honoraires</span>
+                        <span className={`text-sm font-black ${appointment.price > 0 ? 'text-emerald-400' : 'text-amber-400 italic'}`}>
+                            {appointment.price > 0 ? `${appointment.price} FCFA` : 'À définir'}
+                        </span>
                     </div>
 
                     <div className="grid grid-cols-1 gap-2">

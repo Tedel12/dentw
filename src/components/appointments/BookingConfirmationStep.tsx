@@ -1,4 +1,3 @@
-import { getDoctorAppointmentTypes } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChevronLeftIcon, VideoIcon, MapPin, ShieldCheck, Wallet, CalendarDays, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -10,7 +9,7 @@ interface BookingConfirmationStepProps {
   selectedDentistId: string;
   selectedDate: string;
   selectedTime: string;
-  selectedType: string;
+  reason: string;
   selectedMode: "IN_PERSON" | "ONLINE";
   isBooking: boolean;
   onBack: () => void;
@@ -22,7 +21,7 @@ function BookingConfirmationStep({
   selectedDentistId,
   selectedDate,
   selectedTime,
-  selectedType,
+  reason,
   selectedMode,
   isBooking,
   onBack,
@@ -32,9 +31,6 @@ function BookingConfirmationStep({
   const { data: dentists = [] } = useAvailableDoctors();
   const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
   
-  const appointmentTypes = getDoctorAppointmentTypes(selectedDoctor?.basePrice || 3000);
-  const appointmentType = appointmentTypes.find((t) => t.id === selectedType);
-
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header with back button */}
@@ -82,26 +78,26 @@ function BookingConfirmationStep({
                         <div className="flex items-start gap-3 p-4 bg-black/20 rounded-2xl border border-white/5">
                             <Clock className="size-5 text-primary mt-0.5" />
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Heure & Durée</p>
-                                <p className="font-bold text-slate-200">{selectedTime} <span className="text-primary/60 ml-2">({appointmentType?.duration})</span></p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Heure de début</p>
+                                <p className="font-bold text-slate-200">{selectedTime}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-4 bg-black/20 rounded-2xl border border-white/5">
+                        <div className="flex items-start gap-3 p-4 bg-black/20 rounded-2xl border border-white/5 md:col-span-2">
+                            <Clock className="size-5 text-emerald-400 mt-0.5" />
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Motif de consultation</p>
+                                <p className="font-bold text-slate-200 italic">"{reason}"</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-4 bg-black/20 rounded-2xl border border-white/5 md:col-span-2">
                             {selectedMode === 'ONLINE' ? <VideoIcon className="size-5 text-blue-400 mt-0.5" /> : <MapPin className="size-5 text-primary mt-0.5" />}
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Lieu / Mode</p>
                                 <p className={`font-bold ${selectedMode === 'ONLINE' ? 'text-blue-400' : 'text-slate-200'}`}>
                                     {selectedMode === 'ONLINE' ? 'Téléconsultation (Vidéo)' : 'En Cabinet (Présentiel)'}
                                 </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-4 bg-black/20 rounded-2xl border border-white/5">
-                            <Wallet className="size-5 text-emerald-400 mt-0.5" />
-                            <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Coût estimé</p>
-                                <p className="font-black text-emerald-400">{appointmentType?.price}</p>
                             </div>
                         </div>
                     </div>
@@ -113,7 +109,7 @@ function BookingConfirmationStep({
                     <ShieldCheck className="size-6 text-primary" />
                 </div>
                 <p className="text-xs text-slate-300 font-medium leading-relaxed">
-                    En confirmant, vous acceptez les conditions de service de {APP_NAME}. Un email de confirmation vous sera envoyé instantanément.
+                    En confirmant, vous acceptez les conditions de service de {APP_NAME}. Le tarif sera fixé par le praticien lors de la consultation.
                 </p>
             </div>
         </div>

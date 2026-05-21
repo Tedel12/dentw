@@ -163,11 +163,11 @@ export async function getDoctorProfile(clerkId: string) {
 }
 
 export async function updateDoctorSettings(clerkId: string, data: {
-  basePrice: number;
+  practiceAddress: string;
+  cabinetInfo?: string;
   availableDays: string;
   workingHoursStart: string;
   workingHoursEnd: string;
-  consultationDuration: number;
 }) {
   try {
     const doctor = await prisma.doctor.update({
