@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar, RefreshCcw, Video
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar, RefreshCcw, Video,
+  Badge
 } from "lucide-react";
 import {
   searchPatient,
@@ -276,4 +277,5 @@ export function PatientAppointmentsClient() {
   );
 }
 
-import { RefreshCcw as RefreshCcwIcon, MapPin as MapPinIcon } from "lucide-react";
+import { RefreshCcw as RefreshCcwIcon, MapPin as MapPinIcon } from "lucide-react";import Link from "next/link";
+
