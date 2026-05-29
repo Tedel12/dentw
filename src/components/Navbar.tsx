@@ -97,7 +97,7 @@ function Navbar() {
                 )}
 
                 {/* Lien Admin conditionnel */}
-                {clerkUser.primaryEmailAddress?.emailAddress === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+                {clerkUser.emailAddresses.some(e => e.emailAddress.toLowerCase() === process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase()) && (
                   <Link href="/admin" className={linkClass("/admin")}>
                     <Shield className="w-4 h-4" />
                     <span className="hidden lg:inline">Administration</span>

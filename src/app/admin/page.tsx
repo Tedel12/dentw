@@ -8,11 +8,11 @@ async function AdminPage() {
     //user is not logged in
     if(!user) redirect("/");
 
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-    const userEmail = user.emailAddresses[0]?.emailAddress;
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase();
+    const userEmails = user.emailAddresses.map(e => e.emailAddress.toLowerCase());
 
     // user is not the admin
-    if (!adminEmail || userEmail !== adminEmail) redirect ("/dashboard");
+    if (!adminEmail || !userEmails.includes(adminEmail)) redirect ("/dashboard");
 
     return <AdminDashbardClient />
 }
