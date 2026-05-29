@@ -1,279 +1,213 @@
 'use client';
 
 import React from 'react';
-import { Shield, Lock, Eye, UserCheck, Clock, FileText, AlertTriangle, Award } from 'lucide-react';
+import { Shield, Lock, Eye, UserCheck, Clock, FileText, AlertTriangle, Award, HeartPulse } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import { APP_NAME } from '@/lib/brand';
 
 export default function PrivacyPolicy() {
   const lastUpdated = "29 mai 2026";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#020617] text-white">
+      <Navbar />
+      
+      <div className="max-w-4xl mx-auto py-24 px-6 md:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-orange-100">
-              <Shield className="w-16 h-16 text-orange-600" />
+        <div className="text-center mb-16 animate-in fade-in slide-in-from-top-8 duration-1000">
+          <div className="flex justify-center mb-8">
+            <div className="p-5 bg-primary/10 rounded-[2rem] border border-primary/20 shadow-2xl shadow-primary/10 relative group">
+                <div className="absolute inset-0 bg-primary/20 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Shield className="w-16 h-16 text-primary relative z-10" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Politique de Confidentialité
+          <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase mb-4">
+            Politique de <span className="text-primary">Confidentialité</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Comment Bénin Santé protège vos données de santé dans le respect total de la législation béninoise
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto font-medium italic leading-relaxed">
+            Comment {APP_NAME} protège vos données de santé dans le respect total de la législation béninoise.
           </p>
-          <p className="text-sm text-gray-500 mt-4">
-            Dernière mise à jour : {lastUpdated}
-          </p>
+          <div className="mt-8 inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <Clock className="w-3 h-3" /> Dernière mise à jour : {lastUpdated}
+          </div>
         </div>
 
-        <div className="prose prose-lg max-w-none bg-white rounded-3xl shadow-sm p-10 md:p-16 border">
-          <div className="mb-12">
-            <p className="text-gray-700 leading-relaxed">
-              Chez <strong>Bénin Santé</strong>, nous considérons que vos données de santé sont sacrées.
+        <div className="bg-slate-900/40 backdrop-blur-md rounded-[3rem] border border-white/5 p-10 md:p-16 shadow-2xl space-y-16">
+          <div className="bg-primary/5 border border-primary/10 p-8 rounded-3xl relative overflow-hidden group">
+            <div className="absolute -right-4 -top-4 size-32 bg-primary opacity-[0.03] rounded-full blur-3xl group-hover:opacity-10 transition-opacity" />
+            <p className="text-slate-300 leading-relaxed font-medium relative z-10">
+              Chez <strong className="text-white font-black italic">{APP_NAME}</strong>, nous considérons que vos données de santé sont sacrées.
               Nous nous engageons à les protéger avec le plus haut niveau de sécurité et de transparence,
-              en pleine conformité avec la <strong>Loi n° 2017-20 portant Code du numérique en République du Bénin</strong>
-              et la <strong>Loi n° 2009-09 relative à la protection des données à caractère personnel</strong>.
+              en pleine conformité avec la <strong className="text-primary">Loi n° 2017-20 portant Code du numérique en République du Bénin</strong>
+              et la <strong className="text-primary">Loi n° 2009-09 relative à la protection des données à caractère personnel</strong>.
             </p>
           </div>
 
           {/* Section 1 */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <FileText className="w-8 h-8 text-orange-600" />
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl border border-primary/20">
+                <FileText className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-3xl font-semibold text-gray-900">1. Informations que nous collectons</h2>
+              <h2 className="text-3xl font-black italic tracking-tight uppercase">1. Informations collectées</h2>
             </div>
 
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-xl font-semibold mb-3">1.1 Données personnelles et de santé</h3>
-                <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                  <li>Informations d’identification (nom, prénom, date de naissance, sexe, contact)</li>
-                  <li>Données médicales : antécédents, allergies, groupe sanguin, ordonnances, résultats d’analyses, traitements en cours</li>
-                  <li>Informations sur les rendez-vous et historique de consultations</li>
-                  <li>Données techniques : logs d’utilisation, adresse IP (anonymisée), type d’appareil</li>
+            <div className="grid md:grid-cols-2 gap-8 pt-4">
+              <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                <h3 className="text-lg font-black text-primary uppercase tracking-widest mb-4">1.1 Données personnelles</h3>
+                <ul className="space-y-3 text-sm text-slate-400 font-medium">
+                  <li className="flex items-start gap-2 italic">
+                    <span className="text-primary mt-1">•</span> 
+                    Identification (nom, prénom, date de naissance, contact)
+                  </li>
+                  <li className="flex items-start gap-2 italic">
+                    <span className="text-primary mt-1">•</span> 
+                    Données médicales : antécédents, allergies, ordonnances
+                  </li>
+                  <li className="flex items-start gap-2 italic">
+                    <span className="text-primary mt-1">•</span> 
+                    Historique de consultations et rendez-vous
+                  </li>
+                  <li className="flex items-start gap-2 italic">
+                    <span className="text-primary mt-1">•</span> 
+                    Données techniques anonymisées
+                  </li>
                 </ul>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-3">1.2 Données collectées en mode offline</h3>
-                <p className="text-gray-700">
-                  Lorsque vous utilisez le carnet de santé en mode hors-ligne, toutes les données sont stockées localement
-                  sur votre appareil via <strong>IndexedDB</strong> et chiffrées avec l’algorithme <strong>AES-GCM 256 bits</strong>
-                  via l’API Web Crypto du navigateur.
+              <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                <h3 className="text-lg font-black text-primary uppercase tracking-widest mb-4">1.2 Mode Offline</h3>
+                <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                  En mode hors-ligne, les données sont stockées localement via <strong className="text-slate-200">IndexedDB</strong> et chiffrées en <strong className="text-slate-200">AES-GCM 256 bits</strong>. 
+                  Vous gardez le contrôle total sur votre appareil.
                 </p>
               </div>
             </div>
           </section>
 
           {/* Section 2 */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Eye className="w-8 h-8 text-orange-600" />
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl border border-primary/20">
+                <Eye className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-3xl font-semibold text-gray-900">2. Comment nous utilisons vos données</h2>
+              <h2 className="text-3xl font-black italic tracking-tight uppercase">2. Utilisation des données</h2>
             </div>
-            <ul className="space-y-4 text-gray-700">
-              <li className="flex gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-green-600 text-xs">✓</span>
-                </div>
-                Permettre la prise de rendez-vous et la gestion de votre carnet de santé numérique
-              </li>
-              <li className="flex gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-green-600 text-xs">✓</span>
-                </div>
-                Envoyer des rappels (rendez-vous, prise de médicaments)
-              </li>
-              <li className="flex gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-green-600 text-xs">✓</span>
-                </div>
-                Permettre aux praticiens autorisés d’accéder temporairement à votre dossier avec votre consentement explicite
-              </li>
-              <li className="flex gap-3">
-                <div className="mt-1 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-green-600 text-xs">✓</span>
-                </div>
-                Améliorer l’expérience utilisateur et la sécurité de la plateforme
-              </li>
-            </ul>
+            <div className="grid gap-4">
+                {[
+                    "Gestion du carnet de santé numérique et prise de RDV",
+                    "Envoi de rappels médicaux et notifications de sécurité",
+                    "Accès temporaire pour les praticiens autorisés (24h)",
+                    "Amélioration de l'IA médicale et de l'expérience utilisateur"
+                ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-4 bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-primary/20 transition-colors">
+                        <div className="size-6 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                            <span className="text-emerald-400 text-[10px] font-black italic">OK</span>
+                        </div>
+                        <p className="text-slate-300 font-bold italic text-sm uppercase tracking-tight">{item}</p>
+                    </div>
+                ))}
+            </div>
           </section>
 
           {/* Section 3 */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <UserCheck className="w-8 h-8 text-orange-600" />
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl border border-primary/20">
+                <UserCheck className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-3xl font-semibold text-gray-900">3. Partage des données</h2>
+              <h2 className="text-3xl font-black italic tracking-tight uppercase">3. Partage & Consentement</h2>
             </div>
-            <div className="bg-amber-50 border border-amber-200 p-8 rounded-2xl">
-              <p className="font-medium mb-4">Nous ne vendons, ne louons ni ne commercialisons vos données de santé à des tiers.</p>
-
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-2">Partage avec les praticiens :</h4>
-                  <p className="text-gray-700">
-                    L’accès au carnet de santé par un médecin est strictement conditionné par un <strong>consentement explicite</strong> de votre part
-                    (via génération d’un QR code temporaire). L’accès est révoqué automatiquement après la consultation ou à expiration du token.
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold mb-2">Prestataires techniques :</h4>
-                  <p className="text-gray-700">
-                    Nous travaillons avec des sous-traitants de confiance (Clerk, Neon, Vercel, Resend) soumis à des accords de protection des données
-                    stricts et conformes au RGPD et à la législation béninoise.
-                  </p>
+            <div className="bg-amber-500/5 border border-amber-500/20 p-8 rounded-3xl space-y-6">
+              <p className="font-black italic text-amber-500 uppercase tracking-tighter text-lg">Nous ne vendons jamais vos données.</p>
+              <div className="space-y-4">
+                <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                    L'accès par un médecin est <strong className="text-slate-200">uniquement</strong> possible via votre accord explicite (QR Code). 
+                    Le token d'accès expire automatiquement après 24 heures pour garantir votre vie privée.
+                </p>
+                <div className="flex items-center gap-2 p-3 bg-black/40 rounded-xl border border-white/5">
+                    <HeartPulse className="size-4 text-primary" />
+                    <span className="text-[10px] font-black uppercase text-slate-500">Propulsé par Benin Santé – Protection par Design</span>
                 </div>
               </div>
             </div>
           </section>
 
           {/* Section 4 - Sécurité */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Lock className="w-8 h-8 text-orange-600" />
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl border border-primary/20">
+                <Lock className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-3xl font-semibold text-gray-900">4. Mesures de sécurité</h2>
+              <h2 className="text-3xl font-black italic tracking-tight uppercase">4. Sécurité de niveau bancaire</h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="border rounded-2xl p-8 hover:border-orange-200 transition-colors">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <Shield className="text-emerald-600" /> Chiffrement
+              <div className="bg-white/5 border border-white/5 rounded-3xl p-8 hover:border-primary/40 transition-all group">
+                <h3 className="font-black italic text-lg mb-4 flex items-center gap-3 text-white uppercase tracking-tighter">
+                  <Shield className="text-emerald-500 size-6" /> Chiffrement
                 </h3>
-                <ul className="space-y-3 text-sm text-gray-600">
-                  <li>• Chiffrement en transit : HTTPS + TLS 1.3 + HSTS</li>
-                  <li>• Chiffrement des données offline : AES-GCM 256 bits</li>
-                  <li>• Stockage serveur : chiffré au repos sur Neon PostgreSQL</li>
+                <ul className="space-y-3 text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  <li>• Transit : HTTPS + TLS 1.3</li>
+                  <li>• Offline : AES-GCM 256 bits</li>
+                  <li>• Serveur : Chiffrement au repos</li>
                 </ul>
               </div>
 
-              <div className="border rounded-2xl p-8 hover:border-orange-200 transition-colors">
-                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                  <Award className="text-emerald-600" /> Authentification
+              <div className="bg-white/5 border border-white/5 rounded-3xl p-8 hover:border-primary/40 transition-all group">
+                <h3 className="font-black italic text-lg mb-4 flex items-center gap-3 text-white uppercase tracking-tighter">
+                  <Award className="text-emerald-500 size-6" /> Authentification
                 </h3>
-                <ul className="space-y-3 text-sm text-gray-600">
-                  <li>• Authentification multi-facteurs (MFA) via Clerk</li>
-                  <li>• Tokens JWT sécurisés</li>
-                  <li>• Sessions à durée limitée</li>
+                <ul className="space-y-3 text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  <li>• MFA (Double Facteur) via Clerk</li>
+                  <li>• Tokens JWT de courte durée</li>
+                  <li>• Code PIN Biométrique en local</li>
                 </ul>
               </div>
             </div>
           </section>
 
           {/* Section 5 - Vos droits */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <UserCheck className="w-8 h-8 text-orange-600" />
+          <section className="space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/20 rounded-2xl border border-primary/20">
+                <UserCheck className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-3xl font-semibold text-gray-900">5. Vos droits (conformément à la loi béninoise)</h2>
+              <h2 className="text-3xl font-black italic tracking-tight uppercase leading-tight">5. Vos droits (Loi Béninoise)</h2>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               {[
-                { title: "Droit d’accès", desc: "Consulter toutes les données que nous détenons sur vous" },
+                { title: "Droit d’accès", desc: "Consulter toutes vos données détenues" },
                 { title: "Droit de rectification", desc: "Corriger les informations inexactes" },
-                { title: "Droit à l’effacement (« droit à l’oubli »)", desc: "Demander la suppression définitive de vos données" },
-                { title: "Droit d’opposition", desc: "Vous opposer à certains traitements" },
-                { title: "Droit à la portabilité", desc: "Recevoir vos données dans un format lisible (PDF)" },
-                { title: "Droit de retrait du consentement", desc: "Révoquer à tout moment l’accès accordé à un praticien" },
+                { title: "Droit à l’effacement", desc: "Suppression définitive de vos données" },
+                { title: "Droit à la portabilité", desc: "Recevoir vos données au format PDF" },
+                { title: "Droit de retrait", desc: "Révoquer l'accès à un praticien" },
+                { title: "Droit d'opposition", desc: "S'opposer à certains traitements" },
               ].map((right, i) => (
-                <div key={i} className="border-l-4 border-orange-500 pl-6 py-1">
-                  <h4 className="font-semibold text-lg">{right.title}</h4>
-                  <p className="text-gray-600 mt-1">{right.desc}</p>
+                <div key={i} className="border-l-4 border-primary pl-6 py-2 bg-white/[0.02] rounded-r-2xl">
+                  <h4 className="font-black italic text-white uppercase tracking-tighter">{right.title}</h4>
+                  <p className="text-slate-500 text-sm font-medium italic">{right.desc}</p>
                 </div>
               ))}
             </div>
 
-            <p className="mt-8 text-sm text-gray-500 italic">
-              Pour exercer ces droits, contactez-nous à <span className="font-medium text-orange-600">privacy@beninsante.bj</span>
+            <p className="p-4 bg-primary/5 rounded-2xl text-[11px] text-slate-400 text-center border border-primary/10 font-bold italic">
+              Pour exercer ces droits, contactez notre délégué à la protection des données : <span className="text-primary underline">privacy@beninsante.bj</span>
             </p>
           </section>
 
-          {/* Section 6 - Responsabilités */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <AlertTriangle className="w-8 h-8 text-orange-600" />
-              </div>
-              <h2 className="text-3xl font-semibold text-gray-900">6. Responsabilités partagées</h2>
+          {/* Contact Final */}
+          <section className="border-t border-white/5 pt-12 text-center space-y-6">
+            <h2 className="text-2xl font-black italic uppercase tracking-tighter">Besoin d'aide ?</h2>
+            <div className="p-8 bg-white/5 rounded-[2rem] border border-white/5 inline-block min-w-[300px] hover:border-primary/20 transition-all">
+              <p className="text-slate-400 font-bold text-sm mb-2 uppercase">Service Juridique & Support</p>
+              <p className="text-primary font-black italic text-xl">contact@beninsante.bj</p>
             </div>
-
-            <div className="bg-white border border-gray-200 rounded-2xl p-10 space-y-8">
-              <div>
-                <h3 className="font-semibold text-lg mb-3 text-orange-700">Notre responsabilité :</h3>
-                <p className="text-gray-700">
-                  Nous mettons en œuvre toutes les mesures techniques et organisationnelles appropriées pour protéger vos données.
-                  Bénin Santé agit comme un <strong>coffre-fort numérique</strong> dont vous êtes le seul détenteur de la clé.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-lg mb-3 text-orange-700">Votre responsabilité :</h3>
-                <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                  <li>Sécuriser votre appareil et votre code PIN/PIN biométrique</li>
-                  <li>Ne pas partager vos identifiants de connexion</li>
-                  <li>Être vigilant lors du partage temporaire de votre carnet avec un praticien</li>
-                  <li>Nous informer rapidement en cas de soupçon de compromission de votre compte</li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 7 - Mode Offline */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Clock className="w-8 h-8 text-orange-600" />
-              </div>
-              <h2 className="text-3xl font-semibold text-gray-900">7. Mode Offline-first</h2>
-            </div>
-            <p className="text-gray-700">
-              Les données stockées localement sur votre appareil restent sous votre contrôle exclusif. Elles sont chiffrées et ne sont jamais transmises
-              sans votre consentement ni sans une connexion sécurisée. La synchronisation ne s’effectue que lorsque vous êtes connecté à internet.
+            <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest mt-8">
+                {APP_NAME} – Plateforme de santé numérique béninoise • Respect de la vie privée par design
             </p>
           </section>
-
-          {/* Section 8 - Modifications */}
-          <section className="mb-16">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-6">8. Modifications de la Politique</h2>
-            <p className="text-gray-700">
-              Nous pouvons mettre à jour cette politique. Toute modification importante sera notifiée via l’application et par email.
-              Nous vous encourageons à consulter régulièrement cette page.
-            </p>
-          </section>
-
-          {/* Contact */}
-          <section className="border-t pt-12">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Shield className="w-8 h-8 text-orange-600" />
-              </div>
-              <h2 className="text-3xl font-semibold text-gray-900">Nous contacter</h2>
-            </div>
-            <p className="text-gray-700">
-              Pour toute question relative à vos données personnelles ou pour exercer vos droits, vous pouvez nous contacter à :
-            </p>
-            <div className="mt-6 p-8 bg-gray-50 rounded-2xl">
-              <p className="font-medium">✉️ privacy@beninsante.bj</p>
-              <p className="text-sm text-gray-500 mt-4">
-                Conformément à la réglementation, nous répondons à toute demande dans un délai maximum d’un (1) mois.
-              </p>
-            </div>
-          </section>
-        </div>
-
-        <div className="text-center text-xs text-gray-400 mt-12">
-          Bénin Santé – Plateforme de santé numérique béninoise • Respect de la vie privée par design
         </div>
       </div>
     </div>
