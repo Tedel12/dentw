@@ -100,6 +100,32 @@ export function DoctorAppointmentsView({
     }
   };
 
+  const handleResponseToReschedule = async (id: string, accept: boolean) => {
+    try {
+        const res = await respondToReschedule(id, accept);
+        if (res.success) {
+            toast.success(accept ? "Report accepté !" : "Report refusé.");
+            setAppointments(prev => prev.map(apt => {
+                if (apt.id === id) {
+                    return {
+                        ...apt,
+                        status: "CONFIRMED",
+                        date: accept ? apt.proposedDate : apt.date,
+                        time: accept ? apt.proposedTime : apt.time,
+                        proposedDate: null,
+                        proposedTime: null
+                    };
+                }
+                return apt;
+            }));
+        } else {
+            toast.error(res.error || "Erreur lors de la réponse");
+        }
+    } catch (error) {
+        toast.error("Une erreur est survenue");
+    }
+  };
+
   const handleFinalizeCompletion = async () => {
     if (!currentAppointmentId) return;
 
@@ -278,6 +304,40 @@ export function DoctorAppointmentsView({
                         "{apt.reason}"
                     </p>
                 </div>
+
+                {apt.status === 'REQUESTED_RESCHEDULE' && (
+                    <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in duration-500">
+                        <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl space-y-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                                <RotateCcw className="size-3" /> Proposition du patient
+                            </p>
+                            <div className="space-y-1">
+                                <p className="text-sm font-black text-white">
+                                    {apt.proposedDate ? format(new Date(apt.proposedDate), "dd MMMM", { locale: fr }) : "Date à définir"} à {apt.proposedTime}
+                                </p>
+                                <p className="text-xs text-slate-400 italic">"{apt.rescheduleReason}"</p>
+                            </div>
+                            
+                            <div className="flex gap-2 pt-1">
+                                <Button 
+                                    size="sm" 
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                    onClick={() => handleResponseToReschedule(apt.id, true)}
+                                >
+                                    Accepter
+                                </Button>
+                                <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    className="flex-1 border-white/10 bg-white/5 hover:bg-white/10 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                    onClick={() => handleResponseToReschedule(apt.id, false)}
+                                >
+                                    Refuser
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-3 pt-4">
                   <div className="flex items-center gap-2 mb-2">

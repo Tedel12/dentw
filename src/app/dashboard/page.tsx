@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
 import { QRCodeAccess } from "@/components/dashboard/QRCodeAccess";
 
+import { redirect } from "next/navigation";
+
 export const dynamic = "force-dynamic";
 
 async function DashboardPage() {
@@ -16,8 +18,7 @@ async function DashboardPage() {
     const clerkUser = await currentUser();
     
     if (!clerkUser) {
-      console.log("No Clerk user found.");
-      return null;
+      redirect("/");
     }
 
     // Get user from DB with pending health access requests
@@ -33,8 +34,7 @@ async function DashboardPage() {
     });
 
     if (!user) {
-      console.log("User not found in database for Clerk ID:", clerkUser.id);
-      return null;
+      redirect("/");
     }
 
     return (

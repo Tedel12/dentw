@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
   FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar, RefreshCcw, Video,
-  Badge
+  Badge, RotateCcw
 } from "lucide-react";
 import {
   searchPatient,
@@ -42,6 +42,7 @@ import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment
 import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { respondToReschedule } from "@/lib/actions/appointments";
 import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
+import Link from "next/link";
 
 export function PatientAppointmentsClient() {
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
@@ -246,6 +247,40 @@ export function PatientAppointmentsClient() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-2">
+                            {appointment.status === 'REQUESTED_RESCHEDULE' && (
+                                <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in duration-500">
+                                    <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl space-y-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                                            <RotateCcw className="size-3" /> Nouvelle proposition
+                                        </p>
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-black text-white">
+                                                {appointment.proposedDate ? format(new Date(appointment.proposedDate), "dd MMMM", { locale: fr }) : "Date à définir"} à {appointment.proposedTime}
+                                            </p>
+                                            <p className="text-xs text-slate-400 italic">"{appointment.rescheduleReason}"</p>
+                                        </div>
+                                        
+                                        <div className="flex gap-2 pt-1">
+                                            <Button 
+                                                size="sm" 
+                                                className="flex-1 bg-emerald-600 hover:bg-emerald-500 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                                onClick={() => handleResponseToReschedule(appointment.id, true)}
+                                            >
+                                                Accepter
+                                            </Button>
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline"
+                                                className="flex-1 border-white/10 bg-white/5 hover:bg-white/10 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                                onClick={() => handleResponseToReschedule(appointment.id, false)}
+                                            >
+                                                Garder l'initial
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {appointment.status === 'CONFIRMED' && (
                                 <>
                                     {appointment.type === 'ONLINE' && (
@@ -276,6 +311,3 @@ export function PatientAppointmentsClient() {
     </>
   );
 }
-
-import { RefreshCcw as RefreshCcwIcon, MapPin as MapPinIcon } from "lucide-react";import Link from "next/link";
-

@@ -5,16 +5,18 @@ import { PatientAppointmentsClient } from "@/components/appointments/PatientAppo
 import { DoctorAppointmentsView } from "@/components/appointments/DoctorAppointmentsView";
 import { getDoctorAppointments } from "@/lib/actions/appointments";
 
+import { redirect } from "next/navigation";
+
 export default async function AppointmentsPage() {
   const clerkUser = await currentUser();
-  if (!clerkUser) return null;
+  if (!clerkUser) redirect("/");
 
   const user = await prisma.user.findUnique({
     where: { clerkId: clerkUser.id },
     include: { doctorProfile: true }
   });
 
-  if (!user) return null;
+  if (!user) redirect("/");
 
   let doctorAppointments: any[] = [];
   if (user.role === "DOCTOR" && user.doctorProfile) {
