@@ -33,14 +33,15 @@ interface CreateDoctorInput {
   gender: Gender;
   isActive: boolean;
   licenseNumber: string;
+  practiceAddress: string;
   workplaceType?: string;
   professionalCardUrl?: string;
 }
 
 export async function createDoctor(input: CreateDoctorInput) {
   try {
-    if (!input.name || !input.email || !input.licenseNumber) {
-      throw new Error("Name, email and license number are required");
+    if (!input.name || !input.email || !input.licenseNumber || !input.practiceAddress) {
+      throw new Error("Name, email, license number and practice address are required");
     }
 
     const doctor = await prisma.$transaction(async (tx) => {
@@ -59,7 +60,7 @@ export async function createDoctor(input: CreateDoctorInput) {
         data: {
           ...input,
           userId: linkedUser.id,
-          verificationStatus: "PENDING",
+          verificationStatus: "VERIFIED", // Manually added by admin = already verified
           imageUrl: generateAvatar(input.name, input.gender),
         },
       });

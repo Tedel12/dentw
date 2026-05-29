@@ -8,6 +8,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { Suspense } from "react";
 import { QRCodeAccess } from "@/components/dashboard/QRCodeAccess";
+import { OnboardingInstructor } from "@/components/dashboard/OnboardingInstructor";
 
 import { redirect } from "next/navigation";
 
@@ -41,6 +42,10 @@ async function DashboardPage() {
       <>
         <Navbar />
         <div className="w-full px-4 md:px-8 py-8 pt-24">
+          <div className="max-w-[1600px] mx-auto">
+            <OnboardingInstructor />
+          </div>
+          
           {user.role === "DOCTOR" ? (
             <div className="space-y-12 pb-20 max-w-[1600px] mx-auto">
               <WelcomeSection role={user.role} />

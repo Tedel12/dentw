@@ -9,6 +9,7 @@ import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { formatPhoneNumber } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface AddDoctorDialogProps {
     isOpen: boolean,
@@ -25,6 +26,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
         isActive: true,
         licenseNumber: "",
         workplaceType: "Cabinet Privé",
+        practiceAddress: "",
     });
 
     const createDoctorMutation = useCreateDoctor()
@@ -35,7 +37,21 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
     }
 
     const handleSave = () => {
-        createDoctorMutation.mutate({...newDoctor }, { onSuccess: () => { handleClose(); onClose(); } });
+        if (!newDoctor.practiceAddress) {
+            toast.error("L'adresse du cabinet est obligatoire");
+            return;
+        }
+
+        createDoctorMutation.mutate({...newDoctor }, { 
+            onSuccess: () => { 
+                toast.success("Praticien ajouté avec succès");
+                handleClose(); 
+                onClose(); 
+            },
+            onError: (error: any) => {
+                toast.error(error.message || "Erreur lors de l'ajout");
+            }
+        });
     }
 
     const handleClose = () => {
@@ -49,6 +65,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
             isActive: true,
             licenseNumber: "",
             workplaceType: "Cabinet Privé",
+            practiceAddress: "",
         });
     }
 
@@ -56,8 +73,8 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className='sm:max-w-[500px]'>
                 <DialogHeader>
-                    <DialogTitle>Ajoutez un docteur</DialogTitle>
-                    <DialogDescription>Ajoutez un nouveau docteur à votre cabinet.</DialogDescription>
+                    <DialogTitle>Ajoutez un praticien</DialogTitle>
+                    <DialogDescription>Inscrivez manuellement un nouveau professionnel de santé.</DialogDescription>
                 </DialogHeader>
 
                 <div className='grid gap-4 py-4'>
@@ -80,7 +97,7 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
                     <div className='grid grid-cols-2 gap-4'>
                         <div className="space-y-2">
                             <Label htmlFor='new-license'>Numéro de licence *</Label>
-                            <Input id='new-license' value={newDoctor.licenseNumber} onChange={(e) => setNewDoctor({ ...newDoctor, licenseNumber: e.target.value })} placeholder='Ex: 10001234567' />
+                            <Input id='new-license' value={newDoctor.licenseNumber} onChange={(e) => setNewDoctor({ ...newDoctor, licenseNumber: e.target.value })} placeholder='Ex: 1000123' />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor='new-workplace'>Lieu de travail</Label>
@@ -94,11 +111,17 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
                                 <SelectContent>
                                     <SelectItem value='Cabinet Privé'>Cabinet Privé</SelectItem>
                                     <SelectItem value='Clinique'>Clinique</SelectItem>
-                                    <SelectItem value='Hôpital Public'>Hôpital Public</SelectItem>
+                                    <SelectItem value='Centre de Santé Public'>Centre de Santé Public</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
+                    
+                    <div className="space-y-2">
+                        <Label htmlFor='new-address'>Adresse du Cabinet *</Label>
+                        <Input id='new-address' value={newDoctor.practiceAddress} onChange={(e) => setNewDoctor({ ...newDoctor, practiceAddress: e.target.value })} placeholder='Cotonou, Avenue de la Paix' />
+                    </div>
+
                     <div className="space-y-2">
                         <Label htmlFor='new-phone'>Téléphone</Label>
                         <Input id='new-phone' value={newDoctor.phone} onChange={(e) => handlePhoneChange(e.target.value)} placeholder='(229) 01 90909012' />
@@ -149,9 +172,9 @@ function AddDoctorDialog({ isOpen, onClose} : AddDoctorDialogProps) {
                     <Button
                         onClick={handleSave}
                         className='bg-primary hover:bg-primary/90'
-                        disabled={!newDoctor.name || !newDoctor.email || !newDoctor.speciality || !newDoctor.licenseNumber || createDoctorMutation.isPending}
+                        disabled={!newDoctor.name || !newDoctor.email || !newDoctor.speciality || !newDoctor.licenseNumber || !newDoctor.practiceAddress || createDoctorMutation.isPending}
                     >
-                        {createDoctorMutation.isPending ? 'En cours' : 'Ajouter'}
+                        {createDoctorMutation.isPending ? 'En cours...' : 'Ajouter'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

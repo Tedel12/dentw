@@ -170,16 +170,22 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
     }
 
     setIsSubmittingDoctorProfile(true);
-    const res = await completeDoctorProfile(doctorForm);
-    if (res.success) {
-      toast.success("Demande d'inscription envoyée ! L'administrateur va vérifier vos pièces.");
-      setTimeout(() => {
-        window.location.reload();
-      }, 2500);
-    } else {
-      toast.error(res.error || "Erreur lors de la creation du profil");
+    try {
+      const res = await completeDoctorProfile(doctorForm);
+      if (res.success) {
+        toast.success("Demande d'inscription envoyée ! L'administrateur va vérifier vos pièces.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+      } else {
+        toast.error(res.error || "Erreur lors de la création du profil");
+        setIsSubmittingDoctorProfile(false);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Une erreur technique est survenue lors de l'envoi.");
+      setIsSubmittingDoctorProfile(false);
     }
-    setIsSubmittingDoctorProfile(false);
   };
 
   const handleSearch = async () => {

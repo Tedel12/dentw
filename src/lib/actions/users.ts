@@ -198,3 +198,51 @@ export async function checkUserExportPin(pin: string) {
     return { success: false, error: "Verification failed" };
   }
 }
+
+export async function getProfileCompletion() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return null;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUser.id },
+      include: { doctorProfile: true }
+    });
+
+    if (!user) return null;
+
+    let completion = 0;
+    let steps: { label: string; completed: boolean; link: string }[] = [];
+
+    if (user.role === "PATIENT") {
+      const patientSteps = [
+        { label: "Groupe Sanguin", field: user.bloodGroup, link: "/dashboard/health" },
+        { label: "Allergies et Maladies", field: user.allergies || user.chronicDiseases, link: "/dashboard/health" },
+        { label: "Paramètres Biométriques (Poids/Âge)", field: user.weight != null && user.age != null, link: "/dashboard/health" },
+        { label: "Code PIN de Sécurité", field: user.exportPin, link: "/dashboard/health" },
+      ];
+      
+      const completedCount = patientSteps.filter(s => !!s.field).length;
+      completion = Math.round((completedCount / patientSteps.length) * 100);
+      steps = patientSteps.map(s => ({ label: s.label, completed: !!s.field, link: s.link }));
+
+    } else if (user.role === "DOCTOR" && user.doctorProfile) {
+      const doc = user.doctorProfile;
+      const doctorSteps = [
+        { label: "Localisation du Cabinet", field: doc.practiceAddress, link: "/appointments" },
+        { label: "Présentation / Biographie", field: doc.bio, link: "/appointments" },
+        { label: "Configuration des Horaires", field: doc.availableDays, link: "/appointments" },
+        { label: "Contact Professionnel", field: doc.phone, link: "/appointments" },
+      ];
+
+      const completedCount = doctorSteps.filter(s => !!s.field).length;
+      completion = Math.round((completedCount / doctorSteps.length) * 100);
+      steps = doctorSteps.map(s => ({ label: s.label, completed: !!s.field, link: s.link }));
+    }
+
+    return { completion, steps, role: user.role };
+  } catch (error) {
+    console.error("Completion error:", error);
+    return null;
+  }
+}
