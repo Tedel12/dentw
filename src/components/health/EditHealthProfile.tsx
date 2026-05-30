@@ -132,15 +132,15 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 md:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="pseudo"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2"><User className="w-4 h-4" /> Pseudo / Nom Public</FormLabel>
-                <FormControl><Input placeholder="ex: Patient_01" {...field} /></FormControl>
+              <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2"><User className="w-3.5 h-3.5" /> Pseudo / Nom Public</FormLabel>
+                <FormControl><Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl" placeholder="ex: Patient_01" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -149,9 +149,9 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
             control={form.control}
             name="age"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Âge</FormLabel>
-                <FormControl><Input type="number" {...field} /></FormControl>
+              <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Âge</FormLabel>
+                <FormControl><Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl" type="number" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -160,12 +160,12 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
             control={form.control}
             name="weight"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-primary" /> Poids (kg)
+              <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <Scale className="w-3.5 h-3.5 text-primary" /> Poids (kg)
                 </FormLabel>
                 <FormControl>
-                  <Input type="text" inputMode="decimal" placeholder="ex: 70.5" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl" type="text" inputMode="decimal" placeholder="ex: 70.5" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -175,15 +175,15 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
             control={form.control}
             name="bloodGroup"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2"><Droplet className="w-4 h-4 text-red-500" /> Groupe Sanguin</FormLabel>
+              <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2"><Droplet className="w-3.5 h-3.5 text-red-500" /> Groupe Sanguin</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl">
                       <SelectValue placeholder="Sélectionnez" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="bg-slate-900 border-white/10 text-white">
                     {Object.values(BloodGroup).map((bg: any) => (
                       <SelectItem key={bg} value={bg}>{bg.replace("_POSITIVE", "+").replace("_NEGATIVE", "-")}</SelectItem>
                     ))}
@@ -197,12 +197,12 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
             control={form.control}
             name="exportPin"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-primary" /> Code PIN Export (4+ chiffres)
+              <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 text-primary" /> PIN Export (4+ chiffres)
                 </FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl" type="password" placeholder="••••" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -210,73 +210,80 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="allergies"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-500" /> Allergies connues</FormLabel>
-              <FormControl><Textarea placeholder="ex: Pénicilline, Arachides..." className="resize-none" {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4 pt-4 border-t border-white/5">
+            <FormField
+            control={form.control}
+            name="allergies"
+            render={({ field }) => (
+                <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Allergies connues</FormLabel>
+                <FormControl><Textarea placeholder="ex: Pénicilline, Arachides..." className="bg-white/5 border-white/10 rounded-xl min-h-[80px] resize-none" {...field} /></FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
 
-        <FormField
-          control={form.control}
-          name="chronicDiseases"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Maladies Chroniques / Antécédents</FormLabel>
-              <FormControl><Textarea placeholder="ex: Diabète type 2, Asthme..." className="resize-none" {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+            control={form.control}
+            name="chronicDiseases"
+            render={({ field }) => (
+                <FormItem className="text-left">
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Maladies / Antécédents</FormLabel>
+                <FormControl><Textarea placeholder="ex: Diabète type 2, Asthme..." className="bg-white/5 border-white/10 rounded-xl min-h-[80px] resize-none" {...field} /></FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
 
-        <FormField
-          control={form.control}
-          name="electrophoresis"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Électrophorèse</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="ex: AS, AA, AC... ou résultat pertinent"
-                  className="resize-none"
-                  {...field}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                control={form.control}
+                name="electrophoresis"
+                render={({ field }) => (
+                    <FormItem className="text-left">
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Électrophorèse</FormLabel>
+                    <FormControl>
+                        <Input
+                        placeholder="ex: AS, AA, AC..."
+                        className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl"
+                        {...field}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        <FormField
-          control={form.control}
-          name="vaccines"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Vaccins</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="ex: Tétanos (2024), Hépatite B..."
-                  className="resize-none"
-                  {...field}
+                <FormField
+                control={form.control}
+                name="vaccines"
+                render={({ field }) => (
+                    <FormItem className="text-left">
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Derniers Vaccins</FormLabel>
+                    <FormControl>
+                        <Input
+                        placeholder="ex: Tétanos (2024)..."
+                        className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl"
+                        {...field}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            </div>
+        </div>
 
-        <Button type="submit" className="w-full gap-2" disabled={loading}>
-          <ShieldCheck className="w-4 h-4" /> {loading ? "Enregistrement..." : "Sauvegarder mon profil sécurisé"}
-        </Button>
-        
-        <Button type="button" onClick={handlePanicRevoke} variant="destructive" className="w-full gap-2 mt-4" disabled={revoking}>
-            <AlertTriangle className="w-4 h-4" /> {revoking ? "Révocation..." : "PANIC BUTTON: Révoquer tous les accès"}
-        </Button>
+        <div className="flex flex-col gap-3 pt-6">
+            <Button type="submit" className="w-full h-12 md:h-14 font-black italic rounded-xl gap-2 shadow-lg shadow-primary/20" disabled={loading}>
+            {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+            {loading ? "ENREGISTREMENT..." : "SAUVEGARDER MON PROFIL"}
+            </Button>
+            
+            <Button type="button" onClick={handlePanicRevoke} variant="destructive" className="w-full h-10 md:h-12 rounded-xl gap-2 opacity-80 hover:opacity-100 transition-all font-bold text-[10px] md:text-xs" disabled={revoking}>
+                <AlertTriangle className="w-3.5 h-3.5" /> {revoking ? "RÉVOCATION..." : "RÉVOQUER TOUS LES ACCÈS MÉDECINS"}
+            </Button>
+        </div>
       </form>
     </Form>
   );

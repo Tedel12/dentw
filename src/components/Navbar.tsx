@@ -48,12 +48,12 @@ function Navbar() {
   if (!isLoaded) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-2 border-b border-border/50 bg-background/90 backdrop-blur-md h-16">
-      <div className="max-w-7xl mx-auto flex justify-between items-center h-full gap-3">
-        <div className="flex items-center gap-3 md:gap-8">
-          <Link href={clerkUser ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <Image src="/logo.png" alt={`Logo ${APP_NAME}`} width={32} height={32} className="w-11" />
-            {!clerkUser && <span className="font-bold text-lg hidden sm:inline">{APP_NAME}</span>}
+    <nav className="fixed top-0 left-0 right-0 z-50 px-3 md:px-6 py-2 border-b border-border/50 bg-background/90 backdrop-blur-md h-16">
+      <div className="max-w-7xl mx-auto flex justify-between items-center h-full gap-2 md:gap-3">
+        <div className="flex items-center gap-2 md:gap-8 min-w-0">
+          <Link href={clerkUser ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
+            <Image src="/logo.png" alt={`Logo ${APP_NAME}`} width={28} height={28} className="w-8 md:w-11" />
+            {!clerkUser && <span className="font-bold text-sm md:text-lg hidden xs:inline tracking-tight truncate">{APP_NAME}</span>}
           </Link>
 
           <div className="hidden md:flex items-center gap-4 lg:gap-6">
@@ -97,7 +97,7 @@ function Navbar() {
                 )}
 
                 {/* Lien Admin conditionnel */}
-                {clerkUser.emailAddresses.some(e => e.emailAddress.trim().toLowerCase() === process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase()) && (
+                {clerkUser.emailAddresses.some(e => e.emailAddress.trim().toLowerCase() === "benagbannon@gmail.com") && (
                   <Link href="/admin" className={linkClass("/admin")}>
                     <Shield className="w-4 h-4" />
                     <span className="hidden lg:inline">Administration</span>
@@ -124,32 +124,32 @@ function Navbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1.5 md:gap-4 shrink-0">
           {clerkUser ? (
             <>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden" aria-label="Ouvrir le menu">
-                    <MenuIcon className="w-5 h-5" />
+                  <Button variant="ghost" size="icon" className="md:hidden size-9 rounded-xl hover:bg-white/5" aria-label="Ouvrir le menu">
+                    <MenuIcon className="w-5 h-5 text-slate-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[85%] sm:max-w-sm">
-                  <SheetHeader>
-                    <SheetTitle>Navigation</SheetTitle>
+                <SheetContent side="left" className="w-[85%] sm:max-w-sm bg-slate-950 border-white/5 text-white">
+                  <SheetHeader className="text-left">
+                    <SheetTitle className="text-xl font-black italic uppercase tracking-tighter text-primary">Navigation</SheetTitle>
                   </SheetHeader>
-                  <div className="px-4 pb-6 space-y-4 pt-4">
+                  <div className="px-2 pb-6 space-y-4 pt-8">
                     <PWAInstallPrompt />
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <SheetClose asChild>
-                        <Link href="/dashboard" className={`${linkClass("/dashboard")} p-3 rounded-xl hover:bg-muted`}>
-                          <HomeIcon className="w-4 h-4" />
-                          <span>Dashboard</span>
+                        <Link href="/dashboard" className={`${linkClass("/dashboard")} p-4 rounded-2xl hover:bg-white/5 bg-white/[0.02] border border-white/5`}>
+                          <HomeIcon className="w-5 h-5 text-primary" />
+                          <span className="font-bold uppercase tracking-tight text-sm">Tableau de bord</span>
                         </Link>
                       </SheetClose>
                     <SheetClose asChild>
-                      <Link href="/about-project" className={`${linkClass("/about-project")} p-3 rounded-xl hover:bg-muted`}>
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        <span>Le Projet</span>
+                      <Link href="/about-project" className={`${linkClass("/about-project")} p-4 rounded-2xl hover:bg-white/5 bg-white/[0.02] border border-white/5`}>
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        <span className="font-bold uppercase tracking-tight text-sm">Le Projet</span>
                       </Link>
                     </SheetClose>
 
@@ -158,19 +158,19 @@ function Navbar() {
                         <SheetClose asChild>
                           <Link
                             href="/dashboard/health"
-                            className={`${linkClass("/dashboard/health")} p-3 rounded-xl hover:bg-muted`}
+                            className={`${linkClass("/dashboard/health")} p-4 rounded-2xl hover:bg-white/5 bg-white/[0.02] border border-white/5`}
                           >
-                            <HeartPulse className="w-4 h-4" />
-                            <span>Mon Carnet</span>
+                            <HeartPulse className="w-5 h-5 text-primary" />
+                            <span className="font-bold uppercase tracking-tight text-sm">Mon Carnet Digital</span>
                           </Link>
                         </SheetClose>
                         <SheetClose asChild>
                           <Link
                             href="/pro/patients"
-                            className="flex items-center gap-2 p-3 rounded-xl text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+                            className="flex items-center gap-3 p-4 rounded-2xl text-slate-500 hover:text-primary hover:bg-white/5 transition-all bg-white/[0.01] border border-dashed border-white/10"
                           >
                             <Users className="w-4 h-4" />
-                            <span>Professionnel ?</span>
+                            <span className="font-black italic uppercase tracking-widest text-[10px]">Espace Professionnel</span>
                           </Link>
                         </SheetClose>
                       </>
@@ -178,17 +178,17 @@ function Navbar() {
 
                     {role === "DOCTOR" && (
                       <SheetClose asChild>
-                        <Link href="/pro/patients" className={`${linkClass("/pro/patients")} p-3 rounded-xl hover:bg-muted`}>
-                          <Users className="w-4 h-4" />
-                          <span>Espace Praticien</span>
+                        <Link href="/pro/patients" className={`${linkClass("/pro/patients")} p-4 rounded-2xl hover:bg-white/5 bg-white/[0.02] border border-white/5`}>
+                          <Users className="w-5 h-5 text-primary" />
+                          <span className="font-bold uppercase tracking-tight text-sm">Espace Praticien</span>
                         </Link>
                       </SheetClose>
                     )}
 
                     <SheetClose asChild>
-                      <Link href="/appointments" className={`${linkClass("/appointments")} p-3 rounded-xl hover:bg-muted`}>
-                        <CalendarIcon className="w-4 h-4" />
-                        <span>Rendez-vous</span>
+                      <Link href="/appointments" className={`${linkClass("/appointments")} p-4 rounded-2xl hover:bg-white/5 bg-white/[0.02] border border-white/5`}>
+                        <CalendarIcon className="w-5 h-5 text-primary" />
+                        <span className="font-bold uppercase tracking-tight text-sm">Rendez-vous</span>
                       </Link>
                     </SheetClose>
                   </div>
@@ -196,15 +196,15 @@ function Navbar() {
               </SheetContent>
               </Sheet>
               <NotificationBell />
-              <UserButton />
+              <UserButton appearance={{ elements: { userButtonAvatarBox: "size-9 md:size-10 rounded-xl md:rounded-2xl" } }} />
             </>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 md:gap-2">
                 <SignInButton mode="modal">
-                    <Button variant="ghost" size="sm" className="font-bold">Connexion</Button>
+                    <Button variant="ghost" size="sm" className="font-bold text-xs h-9 px-3 rounded-lg hover:bg-white/5">Connexion</Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                    <Button size="sm" className="font-black italic">S'inscrire</Button>
+                    <Button size="sm" className="font-black italic text-xs h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">S'inscrire</Button>
                 </SignUpButton>
             </div>
           )}

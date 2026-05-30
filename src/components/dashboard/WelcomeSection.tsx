@@ -12,25 +12,25 @@ export default async function WelcomeSection({ role }: WelcomeSectionProps) {
 
   return (
     <FadeIn>
-      <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-3xl p-6 md:p-8 border border-primary/20 mb-8 overflow-hidden shadow-sm text-center sm:text-left gap-6">
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 animate-in zoom-in duration-500 delay-200">
-            <div className="size-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-primary">Prêt à vous aider</span>
+      <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-[2rem] md:rounded-3xl p-5 md:p-8 border border-primary/20 mb-6 md:mb-8 overflow-hidden shadow-sm text-center sm:text-left gap-4 md:gap-6">
+        <div className="space-y-3 md:space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 animate-in zoom-in duration-500 delay-200 mx-auto sm:mx-0">
+            <div className="size-1.5 md:size-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Prêt à vous aider</span>
           </div>
           <div>
-            <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">
+            <h1 className="text-2xl md:text-4xl font-black mb-1 md:mb-2 tracking-tighter italic uppercase text-white leading-tight">
               {new Date().getHours() < 12
                 ? "Bonjour"
                 : new Date().getHours() < 18
                 ? "Bon après-midi"
                 : "Bonsoir"}
-              , {role === 'DOCTOR' ? `Dr. ${user?.firstName} ${user?.lastName}` : user?.firstName} 👋
+              ,<br className="sm:hidden" /> {role === 'DOCTOR' ? `Dr. ${user?.firstName}` : user?.firstName} 👋
             </h1>
-            <p className="text-muted-foreground max-w-lg leading-relaxed text-sm md:text-base">
+            <p className="text-slate-400 max-w-lg leading-relaxed text-[11px] md:text-base font-medium italic">
               {role === 'DOCTOR' 
-                ? "Gérez vos consultations du jour et suivez le parcours de santé de vos patients."
-                : `Votre assistant ${APP_NAME} vous accompagne au quotidien. Que souhaitez-vous faire aujourd'hui ?`}
+                ? "Gérez vos consultations et accédez aux dossiers patients."
+                : `Votre assistant ${APP_NAME} vous accompagne au quotidien.`}
             </p>
           </div>
         </div>

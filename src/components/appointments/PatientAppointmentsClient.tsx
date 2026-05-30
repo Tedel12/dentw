@@ -187,111 +187,77 @@ export function PatientAppointmentsClient() {
       )}
 
       {/* Mes Rendez-vous Section */}
-      <div className="mt-20 space-y-8">
-        <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Calendar className="size-5 text-primary" />
+      <div className="mt-12 md:mt-20 space-y-6 md:space-y-8 animate-in fade-in duration-1000 delay-300">
+        <div className="flex items-center gap-2 md:gap-3">
+            <div className="size-8 md:size-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Calendar className="size-4 md:size-5 text-primary" />
             </div>
-            <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">Mes Rendez-vous</h2>
+            <h2 className="text-xl md:text-2xl font-black italic tracking-tighter text-white uppercase">Mes Rendez-vous</h2>
         </div>
 
         {userAppointments.length === 0 ? (
-          <Card className="bg-slate-900/40 border-white/5 rounded-3xl p-12 text-center border-dashed border-2">
-            <p className="text-slate-500 font-medium italic">Vous n'avez pas encore de rendez-vous programmé.</p>
+          <Card className="bg-slate-900/40 border-white/5 rounded-3xl p-8 md:p-12 text-center border-dashed border-2">
+            <p className="text-slate-500 text-sm md:text-base font-medium italic">Vous n'avez pas encore de rendez-vous programmé.</p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {userAppointments.map((appointment: any) => (
-                <Card key={appointment.id} className="bg-slate-900/40 border-white/5 rounded-3xl overflow-hidden backdrop-blur-sm group hover:border-primary/30 transition-all duration-500 shadow-xl">
-                    <div className="p-6 space-y-6">
-                        <div className="flex items-center justify-between">
+                <Card key={appointment.id} className="bg-slate-900/40 border-white/5 rounded-[1.5rem] md:rounded-3xl overflow-hidden backdrop-blur-sm group hover:border-primary/30 transition-all duration-500 shadow-xl">
+                    <div className="p-5 md:p-6 space-y-4 md:space-y-6">
+                        <div className="flex items-center justify-between gap-2">
                             <Badge className={`${
                                 appointment.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-500' : 
                                 appointment.status === 'CANCELLED' ? 'bg-red-500/10 text-red-500' : 
                                 'bg-primary/10 text-primary'
-                            } border-none font-black uppercase text-[10px] tracking-widest px-3`}>
+                            } border-none font-black uppercase text-[8px] md:text-[10px] tracking-widest px-2 md:px-3`}>
                                 {appointment.status === 'COMPLETED' ? 'Terminé' : appointment.status === 'CANCELLED' ? 'Annulé' : 'Confirmé'}
                             </Badge>
-                            <div className="flex items-center gap-2 text-slate-500">
-                                {appointment.type === 'ONLINE' ? <Video className="size-4 text-blue-400" /> : <MapPin className="size-4 text-amber-400" />}
-                                <span className="text-[10px] font-black uppercase tracking-widest">{appointment.type === 'ONLINE' ? 'Vidéo' : 'Cabinet'}</span>
+                            <div className="flex items-center gap-1.5 text-slate-500 shrink-0">
+                                {appointment.type === 'ONLINE' ? <Video className="size-3 md:size-4 text-blue-400" /> : <MapPin className="size-3 md:size-4 text-amber-400" />}
+                                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest">{appointment.type === 'ONLINE' ? 'Vidéo' : 'Cabinet'}</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="size-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-primary/20 transition-all">
-                                <User className="size-7 text-primary" />
+                        <div className="flex items-center gap-3 md:gap-4 text-left min-w-0">
+                            <div className="size-10 md:size-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-primary/20 transition-all shrink-0">
+                                <User className="size-5 md:size-7 text-primary" />
                             </div>
-                            <div>
-                                <h3 className="font-black text-white italic tracking-tight uppercase">{appointment.doctorName}</h3>
-                                <p className="text-xs text-slate-500 font-medium italic">"{appointment.reason}"</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-black/20 p-3 rounded-2xl border border-white/5 flex items-center gap-3">
-                                <Calendar className="size-4 text-primary" />
-                                <span className="text-sm font-black text-white">{format(new Date(appointment.date), "dd MMM", { locale: fr })}</span>
-                            </div>
-                            <div className="bg-black/20 p-3 rounded-2xl border border-white/5 flex items-center gap-3">
-                                <Clock className="size-4 text-primary" />
-                                <span className="text-sm font-black text-white">{appointment.time}</span>
+                            <div className="min-w-0">
+                                <h3 className="font-black text-white text-sm md:text-lg italic tracking-tight uppercase truncate">{appointment.doctorName}</h3>
+                                <p className="text-[10px] md:text-xs text-slate-500 font-medium italic truncate">"{appointment.reason}"</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between bg-black/20 p-3 rounded-2xl border border-white/5">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Honoraires</span>
-                            <span className={`text-sm font-black ${appointment.price > 0 ? 'text-emerald-400' : 'text-amber-400 italic'}`}>
+                        <div className="grid grid-cols-2 gap-2 md:gap-3 text-left">
+                            <div className="bg-black/20 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-white/5 flex items-center gap-2 md:gap-3">
+                                <Calendar className="size-3.5 md:size-4 text-primary shrink-0" />
+                                <span className="text-xs md:text-sm font-black text-white truncate">{format(new Date(appointment.date), "dd MMM", { locale: fr })}</span>
+                            </div>
+                            <div className="bg-black/20 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-white/5 flex items-center gap-2 md:gap-3">
+                                <Clock className="size-3.5 md:size-4 text-primary shrink-0" />
+                                <span className="text-xs md:text-sm font-black text-white">{appointment.time}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between bg-black/20 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-white/5">
+                            <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-500">Honoraires</span>
+                            <span className={`text-xs md:text-sm font-black ${appointment.price > 0 ? 'text-emerald-400' : 'text-amber-400 italic'}`}>
                                 {appointment.price > 0 ? `${appointment.price} FCFA` : 'À définir'}
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-2">
-                            {appointment.status === 'REQUESTED_RESCHEDULE' && (
-                                <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in duration-500">
-                                    <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl space-y-3">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
-                                            <RotateCcw className="size-3" /> Nouvelle proposition
-                                        </p>
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-black text-white">
-                                                {appointment.proposedDate ? format(new Date(appointment.proposedDate), "dd MMMM", { locale: fr }) : "Date à définir"} à {appointment.proposedTime}
-                                            </p>
-                                            <p className="text-xs text-slate-400 italic">"{appointment.rescheduleReason}"</p>
-                                        </div>
-                                        
-                                        <div className="flex gap-2 pt-1">
-                                            <Button 
-                                                size="sm" 
-                                                className="flex-1 bg-emerald-600 hover:bg-emerald-500 h-9 rounded-xl font-bold text-[10px] uppercase"
-                                                onClick={() => handleResponseToReschedule(appointment.id, true)}
-                                            >
-                                                Accepter
-                                            </Button>
-                                            <Button 
-                                                size="sm" 
-                                                variant="outline"
-                                                className="flex-1 border-white/10 bg-white/5 hover:bg-white/10 h-9 rounded-xl font-bold text-[10px] uppercase"
-                                                onClick={() => handleResponseToReschedule(appointment.id, false)}
-                                            >
-                                                Garder l'initial
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
+                        <div className="grid grid-cols-1 gap-2 pt-1 md:pt-0">
                             {appointment.status === 'CONFIRMED' && (
                                 <>
                                     {appointment.type === 'ONLINE' && (
                                         <Link href={`/appointments/room/${appointment.id}`} className="w-full">
-                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 h-11 rounded-xl font-black italic gap-2 shadow-lg shadow-blue-500/20">
-                                                <Video className="size-4" /> REJOINDRE L'APPEL
+                                            <Button className="w-full bg-blue-600 hover:bg-blue-500 h-10 md:h-11 rounded-lg md:rounded-xl font-black italic gap-2 shadow-lg shadow-blue-500/20 text-xs md:text-sm uppercase tracking-tight">
+                                                <Video className="size-3.5 md:size-4" /> REJOINDRE L'APPEL
                                             </Button>
                                         </Link>
                                     )}
-                                    <Button variant="outline" className="w-full h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl font-bold gap-2">
-                                        <RefreshCcw className="size-4 text-primary" /> REPROGRAMMER
+                                    <Button variant="outline" className="w-full h-10 md:h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-lg md:rounded-xl font-bold gap-2 text-xs md:text-sm uppercase tracking-tight">
+                                        <RefreshCcw className="size-3.5 md:size-4 text-primary" /> REPROGRAMMER
                                     </Button>
                                 </>
                             )}

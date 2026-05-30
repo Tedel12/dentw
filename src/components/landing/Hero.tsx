@@ -54,10 +54,10 @@ const Hero = () => {
                 <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Santé connectée {APP_REGION}</span>
               </div>
 
-              <h1 className="text-4xl md:text-7xl lg:text-8xl font-black leading-[1] tracking-tighter italic">
-                <span className="block text-white/90 font-light not-italic tracking-normal text-3xl md:text-6xl mb-2">VOTRE SANTÉ,</span>
+              <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] sm:leading-[1] tracking-tighter italic">
+                <span className="block text-white/90 font-light not-italic tracking-normal text-2xl sm:text-4xl md:text-6xl mb-2">VOTRE SANTÉ,</span>
                 <span className="text-primary drop-shadow-[0_0_20px_rgba(231,138,83,0.5)] uppercase">PROTÉGÉE</span>
-                <span className="block text-white/90 font-light not-italic tracking-normal text-3xl md:text-6xl mt-2 italic">PAR L'IA.</span>
+                <span className="block text-white/90 font-light not-italic tracking-normal text-2xl sm:text-4xl md:text-6xl mt-2 italic">PAR L'IA.</span>
               </h1>
 
               <p className="text-base md:text-xl text-slate-400 max-w-lg leading-relaxed font-medium mx-auto lg:mx-0">

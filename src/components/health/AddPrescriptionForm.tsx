@@ -131,7 +131,7 @@ function PatientSinglePrescriptionForm({
         setIsScanning(true);
         setTimeout(() => {
           setIsScanning(false);
-          toast.success("Scan IA terminé : Données prêtes à être validées");
+          toast.success("Scan IA terminé");
           if (!form.getValues("name")) form.setValue("name", "Prescription analysée");
         }, 3000);
       };
@@ -154,12 +154,12 @@ function PatientSinglePrescriptionForm({
     });
 
     if (res.success) {
-      toast.success("Traitement ajouté à votre carnet de santé");
+      toast.success("Traitement ajouté");
       form.reset();
       setPreviewImage(null);
       await onSuccess?.();
     } else {
-      toast.error("Erreur lors de l'ajout du traitement");
+      toast.error("Erreur lors de l'ajout");
     }
     setLoading(false);
   }
@@ -169,7 +169,7 @@ function PatientSinglePrescriptionForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Section Scan IA */}
         <div className="relative group">
-          <div className={`relative h-48 rounded-2xl border-2 border-dashed transition-all duration-500 overflow-hidden flex flex-col items-center justify-center gap-3 ${previewImage ? 'border-primary/50 bg-primary/5' : 'border-white/10 hover:border-primary/30 bg-white/5'}`}>
+          <div className={`relative h-40 md:h-48 rounded-2xl border-2 border-dashed transition-all duration-500 overflow-hidden flex flex-col items-center justify-center gap-3 ${previewImage ? 'border-primary/50 bg-primary/5' : 'border-white/10 hover:border-primary/30 bg-white/5'}`}>
             {previewImage ? (
               <>
                 <img src={previewImage} alt="Prescription" className="absolute inset-0 w-full h-full object-cover opacity-40" />
@@ -185,14 +185,14 @@ function PatientSinglePrescriptionForm({
                   {isScanning ? (
                     <>
                       <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                      <p className="text-primary font-black italic uppercase tracking-widest text-xs">Scan IA {APP_NAME} en cours...</p>
+                      <p className="text-primary font-black italic uppercase tracking-widest text-[10px]">Analyse IA en cours...</p>
                     </>
                   ) : (
                     <>
                       <div className="bg-primary/20 p-2 rounded-full border border-primary/30">
                         <Sparkles className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-white font-black uppercase tracking-tighter">Analyse terminée</p>
+                      <p className="text-white font-black uppercase tracking-tighter text-xs">Analyse terminée</p>
                     </>
                   )}
                 </div>
@@ -201,8 +201,8 @@ function PatientSinglePrescriptionForm({
               <>
                 <Camera className="w-10 h-10 text-white/20 group-hover:text-primary/50 transition-colors" />
                 <div className="text-center px-4">
-                  <p className="text-sm font-bold text-white/60">Scanner votre ordonnance</p>
-                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-1">L&apos;IA {APP_NAME} extraira les données</p>
+                  <p className="text-sm font-bold text-white/60 uppercase italic">Scanner l'ordonnance</p>
+                  <p className="text-[9px] text-white/40 uppercase font-black tracking-widest mt-1">Extraction IA automatique</p>
                 </div>
               </>
             )}
@@ -227,17 +227,17 @@ function PatientSinglePrescriptionForm({
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Pill className="w-4 h-4 text-primary" /> Médicament
+                <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                  <Pill className="size-3.5" /> Médicament
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: Paracétamol" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" placeholder="ex: Paracétamol" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -248,9 +248,9 @@ function PatientSinglePrescriptionForm({
             name="dosage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Posologie</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Posologie</FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: 500mg" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" placeholder="ex: 500mg" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -261,11 +261,11 @@ function PatientSinglePrescriptionForm({
             name="frequency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" /> Fréquence
+                <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                  <Clock className="size-3.5" /> Fréquence
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: 2x/jour" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" placeholder="ex: 2x/jour" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -276,9 +276,9 @@ function PatientSinglePrescriptionForm({
             name="time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Heure(s) de prise</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary text-left">Heure(s)</FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: 08:00, 20:00" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" placeholder="ex: 08:00, 20:00" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -289,11 +289,11 @@ function PatientSinglePrescriptionForm({
             name="duration"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-primary" /> Durée (jours)
+                <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                  <Calendar className="size-3.5" /> Durée (jours)
                 </FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="7" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" type="number" placeholder="7" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -304,22 +304,9 @@ function PatientSinglePrescriptionForm({
             name="pathology"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Pathologie / motif (optionnel)</FormLabel>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Motif (optionnel)</FormLabel>
                 <FormControl>
-                  <Input placeholder="ex: Infection urinaire" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="administrationRoute"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Voie d&apos;administration (optionnel)</FormLabel>
-                <FormControl>
-                  <Input placeholder="ex: Orale, Topique…" {...field} />
+                  <Input className="bg-white/5 border-white/10 h-11 md:h-12 rounded-xl text-sm" placeholder="ex: Fièvre" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -331,21 +318,21 @@ function PatientSinglePrescriptionForm({
           control={form.control}
           name="notes"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-primary" /> Notes / Conseils
+            <FormItem className="text-left">
+              <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                <FileText className="size-3.5" /> Notes / Conseils
               </FormLabel>
               <FormControl>
-                <Textarea placeholder="Prendre après le repas..." className="resize-none" {...field} />
+                <Textarea placeholder="Précisions..." className="bg-white/5 border-white/10 rounded-xl min-h-[80px] md:min-h-[100px] resize-none text-sm italic" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full gap-2" disabled={loading}>
-          <Send className="w-4 h-4" />
-          {loading ? "Envoi en cours..." : "Ajouter ce traitement"}
+        <Button type="submit" className="w-full h-12 md:h-14 font-black italic rounded-xl gap-2 shadow-lg shadow-primary/20 uppercase tracking-widest text-sm" disabled={loading}>
+          {loading ? <Loader2 className="animate-spin size-4" /> : <Send className="size-4" />}
+          {loading ? "ENVOI..." : "AJOUTER TRAITEMENT"}
         </Button>
       </form>
     </Form>
@@ -380,41 +367,13 @@ function DoctorBatchPrescriptionForm({
   function buildPayload(values: DoctorFormValues) {
     const cleaned = values.lines.filter((l) => l.name.trim().length >= 2);
     if (cleaned.length === 0) {
-      toast.error("Ajoutez au moins un médicament (nom d’au moins 2 caractères).");
+      toast.error("Médicament invalide");
       return null;
     }
-    if (cleaned.length > MAX_LINES) {
-      toast.error(`Maximum ${MAX_LINES} lignes par ordonnance.`);
-      return null;
-    }
-    for (let i = 0; i < cleaned.length; i++) {
-      const l = cleaned[i];
-      if (!l.dosage.trim() || !l.frequency.trim() || !l.time.trim()) {
-        toast.error(`Ligne ${i + 1} : renseignez posologie, fréquence et horaires.`);
-        return null;
-      }
-      if (!l.pathology?.trim() || !l.administrationRoute?.trim()) {
-        toast.error(`Ligne ${i + 1} : indiquez la pathologie / motif et la voie d'administration.`);
-        return null;
-      }
-    }
-    return cleaned.map((l: any) => {
-      let duration: number | undefined;
-      if (l.duration?.trim()) {
-        const n = parseInt(l.duration, 10);
-        duration = Number.isFinite(n) ? n : undefined;
-      }
-      return {
-        name: l.name.trim(),
-        dosage: l.dosage.trim(),
-        frequency: l.frequency.trim(),
-        time: l.time.trim(),
-        duration,
-        pathology: l.pathology.trim(),
-        administrationRoute: l.administrationRoute.trim(),
-        notes: l.notes?.trim() || undefined,
-      };
-    });
+    return cleaned.map((l: any) => ({
+        ...l,
+        duration: l.duration ? parseInt(l.duration, 10) : undefined
+    }));
   }
 
   function onReviewSubmit(values: DoctorFormValues) {
@@ -427,23 +386,17 @@ function DoctorBatchPrescriptionForm({
   async function onConfirmFinalize() {
     const values = form.getValues();
     const payload = buildPayload(values);
-    if (!payload) {
-      setConfirmOpen(false);
-      return;
-    }
+    if (!payload) return;
 
     setLoading(true);
     const res = await addTreatmentsBatch(patientId, doctorId, payload);
-
     if (res.success) {
       setConfirmOpen(false);
-      const n = typeof res.count === "number" ? res.count : payload.length;
-      toast.success(`${n} ligne(s) enregistrée(s). Ordonnance ajoutée au carnet du patient.`);
-      toast.info("Votre accès temporaire à ce dossier est maintenant révoqué.");
+      toast.success("Ordonnance enregistrée");
       form.reset({ lines: [emptyLine()] });
       await onSuccess?.();
     } else {
-      toast.error(res.error || "Erreur lors de l'enregistrement de l'ordonnance");
+      toast.error("Erreur lors de l'envoi");
     }
     setLoading(false);
   }
@@ -451,196 +404,194 @@ function DoctorBatchPrescriptionForm({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onReviewSubmit)} className="space-y-8">
-          <p className="text-sm text-muted-foreground">
-            Ajoutez jusqu’à {MAX_LINES} médicaments sur une même ordonnance. Une fois validée, votre accès au dossier
-            sera révoqué (nouvelle demande nécessaire pour une autre ordonnance).
+        <form onSubmit={form.handleSubmit(onReviewSubmit)} className="space-y-6 md:space-y-8">
+          <p className="text-xs md:text-sm text-slate-500 italic leading-relaxed">
+            Ajoutez les médicaments (max {MAX_LINES}). L'accès au dossier sera révoqué après validation.
           </p>
 
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-4 relative"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-primary">Ligne {index + 1}</span>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" /> Retirer
-                  </Button>
-                )}
-              </div>
+          <div className="space-y-4">
+            {fields.map((field, index) => (
+                <div
+                key={field.id}
+                className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6 space-y-4 relative overflow-hidden group/line"
+                >
+                <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Médicament {index + 1}</span>
+                    {fields.length > 1 && (
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-400 hover:bg-red-500/10 h-7 md:h-8 rounded-lg"
+                        onClick={() => remove(index)}
+                    >
+                        <Trash2 className="size-3.5 mr-1.5" /> <span className="text-[10px] font-bold uppercase tracking-tight">Retirer</span>
+                    </Button>
+                    )}
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.name`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Pill className="w-4 h-4 text-primary" /> Médicament
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: Amoxicilline" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.dosage`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel>Posologie</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: 500mg" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.frequency`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-primary" /> Fréquence
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: 2x/jour" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.time`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel>Heure(s) de prise</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: 08:00, 20:00" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.duration`}
-                  render={({ field: f }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-primary" /> Durée (jours)
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="7" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.pathology`}
-                  render={({ field: f }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Pathologie / motif traité *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: Paludisme, hypertension…" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`lines.${index}.administrationRoute`}
-                  render={({ field: f }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Voie d&apos;administration *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ex: Orale, intramusculaire, topique…" {...f} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <FormField
+                    control={form.control}
+                    name={`lines.${index}.name`}
+                    render={({ field: f }) => (
+                        <FormItem>
+                        <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                            <Pill className="size-3.5" /> Médicament
+                        </FormLabel>
+                        <FormControl>
+                            <Input className="bg-black/20 border-white/10 h-10 md:h-11 rounded-xl text-sm" placeholder="ex: Amoxicilline" {...f} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name={`lines.${index}.dosage`}
+                    render={({ field: f }) => (
+                        <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Posologie</FormLabel>
+                        <FormControl>
+                            <Input className="bg-black/20 border-white/10 h-10 md:h-11 rounded-xl text-sm" placeholder="ex: 500mg" {...f} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                        control={form.control}
+                        name={`lines.${index}.frequency`}
+                        render={({ field: f }) => (
+                            <FormItem>
+                            <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                                <Clock className="size-3" /> Freq.
+                            </FormLabel>
+                            <FormControl>
+                                <Input className="bg-black/20 border-white/10 h-10 rounded-xl text-[11px]" placeholder="1x/jour" {...f} />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name={`lines.${index}.time`}
+                        render={({ field: f }) => (
+                            <FormItem>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Heure</FormLabel>
+                            <FormControl>
+                                <Input className="bg-black/20 border-white/10 h-10 rounded-xl text-[11px]" placeholder="08:00" {...f} />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                    <FormField
+                    control={form.control}
+                    name={`lines.${index}.duration`}
+                    render={({ field: f }) => (
+                        <FormItem>
+                        <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                            <Calendar className="size-3.5" /> Durée (jours)
+                        </FormLabel>
+                        <FormControl>
+                            <Input className="bg-black/20 border-white/10 h-10 md:h-11 rounded-xl text-sm" type="number" placeholder="7" {...f} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                    />
+                </div>
 
-              <FormField
-                control={form.control}
-                name={`lines.${index}.notes`}
-                render={({ field: f }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-primary" /> Notes (ligne)
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Optionnel…" className="resize-none min-h-[72px]" {...f} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <FormField
+                    control={form.control}
+                    name={`lines.${index}.pathology`}
+                    render={({ field: f }) => (
+                        <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Pathologie *</FormLabel>
+                        <FormControl>
+                            <Input className="bg-black/20 border-white/10 h-10 md:h-11 rounded-xl text-sm" placeholder="ex: Paludisme…" {...f} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name={`lines.${index}.administrationRoute`}
+                    render={({ field: f }) => (
+                        <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Voie *</FormLabel>
+                        <FormControl>
+                            <Input className="bg-black/20 border-white/10 h-10 md:h-11 rounded-xl text-sm" placeholder="ex: Orale…" {...f} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                    />
+                </div>
 
-          {fields.length < MAX_LINES && (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-dashed"
-              onClick={() => append(emptyLine())}
-            >
-              <Plus className="w-4 h-4 mr-2" /> Ajouter une ligne ({fields.length}/{MAX_LINES})
-            </Button>
-          )}
+                <FormField
+                    control={form.control}
+                    name={`lines.${index}.notes`}
+                    render={({ field: f }) => (
+                    <FormItem className="text-left">
+                        <FormLabel className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                        <FileText className="size-3.5" /> Précisions
+                        </FormLabel>
+                        <FormControl>
+                        <Textarea placeholder="Notes optionnelles..." className="bg-black/20 border-white/10 rounded-xl min-h-[60px] resize-none text-xs italic" {...f} />
+                        </FormControl>
+                    </FormItem>
+                    )}
+                />
+                </div>
+            ))}
+          </div>
 
-          <Button type="submit" className="w-full gap-2" disabled={loading || confirmOpen}>
-            <Send className="w-4 h-4" />
-            Enregistrer l&apos;ordonnance et terminer la consultation
-          </Button>
+          <div className="flex flex-col gap-3">
+              {fields.length < MAX_LINES && (
+                <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 md:h-12 border-dashed border-white/20 bg-white/5 hover:bg-white/10 rounded-xl font-bold text-xs uppercase"
+                onClick={() => append(emptyLine())}
+                >
+                <Plus className="size-4 mr-2 text-primary" /> Ajouter Médicament ({fields.length}/{MAX_LINES})
+                </Button>
+              )}
+
+              <Button type="submit" className="w-full h-12 md:h-14 font-black italic rounded-[1.5rem] gap-2 shadow-xl shadow-primary/20 uppercase tracking-widest text-sm" disabled={loading || confirmOpen}>
+                <Send className="size-4" />
+                Finaliser l'ordonnance
+              </Button>
+          </div>
         </form>
       </Form>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent className="max-w-lg">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer l&apos;ordonnance</AlertDialogTitle>
+        <AlertDialogContent className="max-w-lg w-[90vw] rounded-[2rem] bg-slate-900 border-white/10 text-white p-6 md:p-8">
+          <AlertDialogHeader className="text-left">
+            <AlertDialogTitle className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">Confirmer l'envoi</AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-3 text-left text-sm text-muted-foreground">
-                <p>
-                  Vérifiez que toutes les lignes sont correctes. Après validation, les entrées seront enregistrées sur le
-                  carnet du patient et <strong>votre accès à ce dossier sera révoqué</strong>.
+              <div className="space-y-4 pt-4 text-left text-xs md:text-sm text-slate-400">
+                <p className="font-medium italic leading-relaxed">
+                  Vérifiez le récapitulatif. Une fois validée, l'ordonnance est archivée et votre accès temporaire est révoqué.
                 </p>
-                <ul className="list-disc pl-4 space-y-1 max-h-48 overflow-y-auto border rounded-md p-3 bg-muted/30">
+                <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar border border-white/5 rounded-2xl p-4 bg-black/40">
                   {previewLines.map((l: any, i: number) => (
-                    <li key={`${l.name}-${i}`}>
-                      <span className="font-medium text-foreground">{l.name}</span> — {l.dosage}, {l.frequency},{" "}
-                      {l.time}
-                      <span className="block text-xs mt-0.5">
-                        Pathologie : {l.pathology} · Voie : {l.administrationRoute}
-                      </span>
-                    </li>
+                    <div key={`${l.name}-${i}`} className="pb-2 last:pb-0 border-b last:border-0 border-white/5">
+                      <p className="font-black text-white italic uppercase tracking-tight text-xs">{l.name} — {l.dosage}</p>
+                      <p className="text-[10px] text-primary/70 font-bold uppercase tracking-widest mt-1">
+                        {l.frequency} • {l.time} • {l.duration}j
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading}>Corriger</AlertDialogCancel>
-            <Button type="button" onClick={() => void onConfirmFinalize()} disabled={loading}>
-              {loading ? "Enregistrement..." : "Confirmer et enregistrer"}
+          <AlertDialogFooter className="gap-3 mt-8">
+            <AlertDialogCancel disabled={loading} className="rounded-xl font-bold uppercase text-[10px] h-11 border-white/10">Corriger</AlertDialogCancel>
+            <Button type="button" onClick={() => void onConfirmFinalize()} disabled={loading} className="flex-1 bg-primary hover:bg-primary/90 h-11 rounded-xl font-black italic uppercase text-[10px] tracking-widest">
+              {loading ? "Chargement..." : "VALIDER & ENVOYER"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

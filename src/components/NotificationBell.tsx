@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Check, X, Calendar, Shield, Info } from "lucide-react";
+import { Bell, Check, X, Calendar, Shield, Info, HeartPulse, Clock, RotateCcw } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -9,146 +9,173 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { useUser } from "@clerk/nextjs";
 import { 
   getNotifications, 
-  markNotificationAsRead, 
-  markAllAsRead 
+  markAsRead, 
+  markAllAsRead, 
+  deleteNotification 
 } from "@/lib/actions/notifications";
-import { respondToReschedule } from "@/lib/actions/appointments";
-import { respondToAccessRequest } from "@/lib/actions/health";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
+import { Badge } from "./ui/badge";
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useUser();
   const router = useRouter();
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const fetchNotifications = async () => {
+    if (!user) return;
     const res = await getNotifications();
     if (res.success) {
       setNotifications(res.notifications || []);
-      setUnreadCount(res.notifications?.filter((n: any) => !n.isRead).length || 0);
     }
   };
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // Polling toutes les 30s
+    const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleMarkAsRead = async (id: string) => {
-    await markNotificationAsRead(id);
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
+    const res = await markAsRead(id);
+    if (res.success) {
+      setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
+    }
   };
 
-  const handleMarkAllAsRead = async () => {
-    await markAllAsRead();
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-    setUnreadCount(0);
+  const handleMarkAllRead = async () => {
+    const res = await markAllAsRead();
+    if (res.success) {
+      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      toast.success("Toutes les notifications marquées comme lues");
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const res = await deleteNotification(id);
+    if (res.success) {
+      setNotifications(notifications.filter(n => n.id !== id));
+    }
   };
 
   const handleAction = async (notif: any, action: "ACCEPT" | "REJECT") => {
     try {
       if (notif.type === "RESCHEDULE_REQUEST") {
-        toast.info("Redirection vers le rendez-vous...");
-        router.push(notif.link || "/dashboard");
+        toast.info("Redirection...");
+        router.push(notif.link || "/appointments");
       }
       await handleMarkAsRead(notif.id);
       setIsOpen(false);
     } catch (error) {
-      toast.error("Une erreur est survenue");
+      toast.error("Erreur");
     }
   };
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "RESCHEDULE_REQUEST":
-      case "RESCHEDULE_RESPONSE":
-        return <Calendar className="w-4 h-4 text-amber-500" />;
-      case "HEALTH_ACCESS":
-        return <Shield className="w-4 h-4 text-blue-500" />;
-      case "APPOINTMENT_CONFIRMED":
-        return <Check className="w-4 h-4 text-green-500" />;
-      default:
-        return <Info className="w-4 h-4 text-primary" />;
+      case "APPOINTMENT_CONFIRMED": return <Calendar className="size-4 text-emerald-500" />;
+      case "APPOINTMENT_CANCELLED": return <X className="size-4 text-red-500" />;
+      case "HEALTH_ACCESS": return <Shield className="size-4 text-primary" />;
+      case "RESCHEDULE_REQUEST": return <RotateCcw className="size-4 text-amber-500" />;
+      default: return <Info className="size-4 text-blue-500" />;
     }
   };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 rounded-full transition-colors">
-          <Bell className="w-6 h-6 text-white" />
+        <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-white/5 size-9 md:size-10">
+          <Bell className="size-5 md:size-6 text-slate-300" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 min-w-[1.2rem] h-[1.2rem] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold border-2 border-background animate-pulse">
-              {unreadCount}
-            </Badge>
+            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 md:h-5 md:w-5 items-center justify-center rounded-full bg-primary text-[8px] md:text-[10px] font-black text-white ring-2 ring-[#020617] animate-in zoom-in duration-300">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 sm:w-96 p-0 bg-card/95 backdrop-blur-md border-primary/20 shadow-2xl rounded-2xl" align="end">
-        <div className="p-4 border-b border-primary/10 flex justify-between items-center">
-          <h3 className="font-black text-lg uppercase tracking-tighter text-white">Notifications</h3>
+      <PopoverContent align="end" className="w-[90vw] xs:w-[350px] md:w-[400px] p-0 bg-slate-900 border-white/10 shadow-2xl rounded-[1.5rem] md:rounded-[2rem] overflow-hidden text-left">
+        <div className="p-5 border-b border-white/5 bg-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+              <h3 className="font-black italic text-sm md:text-lg text-white uppercase tracking-tighter">Notifications</h3>
+              {unreadCount > 0 && <Badge className="bg-primary/20 text-primary border-none text-[8px] md:text-[10px] px-2">{unreadCount} NOUVELLES</Badge>}
+          </div>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead} className="text-xs text-primary hover:text-primary/80 font-bold">
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleMarkAllRead}
+                className="text-[9px] md:text-[10px] font-black uppercase text-primary hover:bg-primary/10 h-7 md:h-8"
+            >
               Tout lire
             </Button>
           )}
         </div>
-        <ScrollArea className="h-[400px]">
+
+        <ScrollArea className="h-[350px] md:h-[450px]">
           {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <Bell className="w-12 h-12 mb-4 opacity-20" />
-              <p className="font-medium">Aucune notification</p>
+            <div className="flex flex-col items-center justify-center h-[300px] text-center p-8 space-y-3 opacity-20">
+              <Bell className="size-12 text-slate-500" />
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500">Aucune notification</p>
             </div>
           ) : (
-            <div className="divide-y divide-primary/5">
+            <div className="divide-y divide-white/5">
               {notifications.map((n) => (
                 <div 
                   key={n.id} 
-                  className={`p-4 transition-colors hover:bg-primary/5 cursor-pointer ${!n.isRead ? 'bg-primary/5' : ''}`}
+                  className={`p-4 md:p-5 transition-all cursor-pointer relative group ${!n.isRead ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-white/5'}`}
                   onClick={() => {
-                    if (!n.isRead) handleMarkAsRead(n.id);
-                    if (n.link) router.push(n.link);
-                    setIsOpen(false);
+                    handleMarkAsRead(n.id);
+                    if (n.link) {
+                        router.push(n.link);
+                        setIsOpen(false);
+                    }
                   }}
                 >
-                  <div className="flex gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${!n.isRead ? 'bg-primary/20' : 'bg-muted'}`}>
+                  <div className="flex gap-3 md:gap-4">
+                    <div className={`size-9 md:size-11 rounded-xl flex items-center justify-center shrink-0 border border-white/5 ${!n.isRead ? 'bg-primary/20 shadow-lg shadow-primary/10' : 'bg-slate-800'}`}>
                       {getIcon(n.type)}
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex justify-between items-start">
-                        <p className={`text-sm font-bold leading-none ${!n.isRead ? 'text-white' : 'text-muted-foreground'}`}>
-                          {n.title}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex justify-between items-start gap-2">
+                        <p className={`text-xs md:text-sm leading-tight ${!n.isRead ? 'font-black text-white' : 'font-medium text-slate-400'}`}>
+                          {n.message}
                         </p>
-                        <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">
-                          {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale: fr })}
-                        </span>
+                        <button 
+                            onClick={(e) => handleDelete(e, n.id)}
+                            className="p-1 rounded-lg hover:bg-red-500/10 text-slate-600 hover:text-red-500 transition-all md:opacity-0 group-hover:opacity-100"
+                        >
+                            <X className="size-3" />
+                        </button>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {n.content}
-                      </p>
+                      <div className="flex items-center gap-2">
+                          <Clock className="size-2.5 text-slate-500" />
+                          <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                            {format(new Date(n.createdAt), "dd MMM, HH:mm", { locale: fr })}
+                          </span>
+                      </div>
                       
                       {n.type === "RESCHEDULE_REQUEST" && !n.isRead && (
-                        <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-                          <Button 
-                            size="sm" 
-                            className="h-7 text-[10px] font-bold bg-green-500 hover:bg-green-600"
-                            onClick={() => handleAction(n, "ACCEPT")}
-                          >
-                            Détails & Répondre
-                          </Button>
-                        </div>
+                         <div className="pt-3 flex gap-2">
+                            <Button 
+                                size="sm" 
+                                className="h-7 md:h-8 flex-1 bg-primary hover:bg-primary/90 rounded-lg text-[9px] font-black uppercase italic"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAction(n, "ACCEPT");
+                                }}
+                            >
+                                Détails & Répondre
+                            </Button>
+                         </div>
                       )}
                     </div>
                   </div>
