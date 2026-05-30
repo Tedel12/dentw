@@ -1,8 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SignUpButton } from "@clerk/nextjs";
 import { CheckCircleIcon } from "lucide-react";
+import { AuthModal } from "../auth/AuthModal";
 
 function PricingSection() {
+  const [authModal, setAuthModal] = useState<{ open: boolean; mode: "sign-in" | "sign-up" }>({
+    open: false,
+    mode: "sign-up",
+  });
+
   return (
     <section id="pricing" className="relative py-16 md:py-32 px-4 md:px-6 overflow-hidden bg-gradient-to-b from-background via-muted/3 to-background text-white">
       {/* Fond en grille */}
@@ -44,11 +52,12 @@ function PricingSection() {
                   <p className="text-xs font-medium text-slate-400">Prise de RDV médicale essentielle</p>
                 </div>
                 
-                <SignUpButton mode="modal">
-                  <Button className="w-full h-12 bg-white/5 hover:bg-white/10 text-white rounded-xl font-black italic border border-white/10 transition-all">
-                    COMMENCER GRATUITEMENT
-                  </Button>
-                </SignUpButton>
+                <Button 
+                    className="w-full h-12 bg-white/5 hover:bg-white/10 text-white rounded-xl font-black italic border border-white/10 transition-all"
+                    onClick={() => setAuthModal({ open: true, mode: "sign-up" })}
+                >
+                COMMENCER GRATUITEMENT
+                </Button>
 
                 <div className="space-y-4 pt-4 border-t border-white/5">
                   {[
@@ -87,7 +96,10 @@ function PricingSection() {
                   <p className="text-xs font-medium text-slate-300 italic">Consultations IA illimitées</p>
                 </div>
 
-                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black italic shadow-lg shadow-primary/20 transition-all">
+                <Button 
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black italic shadow-lg shadow-primary/20 transition-all"
+                    onClick={() => setAuthModal({ open: true, mode: "sign-up" })}
+                >
                   ACTIVER IA BASIQUE
                 </Button>
 
@@ -126,6 +138,7 @@ function PricingSection() {
                 <Button
                   variant="outline"
                   className="w-full h-12 border-2 border-white/5 hover:border-primary/40 hover:bg-primary/5 text-white rounded-xl font-black italic transition-all"
+                  onClick={() => setAuthModal({ open: true, mode: "sign-up" })}
                 >
                   DEVENIR PRO
                 </Button>
@@ -150,6 +163,12 @@ function PricingSection() {
           </div>
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={authModal.open} 
+        onClose={() => setAuthModal({ ...authModal, open: false })} 
+        initialMode={authModal.mode}
+      />
     </section>
   );
 }

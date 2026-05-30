@@ -1,6 +1,6 @@
 "use client";
 
-import { SignUpButton } from "@clerk/nextjs";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import React, { useRef } from "react";
@@ -8,11 +8,16 @@ import { CalendarIcon, HeartPulse, Mic, ShieldCheck } from "lucide-react";
 import { APP_NAME, APP_REGION } from "@/lib/brand";
 import { motion, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { StarrySky } from "../ui/starry-sky";
+import { AuthModal } from "../auth/AuthModal";
 
 const Hero = () => {
   const ref = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [authModal, setAuthModal] = useState<{ open: boolean; mode: "sign-in" | "sign-up" }>({
+    open: false,
+    mode: "sign-up",
+  });
 
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [15, -15]), { stiffness: 150, damping: 30 });
   const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-15, 15]), { stiffness: 150, damping: 30 });
@@ -66,19 +71,24 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <SignUpButton mode="modal">
-                <Button className="h-14 md:h-16 px-6 md:px-10 text-base md:text-lg font-black italic rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl transition-all w-full sm:w-auto" size="lg">
-                  <HeartPulse className="mr-2 size-5" />
-                  CARNET DE SANTÉ
-                </Button>
-              </SignUpButton>
+              <Button 
+                className="h-14 md:h-16 px-6 md:px-10 text-base md:text-lg font-black italic rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl transition-all w-full sm:w-auto" 
+                size="lg"
+                onClick={() => setAuthModal({ open: true, mode: "sign-up" })}
+              >
+                <HeartPulse className="mr-2 size-5" />
+                CARNET DE SANTÉ
+              </Button>
 
-              <SignUpButton mode="modal">
-                <Button variant="outline" className="h-14 md:h-16 px-6 md:px-10 text-base md:text-lg font-bold rounded-2xl border-white/10 bg-white/5 backdrop-blur-md w-full sm:w-auto" size="lg">
-                  <CalendarIcon className="mr-2 size-5" />
-                  PRENDRE RDV
-                </Button>
-              </SignUpButton>
+              <Button 
+                variant="outline" 
+                className="h-14 md:h-16 px-6 md:px-10 text-base md:text-lg font-bold rounded-2xl border-white/10 bg-white/5 backdrop-blur-md w-full sm:w-auto" 
+                size="lg"
+                onClick={() => setAuthModal({ open: true, mode: "sign-in" })}
+              >
+                <CalendarIcon className="mr-2 size-5" />
+                PRENDRE RDV
+              </Button>
             </div>
           </motion.div>
 
@@ -132,6 +142,12 @@ const Hero = () => {
 
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={authModal.open} 
+        onClose={() => setAuthModal({ ...authModal, open: false })} 
+        initialMode={authModal.mode}
+      />
     </section>
   );
 };

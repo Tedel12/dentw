@@ -12,7 +12,6 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import { LandingHeaderAuth } from "@/components/auth/LandingHeaderAuth";
-import { SignedOut, SignUpButton } from "@clerk/nextjs";
 
 const Header = () => {
   return (
@@ -24,16 +23,16 @@ const Header = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
             Comment ça marche ?
           </a>
-          <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
             Tarification
           </a>
-          <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
             À propos
           </a>
-          <Link href="/about-project" className="text-primary font-bold hover:text-primary/80 transition-colors">
+          <Link href="/about-project" className="text-primary font-bold hover:text-primary/80 transition-colors text-sm">
             Le Projet
           </Link>
         </div>
@@ -41,23 +40,21 @@ const Header = () => {
         <LandingHeaderAuth className="hidden md:flex items-center gap-3 cursor-pointer" />
 
         <div className="md:hidden flex items-center gap-2">
-          <LandingHeaderAuth signInLabel="Connexion" className="flex items-center gap-2" />
-
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Ouvrir le menu">
+              <Button variant="ghost" size="icon" className="size-9 rounded-xl" aria-label="Ouvrir le menu">
                 <MenuIcon className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+            <SheetContent side="right" className="bg-slate-950 border-white/5 text-white">
+              <SheetHeader className="text-left">
+                <SheetTitle className="text-xl font-black italic text-primary uppercase tracking-tighter">Menu</SheetTitle>
               </SheetHeader>
-              <div className="p-4 space-y-3">
+              <div className="p-2 space-y-3 mt-8">
                 <SheetClose asChild>
                   <a
                     href="#how-it-works"
-                    className="block rounded-xl p-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    className="block rounded-xl p-4 text-slate-300 font-bold uppercase tracking-tight text-sm hover:bg-white/5 transition-colors border border-white/5 bg-white/[0.02]"
                   >
                     Comment ça marche ?
                   </a>
@@ -65,7 +62,7 @@ const Header = () => {
                 <SheetClose asChild>
                   <a
                     href="#pricing"
-                    className="block rounded-xl p-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    className="block rounded-xl p-4 text-slate-300 font-bold uppercase tracking-tight text-sm hover:bg-white/5 transition-colors border border-white/5 bg-white/[0.02]"
                   >
                     Tarification
                   </a>
@@ -73,7 +70,7 @@ const Header = () => {
                 <SheetClose asChild>
                   <a
                     href="#about"
-                    className="block rounded-xl p-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    className="block rounded-xl p-4 text-slate-300 font-bold uppercase tracking-tight text-sm hover:bg-white/5 transition-colors border border-white/5 bg-white/[0.02]"
                   >
                     A propos
                   </a>
@@ -81,16 +78,18 @@ const Header = () => {
                 <SheetClose asChild>
                   <Link
                     href="/about-project"
-                    className="block rounded-xl p-3 text-primary font-bold hover:bg-primary/10 transition-colors"
+                    className="block rounded-xl p-4 text-primary font-black italic uppercase tracking-tighter text-sm hover:bg-primary/10 transition-colors border border-primary/20 bg-primary/5"
                   >
                     Le Projet
                   </Link>
                 </SheetClose>
-                <SignedOut>
-                  <SignUpButton mode="modal">
-                    <Button className="w-full mt-2">S&apos;inscrire</Button>
-                  </SignUpButton>
-                </SignedOut>
+                
+                <div className="pt-6 border-t border-white/5 mt-4">
+                    <LandingHeaderAuth 
+                        signInLabel="Connexion" 
+                        className="flex flex-col gap-3" 
+                    />
+                </div>
               </div>
             </SheetContent>
           </Sheet>
@@ -101,4 +100,3 @@ const Header = () => {
 };
 
 export default Header;
-

@@ -40,6 +40,13 @@ model User {
   phone     String?
   role      UserRole         @default(PATIENT)
   plan      SubscriptionPlan @default(FREE)
+  gender    Gender?
+  birthDate DateTime?
+  birthPlace String?
+  address    String?
+  nationality String?        @default("Béninoise")
+  emergencyContactName String?
+  emergencyContactPhone String?
   exportPin String? // Code PIN pour l'export du carnet
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt

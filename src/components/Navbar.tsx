@@ -12,11 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PWAInstallPrompt } from "./ui/pwa-install-prompt";
 import { NotificationBell } from "./NotificationBell";
+import { AuthModal } from "./auth/AuthModal";
 
 function Navbar() {
   const { user: clerkUser, isLoaded } = useUser();
   const pathname = usePathname();
   const [role, setRole] = useState<"PATIENT" | "DOCTOR" | null>(null);
+  const [authModal, setAuthModal] = useState<{ open: boolean; mode: "sign-in" | "sign-up" }>({
+    open: false,
+    mode: "sign-in",
+  });
 
   useEffect(() => {
     async function resolveRole() {
@@ -200,16 +205,31 @@ function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-1.5 md:gap-2">
-                <SignInButton mode="modal">
-                    <Button variant="ghost" size="sm" className="font-bold text-xs h-9 px-3 rounded-lg hover:bg-white/5">Connexion</Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                    <Button size="sm" className="font-black italic text-xs h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">S'inscrire</Button>
-                </SignUpButton>
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="font-bold text-xs h-9 px-3 rounded-lg hover:bg-white/5"
+                    onClick={() => setAuthModal({ open: true, mode: "sign-in" })}
+                >
+                    Connexion
+                </Button>
+                <Button 
+                    size="sm" 
+                    className="font-black italic text-xs h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                    onClick={() => setAuthModal({ open: true, mode: "sign-up" })}
+                >
+                    S'inscrire
+                </Button>
             </div>
           )}
         </div>
       </div>
+
+      <AuthModal 
+        isOpen={authModal.open} 
+        onClose={() => setAuthModal({ ...authModal, open: false })} 
+        initialMode={authModal.mode}
+      />
     </nav>
   );
 }

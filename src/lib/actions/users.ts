@@ -35,6 +35,39 @@ export async function syncUser() {
   }
 }
 
+export async function updateUserProfile(data: {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  gender?: Gender;
+  birthDate?: string;
+  birthPlace?: string;
+  address?: string;
+  nationality?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+}) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, error: "Non autorisé" };
+
+  try {
+    await prisma.user.update({
+      where: { clerkId: clerkUser.id },
+      data: {
+        ...data,
+        birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
+      },
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/health");
+    return { success: true };
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return { success: false, error: "Erreur lors de la mise à jour du profil" };
+  }
+}
+
 export async function getCurrentUserRole() {
   const clerkUser = await currentUser();
   if (!clerkUser) return null;
