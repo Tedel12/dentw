@@ -43,7 +43,7 @@ export async function createNotification(data: {
         link: data.link,
       },
     });
-    revalidatePath("/", "layout"); // Pour mettre à jour la cloche partout
+    revalidatePath("/", "layout");
     return { success: true, notification };
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -51,7 +51,7 @@ export async function createNotification(data: {
   }
 }
 
-export async function markNotificationAsRead(id: string) {
+export async function markAsRead(id: string) {
   try {
     await prisma.notification.update({
       where: { id },
@@ -83,5 +83,21 @@ export async function markAllAsRead() {
     return { success: true };
   } catch (error) {
     return { success: false };
+  }
+}
+
+export async function deleteNotification(id: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, error: "Non autorisé" };
+
+  try {
+    await prisma.notification.delete({
+      where: { id },
+    });
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    return { success: false, error: "Erreur lors de la suppression" };
   }
 }

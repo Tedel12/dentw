@@ -54,8 +54,16 @@ export async function updateUserProfile(data: {
     await prisma.user.update({
       where: { clerkId: clerkUser.id },
       data: {
-        ...data,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        gender: data.gender,
         birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
+        birthPlace: data.birthPlace,
+        address: data.address,
+        nationality: data.nationality,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
       },
     });
 
