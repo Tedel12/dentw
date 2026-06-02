@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle, Calendar
 } from "lucide-react";
 import {
   searchPatient,
