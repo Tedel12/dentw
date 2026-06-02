@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 function VapiWidget() {
@@ -52,6 +53,8 @@ function VapiWidget() {
     };
 
     const handleError = (error: any) => {
+      console.error("Vapi Error:", error);
+      toast.error("Erreur de connexion vocale. Vérifiez votre micro.");
       setConnecting(false);
       setCallActive(false);
     };
@@ -86,7 +89,9 @@ function VapiWidget() {
         const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
         if (!assistantId) throw new Error("Assistant Vapi non configuré");
         await vapi.start(assistantId, VAPI_ASSISTANT_OVERRIDES);
-      } catch (error) {
+      } catch (error: any) {
+        console.error("Vapi start error:", error);
+        toast.error("Échec de l'appel : " + (error.message || "Erreur inconnue"));
         setConnecting(false);
       }
     }
