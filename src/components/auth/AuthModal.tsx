@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { 
   Mail, Lock, User, Phone, MapPin, Calendar, 
   ChevronRight, Github, Chrome, Loader2, 
-  ArrowLeft, CheckCircle2, ShieldCheck
+  ArrowLeft, CheckCircle2, ShieldCheck, HeartPulse
 } from "lucide-react";
 import { toast } from "sonner";
 import { APP_NAME } from "@/lib/brand";
