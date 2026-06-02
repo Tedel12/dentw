@@ -88,7 +88,7 @@ function VapiWidget() {
 
         const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
         if (!assistantId) throw new Error("Assistant Vapi non configuré");
-        await vapi.start(assistantId, VAPI_ASSISTANT_OVERRIDES);
+        await vapi.start(assistantId);
       } catch (error: any) {
         console.error("Vapi start error:", error);
         toast.error("Échec de l'appel : " + (error.message || "Erreur inconnue"));
