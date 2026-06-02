@@ -250,13 +250,18 @@ export async function logTreatmentTake(treatmentId: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const log = await prisma.treatmentLog.create({
-      data: {
-        treatmentId,
-      },
-    });
+    await prisma.$transaction([
+        prisma.treatmentLog.create({
+            data: { treatmentId },
+        }),
+        prisma.treatment.update({
+            where: { id: treatmentId },
+            data: { isActive: false }
+        })
+    ]);
+
     revalidatePath("/dashboard/health");
-    return { success: true, log };
+    return { success: true };
   } catch (error) {
     console.error("Error logging treatment:", error);
     return { success: false, error: "Failed to log treatment" };

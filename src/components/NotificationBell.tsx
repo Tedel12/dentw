@@ -146,17 +146,22 @@ export function NotificationBell() {
                     </div>
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex justify-between items-start gap-2">
-                        <p className={`text-xs md:text-sm leading-tight ${!n.isRead ? 'font-black text-white' : 'font-medium text-slate-400'}`}>
-                          {n.message}
-                        </p>
+                        <div className="min-w-0">
+                            <p className={`text-xs md:text-sm leading-tight uppercase font-black tracking-tighter ${!n.isRead ? 'text-white' : 'text-slate-400'}`}>
+                            {n.title}
+                            </p>
+                            <p className={`text-[11px] md:text-xs leading-snug mt-1 ${!n.isRead ? 'text-slate-300 font-medium' : 'text-slate-500'}`}>
+                            {n.content}
+                            </p>
+                        </div>
                         <button 
                             onClick={(e) => handleDelete(e, n.id)}
-                            className="p-1 rounded-lg hover:bg-red-500/10 text-slate-600 hover:text-red-500 transition-all md:opacity-0 group-hover:opacity-100"
+                            className="p-1 rounded-lg hover:bg-red-500/10 text-slate-600 hover:text-red-500 transition-all md:opacity-0 group-hover:opacity-100 shrink-0"
                         >
                             <X className="size-3" />
                         </button>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 pt-1">
                           <Clock className="size-2.5 text-slate-500" />
                           <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                             {format(new Date(n.createdAt), "dd MMM, HH:mm", { locale: fr })}

@@ -13,7 +13,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { Eye, ImageIcon, Printer, Video, MapPin, Stethoscope } from "lucide-react";
+import { Eye, ImageIcon, Printer, Video, MapPin, Stethoscope, Clock, Calendar, Activity, Pill, HeartPulse } from "lucide-react";
 
 export function AnimatedTimelineItem({ item, index }: { item: any, index: number }) {
   // Déterminer si c'est un traitement ou un rendez-vous
@@ -57,7 +57,7 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
       
       <motion.div 
         whileHover={{ scale: 1.01, x: 5 }}
-        className={`p-6 rounded-3xl border backdrop-blur-md transition-all group shadow-2xl ${
+        className={`p-6 rounded-[2rem] border backdrop-blur-md transition-all group shadow-2xl ${
             isTreatment 
             ? 'bg-white/[0.02] border-white/5 hover:border-primary/40' 
             : 'bg-emerald-500/5 border-emerald-500/10 hover:border-emerald-500/30'
@@ -65,14 +65,17 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
       >
         <div className="flex justify-between items-start gap-4">
             <div className="space-y-1">
-                <span className="text-xl font-black italic tracking-tight text-white group-hover:text-primary transition-colors">
-                    {isTreatment ? item.name : `Session avec Dr. ${item.doctor?.name}`}
+                <span className="text-xl font-black italic tracking-tight text-white group-hover:text-primary transition-colors uppercase leading-tight">
+                    {isTreatment ? item.name : `Dr. ${item.doctor?.name}`}
                 </span>
                 {!isTreatment && (
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500/80 uppercase">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500/80 uppercase tracking-widest">
                         {item.type === 'ONLINE' ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                        {item.type === 'ONLINE' ? 'Téléconsultation' : 'Au cabinet'}
+                        {item.type === 'ONLINE' ? 'Téléconsultation' : 'Consultation Cabinet'}
                     </div>
+                )}
+                {isTreatment && (
+                    <p className="text-[10px] font-bold text-primary/70 uppercase tracking-widest">{item.pathology || "Suivi médical"}</p>
                 )}
             </div>
             
@@ -80,12 +83,12 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
                 {isTreatment ? (
                     item.prescribingDoctor && (
                         <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/10 text-[9px] uppercase font-black px-2 py-0.5">
-                            Dr. {item.prescribingDoctor.name || item.prescribingDoctor.user?.lastName}
+                            Praticien: {item.prescribingDoctor.name}
                         </Badge>
                     )
                 ) : (
                     <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[9px] uppercase font-black px-2 py-0.5">
-                        Terminé
+                        Archivé
                     </Badge>
                 )}
                 
@@ -99,7 +102,7 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
                         <DialogContent className="max-w-3xl rounded-[2.5rem] border-white/10 p-0 overflow-hidden bg-black/95">
                             <DialogHeader className="p-6 bg-background/50 backdrop-blur-md border-b border-white/10 flex flex-row items-center justify-between gap-4">
                                 <div>
-                                    <DialogTitle className="text-xl font-black italic text-white uppercase tracking-tighter">Ordonnance Originale</DialogTitle>
+                                    <DialogTitle className="text-xl font-black italic text-white uppercase tracking-tighter">Ordonnance</DialogTitle>
                                     <p className="text-[10px] text-white/50 font-bold uppercase">{item.name} - {format(createdAt, "dd/MM/yyyy")}</p>
                                 </div>
                                 <Button 
@@ -113,7 +116,7 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
                             <div className="p-4 flex items-center justify-center min-h-[50vh] max-h-[80vh] overflow-y-auto">
                                 <img 
                                     src={item.prescriptionUrl} 
-                                    alt="Ordonnance originale" 
+                                    alt="Ordonnance" 
                                     className="max-w-full h-auto rounded-xl shadow-2xl shadow-primary/20 object-contain"
                                 />
                             </div>
@@ -123,35 +126,54 @@ export function AnimatedTimelineItem({ item, index }: { item: any, index: number
             </div>
         </div>
         
-        <div className="mt-4 p-4 bg-black/40 rounded-2xl border border-white/5 shadow-inner">
-            <p className="text-sm text-slate-300 font-bold leading-relaxed italic">
-                {isTreatment 
-                    ? (item.notes || "Traitement prescrit pour votre suivi médical.")
-                    : (item.summary || "Consultation archivée dans votre carnet numérique.")
-                }
-            </p>
-            {!isTreatment && item.reason && (
-                <div className="mt-2 pt-2 border-t border-white/5 text-[10px] text-slate-500 font-medium">
-                    Motif initial : {item.reason}
+        <div className="mt-6 space-y-4">
+            {isTreatment ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                        <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Posologie</span>
+                        <span className="text-xs font-bold text-slate-200 italic">{item.dosage || "N/R"}</span>
+                    </div>
+                    <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                        <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Fréquence</span>
+                        <span className="text-xs font-bold text-slate-200 italic">{item.frequency || "N/R"}</span>
+                    </div>
+                    <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                        <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Heures</span>
+                        <span className="text-xs font-bold text-slate-200 italic">{item.time || "N/R"}</span>
+                    </div>
+                    <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                        <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Durée</span>
+                        <span className="text-xs font-bold text-slate-200 italic">{item.duration ? `${item.duration}j` : "N/R"}</span>
+                    </div>
                 </div>
-            )}
+            ) : null}
+
+            <div className="p-4 bg-black/20 rounded-2xl border border-white/5 shadow-inner">
+                <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
+                    {isTreatment 
+                        ? (item.notes || "Suivi médical enregistré.")
+                        : (item.summary || "Rapport de consultation archivé.")
+                    }
+                </p>
+                {!isTreatment && item.reason && (
+                    <div className="mt-3 pt-3 border-t border-white/5 text-[9px] text-slate-600 font-bold uppercase tracking-widest flex items-center gap-2">
+                        <Activity className="size-3 text-primary" /> Motif initial : {item.reason}
+                    </div>
+                )}
+                {isTreatment && item.administrationRoute && (
+                    <div className="mt-3 pt-3 border-t border-white/5 text-[9px] text-slate-600 font-bold uppercase tracking-widest flex items-center gap-2">
+                        <HeartPulse className="size-3 text-primary" /> Voie : {item.administrationRoute}
+                    </div>
+                )}
+            </div>
         </div>
-        
-        {isTreatment && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Badge variant="outline" className="rounded-xl px-3 py-1.5 bg-primary/5 border-primary/10 text-[9px] font-black uppercase text-primary tracking-widest">{item.dosage}</Badge>
-            <Badge variant="outline" className="rounded-xl px-3 py-1.5 bg-white/5 border-white/10 text-[9px] font-black uppercase text-slate-400 tracking-widest">{item.frequency}</Badge>
-          </div>
-        )}
 
         {!isTreatment && (
             <div className="mt-4 flex items-center gap-3">
-                <div className="flex -space-x-2">
-                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                        <Stethoscope className="w-3 h-3 text-emerald-400" />
-                    </div>
+                <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                 </div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Diagnostic archivé</span>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Dossier mis à jour</span>
             </div>
         )}
       </motion.div>
@@ -171,3 +193,5 @@ export function AnimatedTreatmentCard({ t, index, children }: { t: any, index: n
         </motion.div>
     )
 }
+
+import { CheckCircle2 } from "lucide-react";

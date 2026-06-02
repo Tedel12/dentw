@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle
 } from "lucide-react";
 import {
   searchPatient,
@@ -662,18 +662,55 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                        <div className="grid grid-cols-2 gap-3 md:gap-4 text-left">
                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-sm">
                            <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500">Âge</p>
-                           <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.age ? `${patientData.age} ans` : "N/R"}</p>
+                           <BlurData>
+                            <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.age ? `${patientData.age} ans` : "N/R"}</p>
+                           </BlurData>
                          </div>
                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-sm">
                            <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500">Poids</p>
-                           <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.weight ? `${patientData.weight} kg` : "N/R"}</p>
+                           <BlurData>
+                            <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.weight ? `${patientData.weight} kg` : "N/R"}</p>
+                           </BlurData>
                          </div>
+                       </div>
+
+                       <div className="space-y-4 pt-2 border-t border-white/5">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><Calendar className="size-3.5 text-primary" /> Naissance</span>
+                                <BlurData>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-inner">
+                                        <p className="text-sm font-bold">{patientData.birthDate ? format(new Date(patientData.birthDate), "dd MMMM yyyy", { locale: fr }) : "Non renseigné"}</p>
+                                        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest flex items-center gap-1.5"><Globe className="size-3" /> {patientData.birthPlace || "Lieu non renseigné"}</p>
+                                    </div>
+                                </BlurData>
+                            </div>
+
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><MapPin className="size-3.5 text-primary" /> Résidence</span>
+                                <BlurData>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                                        <p className="text-sm font-medium italic text-slate-300">{patientData.address || "Adresse non renseignée"}</p>
+                                        <p className="text-[10px] text-emerald-400 font-black uppercase mt-1 tracking-widest">{patientData.nationality || "Béninoise"}</p>
+                                    </div>
+                                </BlurData>
+                            </div>
+
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><AlertCircle className="size-3.5 text-red-500" /> Urgence</span>
+                                <BlurData>
+                                    <div className="bg-red-500/5 p-4 rounded-2xl border border-red-500/20">
+                                        <p className="text-sm font-black text-red-100 uppercase tracking-tight">{patientData.emergencyContactName || "Non renseigné"}</p>
+                                        <p className="text-xs font-bold text-red-500 mt-1 flex items-center gap-2"><Phone className="size-3" /> {patientData.emergencyContactPhone || "Pas de numéro"}</p>
+                                    </div>
+                                </BlurData>
+                            </div>
                        </div>
 
                        {[
                          { label: "Allergies", data: patientData.allergies, color: "amber" },
                          { label: "Pathologies", data: patientData.chronicDiseases, color: "blue" },
-                         { label: "Electrophorèse", data: patientData.electrophoresis, color: "violet" }
+                         { label: "Electrophorèse", data: patientData.electrophoresis, color: "violet" },
+                         { label: "Vaccins", data: patientData.vaccines, color: "emerald" }
                        ].map((section, idx) => (
                         <div key={idx} className="space-y-2 text-left">
                           <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-1">{section.label}</span>
@@ -713,42 +750,64 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                         <History className="size-6 md:w-10 md:h-10 shrink-0" /> Journal de soins
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-5 md:p-10 space-y-4 md:space-y-6">
+                    <CardContent className="p-5 md:p-10 space-y-6">
                       {patientData.treatments?.length ? (
                         patientData.treatments.map((t: any) => (
                           <div
                             key={t.id}
-                            className="rounded-2xl md:rounded-[1.5rem] border border-white/5 bg-black/30 p-4 md:p-6 space-y-4 hover:border-primary/30 transition-all group shadow-inner"
+                            className="rounded-2xl md:rounded-[1.5rem] border border-white/5 bg-black/30 p-5 md:p-8 space-y-6 hover:border-primary/30 transition-all group shadow-inner"
                           >
-                            <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
                               <div className="min-w-0">
-                                <h4 className="font-black text-white text-base md:text-xl uppercase tracking-tight italic group-hover:text-primary transition-colors truncate">{t.name}</h4>
-                                <p className="text-[10px] md:text-xs font-bold text-primary/70 uppercase tracking-widest mt-0.5">{t.pathology || "Suivi général"}</p>
+                                <h4 className="font-black text-white text-base md:text-2xl uppercase tracking-tight italic group-hover:text-primary transition-colors truncate leading-tight">{t.name}</h4>
+                                <p className="text-[10px] md:text-sm font-bold text-primary/70 uppercase tracking-widest mt-1">{t.pathology || "Suivi général"}</p>
                               </div>
-                              <span className="text-[9px] md:text-[10px] font-black text-slate-500 bg-white/5 px-3 md:px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/5">
+                              <span className="text-[9px] md:text-[11px] font-black text-slate-500 bg-white/5 px-3 md:px-5 py-1.5 rounded-full uppercase tracking-widest border border-white/5 shrink-0">
                                 {format(new Date(t.createdAt), "dd MMM yyyy", { locale: fr })}
                               </span>
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 text-[10px] md:text-sm border-t border-white/5 pt-4">
-                              <div className="space-y-1">
-                                  <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Posologie</span>
-                                  <span className="font-bold text-slate-200 block truncate italic">{t.dosage || "N/R"}</span>
-                              </div>
-                              <div className="space-y-1">
-                                  <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Durée</span>
-                                  <span className="font-bold text-slate-200 block italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
-                              </div>
-                              <div className="space-y-1 hidden md:block">
-                                  <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Voie</span>
-                                  <span className="font-bold text-slate-200 block truncate italic">{t.administrationRoute || "N/R"}</span>
-                              </div>
-                            </div>
+
+                            <BlurData>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-y border-white/5 py-6 mt-6">
+                                    <div className="space-y-1">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Posologie</span>
+                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.dosage || "N/R"}</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Fréquence</span>
+                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.frequency || "N/R"}</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Horaires</span>
+                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.time || "N/R"}</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Durée</span>
+                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
+                                    </div>
+                                </div>
+                            </BlurData>
+
+                            <BlurData>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Voie d&apos;administration</span>
+                                        <p className="text-xs md:text-sm font-medium text-slate-300 italic">{t.administrationRoute || "N/R"}</p>
+                                    </div>
+                                    {t.notes && (
+                                        <div className="space-y-2">
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Notes & Conseils</span>
+                                            <p className="text-xs md:text-sm font-medium text-slate-400 italic bg-white/[0.02] p-3 rounded-xl border border-white/5">{t.notes}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </BlurData>
                           </div>
                         ))
                       ) : (
-                        <div className="py-16 text-center space-y-4 opacity-20">
-                            <Lock className="size-12 mx-auto text-slate-500" />
-                            <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs italic">Historique vide</p>
+                        <div className="py-20 text-center space-y-4 opacity-20">
+                            <Lock className="size-16 mx-auto text-slate-500" />
+                            <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-xs md:text-sm italic">Historique de traitements vide</p>
                         </div>
                       )}
                     </CardContent>
