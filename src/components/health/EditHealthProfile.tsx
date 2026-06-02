@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Droplet, AlertTriangle, ShieldCheck, Scale, Lock, Calendar, MapPin, Globe, HeartPulse, Loader2 } from "lucide-react";
+import { User, Droplet, AlertTriangle, ShieldCheck, Scale, Lock, Calendar as CalendarIcon, MapPin, Globe, HeartPulse, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom est requis"),
@@ -214,7 +214,7 @@ export function EditHealthProfile({ userId, initialData, onSuccess }: EditHealth
                     name="birthDate"
                     render={({ field }) => (
                     <FormItem className="text-left">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2"><Calendar className="size-3" /> Date de naissance</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2"><CalendarIcon className="size-3" /> Date de naissance</FormLabel>
                         <FormControl><Input type="date" className="bg-white/5 border-white/10 rounded-xl [color-scheme:dark]" {...field} /></FormControl>
                     </FormItem>
                     )}

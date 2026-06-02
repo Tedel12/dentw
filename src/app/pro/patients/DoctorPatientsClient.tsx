@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle, Calendar
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle, Calendar as CalendarIcon
 } from "lucide-react";
 import {
   searchPatient,
@@ -676,7 +676,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
 
                        <div className="space-y-4 pt-2 border-t border-white/5">
                             <div className="space-y-2">
-                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><Calendar className="size-3.5 text-primary" /> Naissance</span>
+                                <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><CalendarIcon className="size-3.5 text-primary" /> Naissance</span>
                                 <BlurData>
                                     <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-inner">
                                         <p className="text-sm font-bold">{patientData.birthDate ? format(new Date(patientData.birthDate), "dd MMMM yyyy", { locale: fr }) : "Non renseigné"}</p>
