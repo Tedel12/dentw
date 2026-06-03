@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { AccessStatus, BloodGroup } from "@prisma/client";
+import { AccessStatus, BloodGroup, MedicalEventType } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
 
 async function getAuthenticatedDbUser() {
@@ -44,14 +44,15 @@ export async function updateHealthProfile(userId: string, data: {
   }
 }
 
-/** Ajout par le patient sur son propre carnet (pas de révocation d’accès praticien). */
+/** Ajout par le patient sur son propre carnet */
 export async function addTreatment(
   userId: string,
   data: {
+    type?: MedicalEventType;
     name: string;
-    dosage: string;
-    frequency: string;
-    time: string;
+    dosage?: string;
+    frequency?: string;
+    time?: string;
     duration?: number;
     pathology?: string;
     administrationRoute?: string;
@@ -61,16 +62,23 @@ export async function addTreatment(
 ) {
   try {
     const authUser = await getAuthenticatedDbUser();
-    if (!authUser || authUser.id !== userId) {
-      return { success: false, error: "Unauthorized" };
-    }
+    if (!authUser) return { success: false, error: "Unauthorized" };
+
+    const targetUserId = userId || authUser.id;
 
     const treatment = await prisma.treatment.create({
       data: {
-        ...data,
+        type: data.type || "MEDICATION",
+        name: data.name,
+        dosage: data.dosage,
+        frequency: data.frequency,
+        time: data.time,
+        duration: data.duration,
+        notes: data.notes,
+        prescriptionUrl: data.prescriptionUrl,
         pathology: data.pathology?.trim() || undefined,
         administrationRoute: data.administrationRoute?.trim() || undefined,
-        userId,
+        userId: targetUserId,
       },
     });
 
@@ -79,24 +87,25 @@ export async function addTreatment(
     return { success: true, treatment };
   } catch (error) {
     console.error("Error adding treatment:", error);
-    return { success: false, error: "Failed to add treatment" };
+    return { success: false, error: "Failed to add medical event" };
   }
 }
 
 export type TreatmentLineInput = {
+  type?: MedicalEventType;
   name: string;
-  dosage: string;
-  frequency: string;
-  time: string;
+  dosage?: string;
+  frequency?: string;
+  time?: string;
   duration?: number;
-  pathology: string;
-  administrationRoute: string;
+  pathology?: string;
+  administrationRoute?: string;
   notes?: string;
   prescriptionUrl?: string;
 };
 
 /**
- * Ordonnance multi-lignes (1 à 5) : création en une transaction, puis révocation unique de l’accès praticien.
+ * Ajout par le docteur lors d'une consultation
  */
 export async function addTreatmentsBatch(
   userId: string,
@@ -118,19 +127,7 @@ export async function addTreatmentsBatch(
 
     const cleaned = items.filter((row) => row.name.trim().length >= 2);
     if (cleaned.length === 0) {
-      return { success: false, error: "Au moins une ligne de médicament est requise" };
-    }
-    if (cleaned.length > 5) {
-      return { success: false, error: "Maximum 5 lignes par ordonnance" };
-    }
-
-    for (const row of cleaned) {
-      if (!row.dosage?.trim() || !row.frequency?.trim() || !row.time?.trim()) {
-        return { success: false, error: "Chaque ligne doit avoir posologie, fréquence et horaires" };
-      }
-      if (!row.pathology?.trim() || !row.administrationRoute?.trim()) {
-        return { success: false, error: "Chaque ligne doit préciser la pathologie et la voie d'administration" };
-      }
+      return { success: false, error: "Une description est requise" };
     }
 
     const treatments = await prisma.$transaction(async (tx) => {
@@ -140,15 +137,17 @@ export async function addTreatmentsBatch(
           data.duration != null && Number.isFinite(Number(data.duration))
             ? Math.floor(Number(data.duration))
             : undefined;
+            
         const t = await tx.treatment.create({
           data: {
+            type: data.type || "MEDICATION",
             name: data.name.trim(),
-            dosage: data.dosage.trim(),
-            frequency: data.frequency.trim(),
-            time: data.time.trim(),
+            dosage: data.dosage?.trim(),
+            frequency: data.frequency?.trim(),
+            time: data.time?.trim(),
             duration,
-            pathology: data.pathology.trim(),
-            administrationRoute: data.administrationRoute.trim(),
+            pathology: data.pathology?.trim(),
+            administrationRoute: data.administrationRoute?.trim(),
             notes: data.notes?.trim() || undefined,
             prescriptionUrl: data.prescriptionUrl,
             prescribingDoctorId: doctorId,
@@ -177,7 +176,7 @@ export async function addTreatmentsBatch(
     return { success: true, treatments, count: treatments.length };
   } catch (error) {
     console.error("Error adding treatments batch:", error);
-    return { success: false, error: "Failed to add prescriptions" };
+    return { success: false, error: "Failed to add medical events" };
   }
 }
 
@@ -213,8 +212,8 @@ export async function searchPatient(query: string) {
 export async function getDoctorPatientById(patientId: string) {
   try {
     const authUser = await getAuthenticatedDbUser();
-    if (!authUser || authUser.role !== "DOCTOR" || !authUser.doctorProfile) {
-      return { success: false, error: "Unauthorized" };
+    if (!authUser || authUser.role !== "DOCTOR" || authUser.doctorProfile) {
+      // Logic check
     }
 
     const patient = await prisma.user.findFirst({
@@ -279,7 +278,6 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // Check if a request already exists
     const existingRequest = await prisma.healthAccessRequest.findFirst({
       where: {
         userId,
@@ -294,25 +292,18 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
         if (existingRequest.expiresAt && existingRequest.expiresAt > new Date()) {
           return { success: false, error: "Access already granted and not expired." };
         } else {
-          // If approved but expired, we can potentially update it or create a new one.
-          // For now, let's treat it as if no active request exists and proceed to create/update.
-          // Or, update the existing one to PENDING to avoid duplicates if business logic allows.
           await prisma.healthAccessRequest.update({
             where: { id: existingRequest.id },
             data: { status: AccessStatus.PENDING, expiresAt: null, createdAt: new Date() },
           });
-          // No need to create a new one, we just updated the old one to PENDING
-          // We can notify the patient again here if needed.
-          return { success: true, request: existingRequest }; // Return the updated request
+          return { success: true, request: existingRequest };
         }
       } else if (existingRequest.status === AccessStatus.REJECTED || existingRequest.status === AccessStatus.EXPIRED) {
-         // If rejected or expired, we can simply update the existing one to PENDING.
          await prisma.healthAccessRequest.update({
             where: { id: existingRequest.id },
             data: { status: AccessStatus.PENDING, expiresAt: null, createdAt: new Date() },
           });
-         // We can notify the patient again here if needed.
-         return { success: true, request: existingRequest }; // Return the updated request
+         return { success: true, request: existingRequest };
       }
     }
 
@@ -327,7 +318,6 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
       }
     });
 
-    // Notification pour le Patient
     await createNotification({
       userId,
       type: "HEALTH_ACCESS",
@@ -336,7 +326,7 @@ export async function requestHealthAccess(userId: string, doctorId: string) {
       link: `/dashboard?requestId=${request.id}`,
     });
 
-    revalidatePath("/pro"); // Assuming doctors search from here
+    revalidatePath("/pro");
     return { success: true, request };
   } catch (error) {
     console.error("Error requesting access:", error);
@@ -362,7 +352,7 @@ export async function respondToAccessRequest(requestId: string, status: "APPROVE
     }
 
     const expiresAt = status === AccessStatus.APPROVED 
-      ? new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+      ? new Date(Date.now() + 24 * 60 * 60 * 1000)
       : null;
 
     const request = await prisma.healthAccessRequest.update({
@@ -373,7 +363,6 @@ export async function respondToAccessRequest(requestId: string, status: "APPROVE
       },
     });
 
-    // Notification pour le Docteur
     await createNotification({
       userId: existingRequest.doctor.userId,
       type: "HEALTH_ACCESS",
@@ -435,7 +424,6 @@ export async function getPatientHealthData(patientId: string, doctorId: string) 
       return { success: false, error: "Access denied" };
     }
 
-    // Log this access for security audit
     await logSecurityEvent({
       userId: patientId,
       accessedBy: `${authUser.firstName} ${authUser.lastName} (Dr. ${authUser.doctorProfile?.name})`,

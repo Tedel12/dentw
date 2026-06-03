@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle, Calendar as CalendarIcon
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Globe, Phone, UserCircle, Calendar as CalendarIcon,
+  Microscope, MessageSquare, ExternalLink, ImageIcon
 } from "lucide-react";
 import {
   searchPatient,
@@ -465,7 +466,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                     CORRIGER MON DOSSIER
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] bg-[#020617] border-white/10 p-6 md:p-8">
+            <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] bg-[#020617] border-white/10 p-6 md:p-8 text-left">
               <DialogHeader className="text-left mb-6">
                 <DialogTitle className="text-2xl font-black flex items-center gap-3 text-white uppercase italic tracking-tighter">
                   <Stethoscope className="text-primary" /> Correction
@@ -489,7 +490,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                 <Stethoscope className="mr-3 w-6 h-6" /> Devenir Praticien
             </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] bg-[#020617] border-white/10 p-6 md:p-8">
+            <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[2rem] bg-[#020617] border-white/10 p-6 md:p-8 text-left">
             <DialogHeader className="text-left mb-6">
                 <DialogTitle className="text-2xl font-black flex items-center gap-3 text-white uppercase italic tracking-tighter">
                 <Stethoscope className="text-primary" /> Inscription
@@ -511,10 +512,10 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-20 md:pt-24 overflow-x-hidden">
         <div className="mb-8 md:mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-white text-left animate-in slide-in-from-top-4 duration-700">
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-4xl font-black tracking-tighter flex items-center gap-2 md:gap-3 uppercase italic">
+            <h1 className="text-2xl md:text-4xl font-black tracking-tighter flex items-center gap-2 md:gap-3 uppercase italic text-left">
               <HeartPulse className="w-8 h-8 md:w-10 md:h-10 text-primary shrink-0" /> Espace Praticien
             </h1>
-            <p className="text-slate-400 text-[11px] md:text-sm font-medium italic truncate">Bienvenue, Dr. {doctor?.name}</p>
+            <p className="text-slate-400 text-[11px] md:text-sm font-medium italic truncate text-left">Bienvenue, Dr. {doctor?.name}</p>
           </div>
           
           {!selectedPatient && (
@@ -533,7 +534,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
         </div>
 
         {!selectedPatient ? (
-          <div className="space-y-8 animate-in fade-in duration-700">
+          <div className="space-y-8 animate-in fade-in duration-700 text-left">
             {/* HISTORIQUE */}
             {recentPatients.length > 0 && (
                 <div className="space-y-3">
@@ -591,7 +592,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
             </div>
           </div>
         ) : (
-          <div className="space-y-6 md:space-y-8 animate-in slide-in-from-right duration-500">
+          <div className="space-y-6 md:space-y-8 animate-in slide-in-from-right duration-500 text-left">
             <Button
               variant="ghost"
               onClick={() => {
@@ -646,7 +647,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
                 <div className="lg:col-span-1 space-y-6">
                   <Card className="bg-slate-900/40 backdrop-blur-sm border-white/5 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl text-white overflow-hidden text-left">
-                    <CardHeader className="p-6 md:p-8 bg-white/5 border-b border-white/5">
+                    <CardHeader className="p-6 md:p-8 bg-white/5 border-b border-white/5 text-left">
                         <CardTitle className="text-lg md:text-xl text-primary font-black uppercase tracking-widest italic">Profil Médical</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6 md:p-8 space-y-5 md:space-y-6">
@@ -661,41 +662,41 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
 
                        <div className="grid grid-cols-2 gap-3 md:gap-4 text-left">
                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-sm">
-                           <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500">Âge</p>
+                           <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500 text-left">Âge</p>
                            <BlurData>
                             <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.age ? `${patientData.age} ans` : "N/R"}</p>
                            </BlurData>
                          </div>
                          <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-sm">
-                           <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500">Poids</p>
+                           <p className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-slate-500 text-left">Poids</p>
                            <BlurData>
                             <p className="font-black text-white text-base md:text-lg italic tracking-tight">{patientData.weight ? `${patientData.weight} kg` : "N/R"}</p>
                            </BlurData>
                          </div>
                        </div>
 
-                       <div className="space-y-4 pt-2 border-t border-white/5">
+                       <div className="space-y-4 pt-2 border-t border-white/5 text-left">
                             <div className="space-y-2">
                                 <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><CalendarIcon className="size-3.5 text-primary" /> Naissance</span>
                                 <BlurData>
-                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-inner">
-                                        <p className="text-sm font-bold">{patientData.birthDate ? format(new Date(patientData.birthDate), "dd MMMM yyyy", { locale: fr }) : "Non renseigné"}</p>
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1">
+                                        <p className="text-sm font-bold">{patientData.birthDate ? format(new Date(patientData.birthDate), "dd MMMM yyyy", { locale: fr }) : "N/R"}</p>
                                         <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest flex items-center gap-1.5"><Globe className="size-3" /> {patientData.birthPlace || "Lieu non renseigné"}</p>
                                     </div>
                                 </BlurData>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 text-left">
                                 <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><MapPin className="size-3.5 text-primary" /> Résidence</span>
                                 <BlurData>
                                     <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                        <p className="text-sm font-medium italic text-slate-300">{patientData.address || "Adresse non renseignée"}</p>
+                                        <p className="text-sm font-medium italic text-slate-300 leading-tight">{patientData.address || "Adresse non renseignée"}</p>
                                         <p className="text-[10px] text-emerald-400 font-black uppercase mt-1 tracking-widest">{patientData.nationality || "Béninoise"}</p>
                                     </div>
                                 </BlurData>
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 text-left">
                                 <span className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 italic"><AlertCircle className="size-3.5 text-red-500" /> Urgence</span>
                                 <BlurData>
                                     <div className="bg-red-500/5 p-4 rounded-2xl border border-red-500/20">
@@ -727,9 +728,9 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
 
                 <div className="lg:col-span-2 text-white text-left space-y-6 md:space-y-10">
                   <Card className="bg-slate-900/40 backdrop-blur-sm rounded-[2rem] md:rounded-[2.5rem] border-white/5 shadow-2xl overflow-hidden">
-                    <CardHeader className="bg-white/5 border-b border-white/5 px-6 md:px-10 py-5 md:py-8">
+                    <CardHeader className="bg-white/5 border-b border-white/5 px-6 md:px-10 py-5 md:py-8 text-left">
                       <CardTitle className="flex items-center gap-3 text-lg md:text-3xl font-black text-primary italic uppercase tracking-tighter leading-none">
-                        <PlusCircle className="size-6 md:w-10 md:h-10 shrink-0" /> Prescription
+                        <PlusCircle className="size-6 md:w-10 md:h-10 shrink-0" /> Nouvel Acte
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6 md:p-10">
@@ -744,62 +745,78 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-slate-900/40 backdrop-blur-sm rounded-[2rem] md:rounded-[2.5rem] border-white/5 shadow-2xl overflow-hidden">
-                    <CardHeader className="bg-white/5 border-b border-white/5 px-6 md:px-10 py-5 md:py-8">
+                  <Card className="bg-slate-900/40 backdrop-blur-sm rounded-[2rem] md:rounded-[2.5rem] border-white/5 shadow-2xl overflow-hidden text-left">
+                    <CardHeader className="bg-white/5 border-b border-white/5 px-6 md:px-10 py-5 md:py-8 text-left">
                       <CardTitle className="flex items-center gap-3 text-lg md:text-3xl font-black text-primary italic uppercase tracking-tighter leading-none">
                         <History className="size-6 md:w-10 md:h-10 shrink-0" /> Journal de soins
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-5 md:p-10 space-y-6">
+                    <CardContent className="p-5 md:p-10 space-y-6 text-left">
                       {patientData.treatments?.length ? (
                         patientData.treatments.map((t: any) => (
                           <div
                             key={t.id}
-                            className="rounded-2xl md:rounded-[1.5rem] border border-white/5 bg-black/30 p-5 md:p-8 space-y-6 hover:border-primary/30 transition-all group shadow-inner"
+                            className="rounded-2xl md:rounded-[1.5rem] border border-white/5 bg-black/30 p-5 md:p-8 space-y-6 hover:border-primary/30 transition-all group shadow-inner text-left"
                           >
-                            <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div className="flex flex-wrap items-start justify-between gap-4 text-left">
                               <div className="min-w-0">
                                 <h4 className="font-black text-white text-base md:text-2xl uppercase tracking-tight italic group-hover:text-primary transition-colors truncate leading-tight">{t.name}</h4>
-                                <p className="text-[10px] md:text-sm font-bold text-primary/70 uppercase tracking-widest mt-1">{t.pathology || "Suivi général"}</p>
+                                <p className="text-[10px] md:text-sm font-bold text-primary/70 uppercase tracking-widest mt-1">
+                                    {t.type === 'MEDICATION' ? 'Ordonnance' : t.type === 'EXAM' ? 'Examen / Analyse' : 'Suivi médical'}
+                                </p>
                               </div>
                               <span className="text-[9px] md:text-[11px] font-black text-slate-500 bg-white/5 px-3 md:px-5 py-1.5 rounded-full uppercase tracking-widest border border-white/5 shrink-0">
                                 {format(new Date(t.createdAt), "dd MMM yyyy", { locale: fr })}
                               </span>
                             </div>
 
-                            <BlurData>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-y border-white/5 py-6 mt-6">
-                                    <div className="space-y-1">
-                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Posologie</span>
-                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.dosage || "N/R"}</span>
+                            {t.type === "MEDICATION" ? (
+                                <BlurData>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-y border-white/5 py-6 text-left">
+                                        <div className="space-y-1">
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Posologie</span>
+                                            <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.dosage || "N/R"}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Fréquence</span>
+                                            <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.frequency || "N/R"}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Horaires</span>
+                                            <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.time || "N/R"}</span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Durée</span>
+                                            <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Fréquence</span>
-                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.frequency || "N/R"}</span>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Horaires</span>
-                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.time || "N/R"}</span>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Durée</span>
-                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
-                                    </div>
-                                </div>
-                            </BlurData>
+                                </BlurData>
+                            ) : null}
 
                             <BlurData>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Voie d&apos;administration</span>
-                                        <p className="text-xs md:text-sm font-medium text-slate-300 italic">{t.administrationRoute || "N/R"}</p>
-                                    </div>
-                                    {t.notes && (
+                                <div className="space-y-6 text-left">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Notes & Conseils</span>
-                                            <p className="text-xs md:text-sm font-medium text-slate-400 italic bg-white/[0.02] p-3 rounded-xl border border-white/5">{t.notes}</p>
+                                            <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">
+                                                {t.type === 'EXAM' ? 'Raison de l\'examen' : t.type === 'MEDICATION' ? 'Voie d\'administration' : 'Motif du suivi'}
+                                            </span>
+                                            <p className="text-xs md:text-sm font-medium text-slate-300 italic">{t.pathology || t.administrationRoute || "N/R"}</p>
                                         </div>
-                                    )}
+                                        {t.prescriptionUrl && (
+                                            <div className="space-y-2">
+                                                <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">Document lié</span>
+                                                <Button variant="outline" size="sm" onClick={() => window.open(t.prescriptionUrl)} className="h-9 rounded-xl border-white/10 bg-white/5 font-black italic text-[9px] gap-2 hover:bg-white/10">
+                                                    <ImageIcon className="size-3.5 text-primary" /> VOIR LE DOCUMENT
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2 p-4 bg-white/[0.02] border border-white/5 rounded-2xl shadow-inner">
+                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-[0.2em] block">
+                                            {t.type === 'MEDICATION' ? 'Notes & Conseils' : t.type === 'EXAM' ? 'Résultat / Conclusion' : 'Observations Cliniques'}
+                                        </span>
+                                        <p className="text-xs md:text-sm font-medium text-slate-300 italic leading-relaxed">{t.notes || "Aucun détail supplémentaire."}</p>
+                                    </div>
                                 </div>
                             </BlurData>
                           </div>
@@ -807,7 +824,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                       ) : (
                         <div className="py-20 text-center space-y-4 opacity-20">
                             <Lock className="size-16 mx-auto text-slate-500" />
-                            <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-xs md:text-sm italic">Historique de traitements vide</p>
+                            <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-xs md:text-sm italic">Historique vide</p>
                         </div>
                       )}
                     </CardContent>
@@ -820,7 +837,7 @@ export function DoctorPatientsClient({ isInitialPatient, userId, doctor }: Docto
                 <div className="size-16 md:size-24 rounded-full bg-primary/5 flex items-center justify-center mb-6 md:mb-10 ring-4 ring-primary/5 animate-pulse">
                     <Lock className="size-8 md:size-12 text-primary/20" />
                 </div>
-                <h3 className="text-xl md:text-4xl font-black text-primary/30 uppercase tracking-tighter italic">Accès Verrouillé</h3>
+                <h3 className="text-xl md:text-4xl font-black text-primary/30 uppercase tracking-tighter italic text-center">Accès Verrouillé</h3>
                 <p className="text-slate-500 font-medium max-w-xs text-center mt-3 px-6 text-xs md:text-lg italic leading-relaxed">
                   L'autorisation du patient est nécessaire pour déchiffrer ce dossier médical.
                 </p>

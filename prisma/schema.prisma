@@ -189,27 +189,34 @@ model Notification {
 }
 
 model Treatment {
-  id                  String   @id @default(cuid())
+  id                  String           @id @default(cuid())
   userId              String
+  type                MedicalEventType @default(MEDICATION)
   name                String
-  dosage              String
-  frequency           String // ex: "1x/jour", "2x/jour"
-  time                String // Heure(s) de prise (ex: "08:00, 20:00")
+  dosage              String?
+  frequency           String? // ex: "1x/jour", "2x/jour"
+  time                String? // Heure(s) de prise (ex: "08:00, 20:00")
   duration            Int? // Durée en jours
   pathology           String? // pathologie / motif
   administrationRoute String? // voie d'administration
   notes               String?
   prescriptionUrl     String? // Pour stocker l'image/scan (base64 ou URL)
-  isActive            Boolean  @default(true)
+  isActive            Boolean          @default(true)
   prescribingDoctorId String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 
   user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescribingDoctor Doctor?        @relation("PrescribingDoctor", fields: [prescribingDoctorId], references: [id], onDelete: SetNull)
   logs              TreatmentLog[]
 
   @@map("treatments")
+}
+
+enum MedicalEventType {
+  MEDICATION
+  EXAM
+  OBSERVATION
 }
 
 model TreatmentLog {

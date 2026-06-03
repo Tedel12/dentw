@@ -19,7 +19,7 @@ import {
   Zap,
   Loader2,
   WifiOff,
-  Calendar,
+  Calendar as CalendarIcon,
   Globe,
   MapPin,
   AlertCircle,
@@ -152,7 +152,7 @@ export default function HealthPage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <span className="text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 italic"><Calendar className="size-3.5 text-primary" /> Naissance</span>
+                                    <span className="text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 italic"><CalendarIcon className="size-3.5 text-primary" /> Naissance</span>
                                     <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-inner">
                                         <p className="text-sm font-bold">{user.birthDate ? format(new Date(user.birthDate), "dd MMMM yyyy", { locale: fr }) : "Non renseigné"}</p>
                                         <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest flex items-center gap-1.5"><Globe className="size-3" /> {user.birthPlace || "Lieu non renseigné"}</p>

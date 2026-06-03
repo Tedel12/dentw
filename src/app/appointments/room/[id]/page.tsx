@@ -5,7 +5,7 @@ import RoomSidebar from "@/components/appointments/RoomSidebar";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Shield } from "lucide-react";
+import { Calendar as CalendarIcon, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -57,7 +57,7 @@ export default async function VideoRoomPage({ params }: RoomPageProps) {
 
           <div className="flex items-center gap-4 text-[10px] bg-black/40 px-4 py-2 rounded-xl border border-white/5 font-black uppercase tracking-widest">
             <div className="flex items-center gap-2">
-              <Calendar className="w-3 h-3 text-primary" />
+              <CalendarIcon className="w-3 h-3 text-primary" />
               <span className="text-slate-300">{format(appointment.date, "d MMM yyyy", { locale: fr })}</span>
             </div>
             <div className="w-[1px] h-3 bg-slate-800" />

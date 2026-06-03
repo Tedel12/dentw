@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Check, X, Calendar, Shield, Info, HeartPulse, Clock, RotateCcw } from "lucide-react";
+import { Bell, Check, X, Calendar as CalendarIcon, Shield, Info, HeartPulse, Clock, RotateCcw } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -82,7 +82,7 @@ export function NotificationBell() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "APPOINTMENT_CONFIRMED": return <Calendar className="size-4 text-emerald-500" />;
+      case "APPOINTMENT_CONFIRMED": return <CalendarIcon className="size-4 text-emerald-500" />;
       case "APPOINTMENT_CANCELLED": return <X className="size-4 text-red-500" />;
       case "HEALTH_ACCESS": return <Shield className="size-4 text-primary" />;
       case "RESCHEDULE_REQUEST": return <RotateCcw className="size-4 text-amber-500" />;

@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Calendar, UserCheck, Clock, TrendingUp } from "lucide-react";
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, TrendingUp } from "lucide-react";
+import React from 'react';
 
 interface AdminStatsProps {
     totalDoctors: number;
@@ -21,7 +22,7 @@ export default function AdminStats({
     const statCards = [
         { label: "Total Docteurs", value: totalDoctors, icon: <Users />, color: "bg-blue-500" },
         { label: "Docteurs Actifs", value: activeDoctors, icon: <UserCheck />, color: "bg-green-500" },
-        { label: "Rendez-vous", value: totalAppointments, icon: <Calendar />, color: "bg-primary" },
+        { label: "Rendez-vous", value: totalAppointments, icon: <CalendarIcon />, color: "bg-primary" },
         { label: "Terminés", value: completedAppointments, icon: <Clock />, color: "bg-purple-500" },
     ];
 
@@ -61,5 +62,3 @@ export default function AdminStats({
         </div>
     );
 }
-
-import React from 'react';
