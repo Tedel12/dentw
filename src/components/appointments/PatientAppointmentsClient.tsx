@@ -201,7 +201,9 @@ export function PatientAppointmentsClient() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {userAppointments.map((appointment: any) => (
+            {userAppointments.map((appointment: any) => {
+            console.log("Appointment status:", appointment.status, "Data:", appointment);
+            return (
                 <Card key={appointment.id} className="bg-slate-900/40 border-white/5 rounded-[1.5rem] md:rounded-3xl overflow-hidden backdrop-blur-sm group hover:border-primary/30 transition-all duration-500 shadow-xl">
                     <div className="p-5 md:p-6 space-y-4 md:space-y-6">
                         <div className="flex items-center justify-between gap-2">
