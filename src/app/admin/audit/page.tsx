@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getAuditLogs } from "@/lib/actions/security";
 import { AuditLogTable } from "@/components/admin/AuditLogTable";
+import UnblockExportRequests from "@/components/admin/UnblockExportRequests";
 import Navbar from "@/components/Navbar";
 
 async function AuditPage() {
@@ -9,10 +10,10 @@ async function AuditPage() {
 
     if (!user) redirect("/");
 
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-    const userEmail = user.emailAddresses[0]?.emailAddress;
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase();
+    const userEmails = user.emailAddresses.map(e => e.emailAddress.trim().toLowerCase());
 
-    if (!adminEmail || userEmail !== adminEmail) redirect("/dashboard");
+    if (!adminEmail || !userEmails.includes(adminEmail)) redirect("/dashboard");
 
     const { logs, success } = await getAuditLogs();
 
@@ -24,6 +25,9 @@ async function AuditPage() {
                     <h1 className="text-3xl font-black italic">Audit de Sécurité</h1>
                     <p className="text-muted-foreground">Historique des accès aux données sensibles.</p>
                 </div>
+
+                <UnblockExportRequests />
+
                 {success ? (
                     <AuditLogTable logs={logs as any} />
                 ) : (

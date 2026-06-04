@@ -48,6 +48,8 @@ model User {
   emergencyContactName String?
   emergencyContactPhone String?
   exportPin String? // Code PIN pour l'export du carnet
+  isExportBlocked Boolean    @default(false)
+  unblockRequestReason String?
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
@@ -170,6 +172,7 @@ enum NotificationType {
   RESCHEDULE_RESPONSE
   APPOINTMENT_CONFIRMED
   HEALTH_ACCESS
+  EXPORT_UNBLOCK_REQUEST
   GENERAL
 }
 

@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Search, User, ShieldAlert, ShieldCheck, Lock, ChevronRight, History, PlusCircle, Stethoscope, QrCode,
-  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar, RefreshCcw, Video,
-  Badge, RotateCcw
+  FileText, Upload, MapPin, Download, AlertCircle, Clock, HeartPulse, Calendar as CalendarIcon, RefreshCcw, Video,
+  Badge, RotateCcw, XCircle
 } from "lucide-react";
 import {
   searchPatient,
@@ -40,7 +40,7 @@ import TimeSelectionStep from "@/components/appointments/TimeSelectionStep";
 import BookingConfirmationStep from "@/components/appointments/BookingConfirmationStep";
 import { useBookAppointment, useUserAppointments } from "@/hooks/use-appointment";
 import { useAvailableDoctors } from "@/hooks/use-doctors";
-import { respondToReschedule } from "@/lib/actions/appointments";
+import { respondToReschedule, updateAppointmentStatus } from "@/lib/actions/appointments";
 import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
 import Link from "next/link";
 
@@ -126,6 +126,17 @@ export function PatientAppointmentsClient() {
     );
   };
 
+  const handleCancelAppointment = async (id: string) => {
+    if (!confirm("Voulez-vous vraiment annuler ce rendez-vous ?")) return;
+    try {
+      await updateAppointmentStatus({ id, status: "CANCELLED" });
+      toast.success("Rendez-vous annulé");
+      refetchAppointments();
+    } catch (error) {
+      toast.error("Erreur lors de l'annulation");
+    }
+  };
+
   return (
     <>
       <div className="mb-8 text-left">
@@ -176,7 +187,7 @@ export function PatientAppointmentsClient() {
       <div className="mt-12 md:mt-20 space-y-6 md:space-y-8 animate-in fade-in duration-1000 delay-300">
         <div className="flex items-center gap-2 md:gap-3">
             <div className="size-8 md:size-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Calendar className="size-4 md:size-5 text-primary" />
+                <CalendarIcon className="size-4 md:size-5 text-primary" />
             </div>
             <h2 className="text-xl md:text-2xl font-black italic tracking-tighter text-white uppercase">Mes Rendez-vous</h2>
         </div>
@@ -216,7 +227,7 @@ export function PatientAppointmentsClient() {
 
                         <div className="grid grid-cols-2 gap-2 md:gap-3 text-left">
                             <div className="bg-black/20 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-white/5 flex items-center gap-2 md:gap-3">
-                                <Calendar className="size-3.5 md:size-4 text-primary shrink-0" />
+                                <CalendarIcon className="size-3.5 md:size-4 text-primary shrink-0" />
                                 <span className="text-xs md:text-sm font-black text-white truncate">{format(new Date(appointment.date), "dd MMM", { locale: fr })}</span>
                             </div>
                             <div className="bg-black/20 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-white/5 flex items-center gap-2 md:gap-3">
@@ -276,9 +287,21 @@ export function PatientAppointmentsClient() {
                                             </Button>
                                         </Link>
                                     )}
-                                    <Button variant="outline" className="w-full h-10 md:h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-lg md:rounded-xl font-bold gap-2 text-xs md:text-sm uppercase tracking-tight">
-                                        <RefreshCcw className="size-3.5 md:size-4 text-primary" /> REPROGRAMMER
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button 
+                                            variant="outline" 
+                                            className="flex-1 h-10 md:h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-lg md:rounded-xl font-bold gap-2 text-xs md:text-sm uppercase tracking-tight"
+                                            onClick={() => handleCancelAppointment(appointment.id)}
+                                        >
+                                            <XCircle className="size-3.5 md:size-4 text-red-500" /> ANNULER
+                                        </Button>
+                                        <Button 
+                                            variant="outline" 
+                                            className="flex-1 h-10 md:h-11 border-white/5 bg-white/5 hover:bg-white/10 rounded-lg md:rounded-xl font-bold gap-2 text-xs md:text-sm uppercase tracking-tight"
+                                        >
+                                            <RefreshCcw className="size-3.5 md:size-4 text-primary" /> REPORTER
+                                        </Button>
+                                    </div>
                                 </>
                             )}
                         </div>

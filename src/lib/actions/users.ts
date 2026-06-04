@@ -3,7 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { Gender } from "@prisma/client";
+import { Gender, NotificationType } from "@prisma/client";
+import { createNotification } from "./notifications";
 
 export async function syncUser() {
   const clerkUser = await currentUser();
@@ -319,5 +320,124 @@ export async function getProfileCompletion() {
   } catch (error) {
     console.error("Completion error:", error);
     return null;
+  }
+}
+
+export async function getExportStatus() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { isBlocked: false };
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUser.id },
+      select: { isExportBlocked: true, unblockRequestReason: true }
+    });
+    return { 
+      isBlocked: user?.isExportBlocked || false,
+      hasPendingRequest: !!user?.unblockRequestReason 
+    };
+  } catch (error) {
+    return { isBlocked: false };
+  }
+}
+
+export async function blockUserExport() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false };
+
+  try {
+    await prisma.user.update({
+      where: { clerkId: clerkUser.id },
+      data: { isExportBlocked: true }
+    });
+    revalidatePath("/dashboard/health");
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function requestExportUnblock(reason: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false };
+
+  try {
+    const user = await prisma.user.update({
+      where: { clerkId: clerkUser.id },
+      data: { unblockRequestReason: reason }
+    });
+
+    // Notify Admin
+    const adminUser = await prisma.user.findFirst({
+        where: { email: "benagbannon@gmail.com" }
+    });
+
+    if (adminUser) {
+        await createNotification({
+            userId: adminUser.id,
+            type: "EXPORT_UNBLOCK_REQUEST",
+            title: "Demande de déblocage Export",
+            content: `Le patient ${user.firstName} ${user.lastName} demande le déblocage de ses exports PDF. Motif: ${reason}`,
+            link: "/admin/audit"
+        });
+    }
+
+    revalidatePath("/dashboard/health");
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function unblockUserExport(userId: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false };
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { 
+        isExportBlocked: false,
+        unblockRequestReason: null 
+      }
+    });
+
+    await createNotification({
+        userId: user.id,
+        type: "GENERAL",
+        title: "Export PDF Débloqué",
+        content: "Votre accès aux exports PDF a été rétabli par l'administration.",
+        link: "/dashboard/health"
+    });
+
+    revalidatePath("/dashboard/health");
+    revalidatePath("/admin/audit");
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function getUsersWithUnblockRequests() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, users: [] };
+
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        unblockRequestReason: { not: null },
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        unblockRequestReason: true,
+        isExportBlocked: true,
+      },
+    });
+    return { success: true, users };
+  } catch (error) {
+    return { success: false, users: [] };
   }
 }

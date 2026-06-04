@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,21 +13,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileDown, Lock } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { FileDown, Lock, ShieldAlert, Timer, Send, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getOwnHealthData } from "@/lib/actions/health";
-import { checkUserExportPin } from "@/lib/actions/users";
+import { checkUserExportPin, getExportStatus, blockUserExport, requestExportUnblock } from "@/lib/actions/users";
 import { logSecurityEvent } from "@/lib/actions/security";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { formatGenderFr } from "@/lib/utils";
 import { APP_NAME } from "@/lib/brand";
+import { motion, AnimatePresence } from "framer-motion";
+
+const MAX_ATTEMPTS = 7;
+const LOCKOUT_DURATION = 60000;
 
 /** Rose « santé » : bandeau + en-têtes de tableaux (RGB) */
 const PDF_ROSE_PRIMARY: [number, number, number] = [214, 91, 138];
-const PDF_TABLE_HEAD = { fillColor: PDF_ROSE_PRIMARY, textColor: 255, fontStyle: "bold" as const };
 
 type PdfDoctor = {
   id: string;
@@ -52,22 +55,12 @@ function doctorNameParts(d: PdfDoctor) {
   return { prenom: prenom || "—", nom: nom || "—" };
 }
 
-function doctorShortLabel(d: PdfDoctor | null | undefined): string {
-  if (!d) return "—";
-  const { prenom, nom } = doctorNameParts(d);
-  let base = [prenom, nom].filter((x) => x !== "—").join(" ").trim();
-  if (!base) base = d.name?.trim() || "—";
-  const label = base.startsWith("Dr.") ? base : `Dr. ${base}`;
-  return label.length > 40 ? `${label.slice(0, 37)}…` : label;
-}
-
 function truncateCell(s: string, max: number) {
   const t = (s || "—").replace(/\s+/g, " ").trim();
   if (t.length <= max) return t;
   return `${t.slice(0, max - 1)}…`;
 }
 
-/** Données carnet pour export (aligné sur Prisma après `prisma generate`) */
 interface HealthPdfUser {
   id: string;
   clerkId: string;
@@ -81,12 +74,20 @@ interface HealthPdfUser {
   chronicDiseases?: string | null;
   electrophoresis?: string | null;
   vaccines?: string | null;
+  birthDate?: string | Date | null;
+  birthPlace?: string | null;
+  address?: string | null;
+  nationality?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
   treatments?: Array<{
     id: string;
     createdAt: Date | string;
     name: string;
+    type: string;
     dosage: string;
     frequency: string;
+    time: string;
     pathology?: string | null;
     administrationRoute?: string | null;
     notes?: string | null;
@@ -95,165 +96,170 @@ interface HealthPdfUser {
 }
 
 export function ExportCarnetDialog() {
-  const [pin, setPin] = useState("");
-  const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pin, setPin] = useState("");
+  
+  // Security states
+  const [isDbBlocked, setIsDbBlocked] = useState(false);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [unblockReason, setUnblockReason] = useState("");
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 1. Check local lockout
+    const storedLockout = localStorage.getItem("export_lockout_until");
+    if (storedLockout) {
+        const until = parseInt(storedLockout, 10);
+        if (until > Date.now()) {
+            setTimeLeft(Math.ceil((until - Date.now()) / 1000));
+        }
+    }
+
+    // 2. Check DB status
+    async function checkStatus() {
+        const res = await getExportStatus();
+        setIsDbBlocked(res.isBlocked);
+        setHasPendingRequest(res.hasPendingRequest);
+    }
+    checkStatus();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const handleFailure = async () => {
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+
+    if (newAttempts >= MAX_ATTEMPTS) {
+        // Definitive block in DB
+        await blockUserExport();
+        setIsDbBlocked(true);
+
+        // Local 60s cooldown
+        const until = Date.now() + LOCKOUT_DURATION;
+        localStorage.setItem("export_lockout_until", until.toString());
+        setTimeLeft(LOCKOUT_DURATION / 1000);
+        
+        toast.error("Sécurité : Exportation bloquée. Contactez l'admin.");
+    }
+  };
+
+  const handleUnblockRequest = async () => {
+    if (!unblockReason.trim()) return;
+    setSubmittingRequest(true);
+    const res = await requestExportUnblock(unblockReason);
+    if (res.success) {
+        toast.success("Demande envoyée à l'administrateur");
+        setHasPendingRequest(true);
+    } else {
+        toast.error("Erreur lors de l'envoi");
+    }
+    setSubmittingRequest(false);
+  };
 
   const handleExport = async () => {
     setLoading(true);
     const pinValidation = await checkUserExportPin(pin);
     if (!pinValidation.success) {
-      toast.error(pinValidation.error || "Code de sécurité incorrect");
+      toast.error("Code PIN invalide");
+      await handleFailure();
       setLoading(false);
       return;
     }
 
     const res = await getOwnHealthData();
-
     if (!res.success || !res.data) {
-      toast.error("Erreur lors de la récupération des données");
+      toast.error("Erreur de récupération");
       setLoading(false);
       return;
     }
 
     const user = res.data as HealthPdfUser;
-
-    // Log de l'exportation
-    await logSecurityEvent({
-        userId: user.id,
-        accessedBy: user.clerkId,
-        action: "EXPORT_PDF",
-        targetId: user.id
-    });
+    await logSecurityEvent({ userId: user.id, accessedBy: user.clerkId, action: "EXPORT_PDF", targetId: user.id });
     
     try {
       const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-      
-      // Palette et Polices
-      const ROSE = [214, 91, 138];
-      const GRIS_TEXTE = [55, 65, 81];
-      const NOIR = [17, 24, 39];
-
-      // Ajout logo
-      const logoUrl = "https://i.ibb.co.com/tRy6cC2/logo.png";
-      try {
-        doc.addImage(logoUrl, "PNG", 15, 10, 15, 15);
-      } catch (e) { console.warn("Logo non chargé"); }
+      const ROSE = [231, 138, 83]; // Benin Santé Primary
+      const GRIS_TEXTE = [71, 85, 105];
+      const NOIR = [15, 23, 42];
 
       // Header
-      doc.setTextColor(ROSE[0], ROSE[1], ROSE[2]);
+      doc.setFillColor(NOIR[0], NOIR[1], NOIR[2]);
+      doc.rect(0, 0, 210, 40, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(28);
-      doc.text(APP_NAME.toUpperCase(), 35, 20);
-      doc.setFont("times", "normal");
-      doc.setFontSize(11);
-      doc.setTextColor(GRIS_TEXTE[0], GRIS_TEXTE[1], GRIS_TEXTE[2]);
-      doc.text("Carnet de santé confidentiel", 35, 26);
-      doc.line(15, 30, 195, 30);
+      doc.text(APP_NAME.toUpperCase(), 20, 25);
+      doc.setFontSize(10);
+      doc.text("CARNET DE SANTÉ NUMÉRIQUE SÉCURISÉ", 20, 32);
 
-      // Profil Patient
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
+      // Patient Info
       doc.setTextColor(NOIR[0], NOIR[1], NOIR[2]);
-      doc.text("INFORMATIONS DU PATIENT", 15, 45);
-
-      const bloodGroupLabel = user.bloodGroup ? String(user.bloodGroup).replace(/_/g, " ") : "N/A";
+      doc.setFontSize(14);
+      doc.text("IDENTITÉ DU PATIENT", 20, 55);
+      
       const profileData = [
-        ["Nom complet", `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "N/A"],
-        ["Pseudo", user.pseudo || "N/A"],
-        ["Âge", user.age ? `${user.age} ans` : "N/A"],
-        ["Poids (kg)", user.weight != null ? String(user.weight) : "N/A"],
-        ["Groupe Sanguin", bloodGroupLabel],
-        ["Allergies", user.allergies || "Aucune connue"],
-        ["Maladies", user.chronicDiseases || "Aucun antécédent"]
+        ["Nom complet", `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()],
+        ["Naissance", user.birthDate ? `${format(new Date(user.birthDate), "dd/MM/yyyy")} à ${user.birthPlace || "N/R"}` : "N/R"],
+        ["Adresse", user.address || "N/R"],
+        ["Groupe Sanguin", user.bloodGroup?.replace(/_/g, " ") || "N/R"],
+        ["Contact Urgence", `${user.emergencyContactName || "N/R"} (${user.emergencyContactPhone || "N/R"})`],
+        ["Allergies", user.allergies || "Néant"],
+        ["Antécédents", user.chronicDiseases || "Néant"]
       ];
 
       autoTable(doc, {
-        startY: 50,
+        startY: 60,
         body: profileData,
-        theme: "plain",
-        styles: { fontSize: 10, font: "times", textColor: GRIS_TEXTE },
-        columnStyles: { 0: { font: "helvetica", fontStyle: "bold", textColor: NOIR } },
+        theme: "striped",
+        headStyles: { fillColor: ROSE },
+        styles: { fontSize: 9 }
       });
 
-      let cursorY = (doc as any).lastAutoTable.finalY + 10;
+      let cursorY = (doc as any).lastAutoTable.finalY + 15;
 
-      // Identification Praticiens
-      const treatments = (user.treatments ?? []) as Array<any>;
-      const prescriberMap = new Map<string, PdfDoctor>();
-      treatments.forEach(t => { if (t.prescribingDoctor?.id) prescriberMap.set(t.prescribingDoctor.id, t.prescribingDoctor); });
-      const prescribers = [...prescriberMap.values()];
-
-      if (prescribers.length > 0) {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.text("PRATICIENS PRESCRIPTEURS", 15, cursorY);
-        autoTable(doc, {
-          startY: cursorY + 5,
-          head: [["Prénom", "Nom", "Spécialité", "Téléphone"]],
-          body: prescribers.map(d => [doctorNameParts(d).prenom, doctorNameParts(d).nom, d.speciality, d.phone]),
-          headStyles: { fillColor: ROSE, font: "helvetica" },
-          styles: { font: "courier", fontSize: 9 }
-        });
-        cursorY = (doc as any).lastAutoTable.finalY + 10;
-      }
-
-      // Historique Traitements
-      doc.setFont("helvetica", "bold");
+      // Treatments History
       doc.setFontSize(14);
-      doc.text("HISTORIQUE DES SOINS", 15, cursorY);
+      doc.text("HISTORIQUE MÉDICAL", 20, cursorY);
+      
+      const treatments = (user.treatments ?? []);
       autoTable(doc, {
         startY: cursorY + 5,
-        head: [["Date", "Médicament", "Posologie", "Fréq.", "Notes"]],
-        body: treatments.map(t => [format(new Date(t.createdAt), "dd/MM/yy"), truncateCell(t.name, 20), t.dosage, t.frequency, truncateCell(t.notes || "-", 25)]),
-        headStyles: { fillColor: ROSE, font: "helvetica" },
-        styles: { font: "courier", fontSize: 9 }
+        head: [["Date", "Acte", "Description", "Praticien"]],
+        body: treatments.map(t => [
+            format(new Date(t.createdAt), "dd/MM/yyyy"),
+            t.type === 'MEDICATION' ? 'Ordonnance' : t.type === 'EXAM' ? 'Examen' : 'Suivi',
+            `${t.name}${t.dosage ? ` (${t.dosage})` : ""}\n${t.notes || ""}`,
+            t.prescribingDoctor?.name || "Patient"
+        ]),
+        headStyles: { fillColor: ROSE },
+        styles: { fontSize: 8 }
       });
 
-
-      // SECTION ANNEXES (Photos d'ordonnances)
-      const treatmentsWithImages = treatments.filter((t: any) => !!t.prescriptionUrl);
-      if (treatmentsWithImages.length > 0) {
-        for (const t of treatmentsWithImages) {
+      // Annexes
+      const images = treatments.filter(t => !!t.prescriptionUrl);
+      for (const img of images) {
           doc.addPage();
-          doc.setFillColor(PDF_ROSE_PRIMARY[0], PDF_ROSE_PRIMARY[1], PDF_ROSE_PRIMARY[2]);
-          doc.rect(0, 0, 210, 20, "F");
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(12);
-          doc.text(`ANNEXE : PREUVE MÉDICALE - ${t.name.toUpperCase()}`, 105, 13, { align: "center" });
-
-          doc.setTextColor(100);
-          doc.setFontSize(8);
-          doc.text(`Prescription du ${format(new Date(t.createdAt), "dd MMMM yyyy", { locale: fr })}`, 15, 30);
-
+          doc.text(`ANNEXE : ${img.name.toUpperCase()}`, 20, 20);
           try {
-            // Ajout de l'image (base64)
-            doc.addImage(t.prescriptionUrl as string, "JPEG", 15, 35, 180, 240, undefined, 'FAST');
-          } catch (e) {
-            doc.setTextColor(255, 0, 0);
-            doc.text("Erreur lors du chargement de l'image de l'ordonnance.", 15, 45);
-          }
-        }
+            doc.addImage(img.prescriptionUrl as string, "JPEG", 15, 30, 180, 240, undefined, 'FAST');
+          } catch (e) {}
       }
 
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text("Ce document est confidentiel et protégé par la Loi sur le Numérique du Bénin.", 105, 285, {
-          align: "center",
-        });
-        doc.text(`Page ${i} sur ${pageCount}`, 190, 285, { align: "right" });
-      }
-
-      doc.save(`Carnet_Sante_${user.lastName ?? "patient"}.pdf`);
-      toast.success("Votre carnet a été téléchargé avec succès !");
+      doc.save(`BeninSante_Export_${user.lastName}.pdf`);
+      toast.success("Carnet téléchargé !");
       setIsOpen(false);
-      setPin("");
     } catch (error) {
-      console.error("PDF generation error:", error);
-      toast.error("Erreur lors de la génération du PDF");
+      toast.error("Échec de génération PDF");
     } finally {
       setLoading(false);
     }
@@ -262,42 +268,97 @@ export function ExportCarnetDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <FileDown className="w-4 h-4" /> Exporter PDF
+        <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-black uppercase tracking-widest text-[10px] h-12 px-6 rounded-2xl gap-2">
+          <FileDown className="size-4" /> Exporter mon carnet
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Lock className="w-6 h-6 text-primary" />
-          </div>
-          <DialogTitle>Validation de sécurité</DialogTitle>
-          <DialogDescription>
-            Veuillez entrer votre code PIN de sécurité pour déverrouiller l'exportation de vos données médicales.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="pin">Code PIN</Label>
-            <Input
-              id="pin"
-              type="password"
-              placeholder="••••"
-              maxLength={10}
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="text-center text-2xl tracking-[0.5em]"
-            />
-          </div>
+      <DialogContent className="sm:max-w-[450px] w-[95vw] rounded-[2.5rem] bg-[#020617] border-white/10 p-0 overflow-hidden shadow-2xl text-left">
+        <div className="p-8 md:p-10 space-y-8">
+            <div className="flex flex-col items-center text-center space-y-4">
+                <div className={`size-16 rounded-2xl flex items-center justify-center border shadow-lg ${isDbBlocked ? 'bg-red-500/20 border-red-500/30' : 'bg-primary/20 border-primary/30'}`}>
+                    {timeLeft > 0 ? <Timer className="size-8 text-red-500 animate-pulse" /> : isDbBlocked ? <ShieldAlert className="size-8 text-red-500" /> : <Lock className="size-8 text-primary animate-pulse" />}
+                </div>
+                <div className="space-y-2">
+                    <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-white leading-tight">
+                        {isDbBlocked ? "Exportation Bloquée" : "Accès Sécurisé"}
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-400 font-medium italic text-xs md:text-sm leading-relaxed">
+                        {isDbBlocked 
+                            ? "Votre accès à l'exportation PDF a été suspendu pour des raisons de sécurité après plusieurs échecs." 
+                            : timeLeft > 0 
+                            ? `Trop d'échecs. Veuillez patienter ${timeLeft} secondes.`
+                            : "Entrez votre PIN pour déverrouiller l'exportation de vos données."}
+                    </DialogDescription>
+                </div>
+            </div>
+
+            {isDbBlocked ? (
+                <div className="space-y-6">
+                    {hasPendingRequest ? (
+                        <div className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl text-center space-y-3">
+                            <Clock className="size-8 text-amber-500 mx-auto" />
+                            <p className="text-xs font-bold text-amber-200 uppercase tracking-widest italic">Demande en cours d&apos;étude</p>
+                            <p className="text-[10px] text-slate-500 leading-relaxed">L&apos;administrateur vérifie votre identité avant de débloquer votre accès.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1">Motif de déblocage</Label>
+                                <Textarea 
+                                    placeholder="Expliquez pourquoi vous avez besoin de débloquer l'export (ex: j'ai oublié mon PIN)..." 
+                                    className="bg-white/5 border-white/10 rounded-xl min-h-[100px] text-xs italic"
+                                    value={unblockReason}
+                                    onChange={(e) => setUnblockReason(e.target.value)}
+                                />
+                            </div>
+                            <Button 
+                                onClick={handleUnblockRequest}
+                                disabled={submittingRequest || !unblockReason.trim()}
+                                className="w-full h-12 bg-white text-black hover:bg-slate-200 font-black italic rounded-xl gap-2 shadow-xl"
+                            >
+                                {submittingRequest ? <Loader2 className="animate-spin size-4" /> : <Send className="size-4" />}
+                                ENVOYER LA DEMANDE
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Code PIN</Label>
+                        <Input
+                            type="password"
+                            inputMode="numeric"
+                            maxLength={6}
+                            disabled={timeLeft > 0}
+                            placeholder="••••"
+                            value={pin}
+                            onChange={(e) => {
+                                setPin(e.target.value.replace(/\D/g, ""));
+                            }}
+                            className="h-16 bg-white/5 border-white/10 rounded-2xl text-center text-3xl tracking-[0.5em] font-black focus:ring-primary shadow-inner"
+                        />
+                        {attempts > 0 && !isDbBlocked && (
+                            <p className="text-center text-red-500 text-[9px] font-black uppercase mt-2">
+                                {MAX_ATTEMPTS - attempts} tentatives restantes avant blocage définitif
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <Button 
+                            onClick={handleExport}
+                            disabled={loading || pin.length < 4 || timeLeft > 0}
+                            className="w-full h-14 bg-primary hover:bg-primary/90 rounded-2xl font-black italic shadow-xl text-sm uppercase tracking-widest transition-all"
+                        >
+                            {loading ? <Loader2 className="animate-spin mr-2" /> : <ShieldCheck className="mr-2" />}
+                            {timeLeft > 0 ? `BLOQUÉ (${timeLeft}s)` : "DÉVERROUILLER & TÉLÉCHARGER"}
+                        </Button>
+                        <Button variant="ghost" onClick={() => setIsOpen(false)} className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Annuler</Button>
+                    </div>
+                </div>
+            )}
         </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => setIsOpen(false)}>
-            Annuler
-          </Button>
-          <Button onClick={handleExport} disabled={loading || pin.length < 4}>
-            {loading ? "Génération..." : "Confirmer & Télécharger"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
