@@ -29,9 +29,9 @@ import {
 import { 
   Dialog, 
   DialogContent, 
-  DialogDescription, 
   DialogHeader, 
   DialogTitle, 
+  DialogDescription, 
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { EditHealthProfile } from "@/components/health/EditHealthProfile";
@@ -41,12 +41,14 @@ import { AddPastConsultationDialog } from "@/components/health/AddPastConsultati
 import { MarkTreatmentTakenButton } from "@/components/health/MarkTreatmentTakenButton";
 import { AnimatedTimelineItem, AnimatedTreatmentCard } from "@/components/health/AnimatedHealthContent";
 import { FadeIn } from "@/components/ui/motion-wrapper";
+import { PinAccessModal } from "@/components/health/PinAccessModal";
 import axios from "axios";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function HealthPage() {
   const [hasConsent, setHasConsent] = useState(false);
+  const [isPinVerified, setIsPinVerified] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function HealthPage() {
       return response.data;
     },
     staleTime: 1000 * 60 * 5,
-    enabled: hasConsent 
+    enabled: hasConsent && isPinVerified
   });
 
   if (!isClient) return null;
@@ -76,17 +78,19 @@ export default function HealthPage() {
 
   return (
     <>
-      <HealthConsentModal isOpen={!hasConsent} onAccept={handleAccept} />
+      <PinAccessModal isOpen={!isPinVerified} onSuccess={() => setIsPinVerified(true)} />
+      <HealthConsentModal isOpen={isPinVerified && !hasConsent} onAccept={handleAccept} />
       <Navbar />
+      
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 pt-24">
-        {isLoading && hasConsent && (
+        {isLoading && hasConsent && isPinVerified && (
             <div className="flex flex-col items-center justify-center gap-4 py-20">
                 <Loader2 className="w-10 h-10 text-primary animate-spin" />
                 <p className="text-muted-foreground font-black italic animate-pulse">Chargement sécurisé...</p>
             </div>
         )}
 
-        {isError && (
+        {isError && isPinVerified && hasConsent && (
             <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">
                 <WifiOff className="w-16 h-16 text-red-500/50 mb-4" />
                 <h2 className="text-2xl font-black italic">Erreur de chargement</h2>
@@ -94,7 +98,7 @@ export default function HealthPage() {
             </div>
         )}
 
-        {hasConsent && user && (
+        {hasConsent && isPinVerified && user && (
             <>
                 <FadeIn direction="down">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 text-white text-center md:text-left">
@@ -140,17 +144,17 @@ export default function HealthPage() {
                         <CardContent className="space-y-6 pt-8 text-left">
                             {/* Nouveaux champs d'identité */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-1">
+                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-1 text-left">
                                     <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest">Âge</span>
                                     <p className="font-black text-white text-lg">{user.age != null ? `${user.age} ans` : "N/R"}</p>
                                 </div>
-                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-1">
+                                <div className="bg-black/20 p-4 rounded-2xl border border-white/5 space-y-1 text-left">
                                     <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest">Poids</span>
                                     <p className="font-black text-white text-lg">{user.weight != null ? `${user.weight} kg` : "N/R"}</p>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4 text-left">
                                 <div className="space-y-2">
                                     <span className="text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2 italic"><CalendarIcon className="size-3.5 text-primary" /> Naissance</span>
                                     <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 shadow-inner">
@@ -194,12 +198,12 @@ export default function HealthPage() {
                                     </p>
                                 </div>
                                 <div className="space-y-2">
-                                    <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest italic">Maladies Chroniques</span>
+                                    <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest italic text-left block">Maladies Chroniques</span>
                                     <p className="text-xs bg-blue-500/10 text-blue-200 p-4 rounded-2xl border border-blue-500/20 font-bold leading-relaxed italic">
                                         {user.chronicDiseases || "Aucun antécédent particulier"}
                                     </p>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 text-left">
                                     <span className="text-slate-500 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest italic">
                                         <ShieldCheck className="w-4 h-4 text-emerald-500" /> Vaccins
                                     </span>
@@ -207,7 +211,7 @@ export default function HealthPage() {
                                         {user.vaccines || "Aucun vaccin renseigné"}
                                     </p>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-2 text-left">
                                     <span className="text-slate-500 text-[9px] font-black uppercase tracking-widest italic">Électrophorèse</span>
                                     <p className="text-xs bg-violet-500/10 text-violet-200 p-3 rounded-xl border border-violet-500/20 font-black italic">
                                         {user.electrophoresis || "N/R"}
@@ -220,7 +224,7 @@ export default function HealthPage() {
 
                     <FadeIn delay={0.4}>
                         <Card className="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm rounded-[2rem] overflow-hidden">
-                        <CardHeader className="pb-2">
+                        <CardHeader className="pb-2 text-left">
                             <CardTitle className="text-[10px] font-black text-emerald-500 flex items-center gap-2 uppercase tracking-[0.2em]">
                             <ShieldCheck className="w-4 h-4" />
                             Souveraineté des données
@@ -242,7 +246,7 @@ export default function HealthPage() {
                   {/* Section Traitements et Timeline */}
                   <div className="lg:col-span-2 space-y-12">
                     <section className="text-left">
-                      <h2 className="text-2xl md:text-3xl font-black mb-8 flex items-center gap-3 italic text-white uppercase tracking-tighter">
+                      <h2 className="text-2xl md:text-3xl font-black mb-8 flex items-center gap-3 italic text-white uppercase tracking-tighter text-left">
                         <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0 border border-primary/10">
                             <Activity className="w-7 h-7 text-primary" />
                         </div>
@@ -255,35 +259,37 @@ export default function HealthPage() {
                                 <Card className="overflow-hidden border-l-4 border-l-primary hover:shadow-2xl transition-all duration-500 bg-slate-900/40 backdrop-blur-md group rounded-[2rem] border-white/5">
                                 <div className="p-8 space-y-8">
                                     <div className="flex flex-col md:flex-row justify-between gap-6">
-                                        <div className="space-y-2 flex-1">
+                                        <div className="space-y-2 flex-1 text-left">
                                             <div className="flex items-center gap-3 flex-wrap">
                                                 <h3 className="font-black text-2xl md:text-3xl text-white tracking-tight group-hover:text-primary transition-colors uppercase italic">{t.name}</h3>
-                                                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] uppercase font-black h-6 px-3">{t.dosage}</Badge>
+                                                {t.dosage && <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] uppercase font-black h-6 px-3">{t.dosage}</Badge>}
                                             </div>
-                                            <p className="text-primary/70 font-black text-[11px] md:text-sm uppercase tracking-[0.2em]">{t.pathology || "Traitement général"}</p>
+                                            <p className="text-primary/70 font-black text-[11px] md:text-sm uppercase tracking-[0.2em]">{t.pathology || "Suivi médical"}</p>
                                             
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-y border-white/5 py-6 mt-6">
-                                                <div className="space-y-1">
-                                                    <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Fréquence</span>
-                                                    <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.frequency || "N/R"}</span>
+                                            {t.type === "MEDICATION" && (
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 border-y border-white/5 py-6 mt-6">
+                                                    <div className="space-y-1">
+                                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Fréquence</span>
+                                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.frequency || "N/R"}</span>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Horaires</span>
+                                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.time || "N/R"}</span>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Durée</span>
+                                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Voie</span>
+                                                        <span className="font-bold text-slate-200 block text-xs md:text-base italic truncate">{t.administrationRoute || "N/R"}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Horaires</span>
-                                                    <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.time || "N/R"}</span>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Durée</span>
-                                                    <span className="font-bold text-slate-200 block text-xs md:text-base italic">{t.duration ? `${t.duration} jours` : "N/R"}</span>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-slate-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest block">Voie</span>
-                                                    <span className="font-bold text-slate-200 block text-xs md:text-base italic truncate">{t.administrationRoute || "N/R"}</span>
-                                                </div>
-                                            </div>
+                                            )}
 
                                             {t.notes && (
                                                 <div className="mt-6 p-4 bg-white/[0.02] border border-white/5 rounded-2xl italic text-xs md:text-sm text-slate-400">
-                                                    <span className="text-slate-600 font-black uppercase text-[8px] block mb-2 tracking-[0.2em]">Notes médicales</span>
+                                                    <span className="text-slate-600 font-black uppercase text-[8px] block mb-2 tracking-[0.2em]">Détails</span>
                                                     {t.notes}
                                                 </div>
                                             )}
@@ -300,7 +306,7 @@ export default function HealthPage() {
                           <FadeIn delay={0.6}>
                             <div className="text-center py-20 bg-white/5 rounded-[3rem] border-4 border-dashed border-white/5 flex flex-col items-center gap-4">
                                 <Activity className="w-16 h-16 text-white/5" />
-                                <p className="text-slate-600 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs italic">Aucun traitement actif</p>
+                                <p className="text-slate-600 font-black uppercase tracking-widest text-[10px] md:text-xs italic">Aucun suivi actif</p>
                             </div>
                           </FadeIn>
                         )}
@@ -308,7 +314,7 @@ export default function HealthPage() {
                     </section>
 
                     <section className="text-left">
-                      <h2 className="text-2xl md:text-3xl font-black mb-10 flex items-center gap-3 italic text-white uppercase tracking-tighter">
+                      <h2 className="text-2xl md:text-3xl font-black mb-10 flex items-center gap-3 italic text-white uppercase tracking-tighter text-left">
                         <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0 border border-primary/10">
                             <History className="w-7 h-7 text-primary" />
                         </div>
@@ -331,7 +337,7 @@ export default function HealthPage() {
                         })()}
                         
                         {(!user.treatments?.length && !user.appointments?.length) && (
-                            <div className="pl-12 py-10 opacity-30">
+                            <div className="pl-12 py-10 opacity-30 text-left">
                                 <History className="size-10 text-slate-500 mb-4" />
                                 <p className="text-xs font-black uppercase tracking-widest text-slate-500 italic">Journal de bord vide.</p>
                             </div>

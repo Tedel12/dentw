@@ -240,6 +240,40 @@ export async function checkUserExportPin(pin: string) {
   }
 }
 
+export async function getUserPinStatus() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { hasPin: false };
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUser.id },
+      select: { exportPin: true },
+    });
+    return { hasPin: !!user?.exportPin };
+  } catch (error) {
+    return { hasPin: false };
+  }
+}
+
+export async function verifyUserPin(pin: string) {
+  const clerkUser = await currentUser();
+  if (!clerkUser) return { success: false, error: "Non autorisé" };
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: clerkUser.id },
+      select: { exportPin: true },
+    });
+
+    if (user?.exportPin === pin) {
+      return { success: true };
+    }
+    return { success: false, error: "Code PIN incorrect" };
+  } catch (error) {
+    return { success: false, error: "Erreur technique" };
+  }
+}
+
 export async function getProfileCompletion() {
   const clerkUser = await currentUser();
   if (!clerkUser) return null;
