@@ -54,19 +54,6 @@ export function PatientAppointmentsClient() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [bookedAppointment, setBookedAppointment] = useState<any>(null);
 
-  // Pour le report
-  const [rescheduleModal, setRescheduleModal] = useState<{
-    isOpen: boolean;
-    appointmentId: string;
-    date: Date;
-    time: string;
-  }>({
-    isOpen: false,
-    appointmentId: "",
-    date: new Date(),
-    time: "",
-  });
-
   const { data: doctors = [] } = useAvailableDoctors();
   const bookAppointmentMutation = useBookAppointment();
   const { data: userAppointments = [], refetch: refetchAppointments } = useUserAppointments();
@@ -105,7 +92,7 @@ export function PatientAppointmentsClient() {
         reason: reason,
         type: selectedMode,
         duration: selectedDoctor?.consultationDuration || 30,
-        price: 0, // Sera fixé par le docteur plus tard
+        price: 0,
       },
       {
         onSuccess: async (appointment) => {
@@ -141,7 +128,7 @@ export function PatientAppointmentsClient() {
 
   return (
     <>
-      <div className="mb-8">
+      <div className="mb-8 text-left">
         <h1 className="text-3xl font-bold mb-2 text-white tracking-tight">Prendre un rendez-vous</h1>
         <p className="text-muted-foreground font-medium">Trouvez et prenez rendez-vous avec nos praticiens certifiés sur Benin Santé.</p>
       </div>
@@ -186,7 +173,6 @@ export function PatientAppointmentsClient() {
         />
       )}
 
-      {/* Mes Rendez-vous Section */}
       <div className="mt-12 md:mt-20 space-y-6 md:space-y-8 animate-in fade-in duration-1000 delay-300">
         <div className="flex items-center gap-2 md:gap-3">
             <div className="size-8 md:size-10 rounded-xl bg-primary/20 flex items-center justify-center">
@@ -197,13 +183,11 @@ export function PatientAppointmentsClient() {
 
         {userAppointments.length === 0 ? (
           <Card className="bg-slate-900/40 border-white/5 rounded-3xl p-8 md:p-12 text-center border-dashed border-2">
-            <p className="text-slate-500 text-sm md:text-base font-medium italic">Vous n'avez pas encore de rendez-vous programmé.</p>
+            <p className="text-slate-500 text-sm md:text-base font-medium italic text-center">Vous n'avez pas encore de rendez-vous programmé.</p>
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {userAppointments.map((appointment: any) => {
-            console.log("Appointment status:", appointment.status, "Data:", appointment);
-            return (
+            {userAppointments.map((appointment: any) => (
                 <Card key={appointment.id} className="bg-slate-900/40 border-white/5 rounded-[1.5rem] md:rounded-3xl overflow-hidden backdrop-blur-sm group hover:border-primary/30 transition-all duration-500 shadow-xl">
                     <div className="p-5 md:p-6 space-y-4 md:space-y-6">
                         <div className="flex items-center justify-between gap-2">
@@ -224,7 +208,7 @@ export function PatientAppointmentsClient() {
                             <div className="size-10 md:size-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-primary/20 transition-all shrink-0">
                                 <User className="size-5 md:size-7 text-primary" />
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 text-left">
                                 <h3 className="font-black text-white text-sm md:text-lg italic tracking-tight uppercase truncate">{appointment.doctorName}</h3>
                                 <p className="text-[10px] md:text-xs text-slate-500 font-medium italic truncate">"{appointment.reason}"</p>
                             </div>
@@ -249,6 +233,40 @@ export function PatientAppointmentsClient() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-2 pt-1 md:pt-0">
+                            {appointment.status === 'REQUESTED_RESCHEDULE' && (
+                                <div className="space-y-4 pt-4 border-t border-white/5 animate-in fade-in duration-500 text-left">
+                                    <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl space-y-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                                            <RotateCcw className="size-3" /> Nouvelle proposition
+                                        </p>
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-black text-white">
+                                                {appointment.proposedDate ? format(new Date(appointment.proposedDate), "dd MMMM", { locale: fr }) : "Date à définir"} à {appointment.proposedTime}
+                                            </p>
+                                            <p className="text-xs text-slate-400 italic">"{appointment.rescheduleReason}"</p>
+                                        </div>
+                                        
+                                        <div className="flex gap-2 pt-1">
+                                            <Button 
+                                                size="sm" 
+                                                className="flex-1 bg-emerald-600 hover:bg-emerald-500 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                                onClick={() => handleResponseToReschedule(appointment.id, true)}
+                                            >
+                                                Accepter
+                                            </Button>
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline"
+                                                className="flex-1 border-white/10 bg-white/5 hover:bg-white/10 h-9 rounded-xl font-bold text-[10px] uppercase"
+                                                onClick={() => handleResponseToReschedule(appointment.id, false)}
+                                            >
+                                                Refuser
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {appointment.status === 'CONFIRMED' && (
                                 <>
                                     {appointment.type === 'ONLINE' && (
