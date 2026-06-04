@@ -35,9 +35,9 @@ function TimeSelectionStep({
   selectedMode,
 }: TimeSelectionStepProps) {
   const { data: bookedTimeSlots = [] } = useBookedTimeSlots(selectedDoctorId, selectedDate);
-  const { data: dentists = [] } = useAvailableDoctors();
+  const { data: doctors = [] } = useAvailableDoctors();
   
-  const selectedDoctor = dentists.find((d: any) => d.id === selectedDoctorId);
+  const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
 
   const availableDates = getNext14Days();
   const availableTimeSlots = getAvailableTimeSlots(

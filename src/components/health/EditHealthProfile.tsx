@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { User, Droplet, AlertTriangle, ShieldCheck, Scale, Lock, Calendar as CalendarIcon, MapPin, Globe, Loader2 } from "lucide-react";
+import { User, Droplet, AlertTriangle, ShieldCheck, Scale, Lock, Calendar as CalendarIcon, MapPin, Globe, Loader2, HeartPulse } from "lucide-react";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "Le prénom est requis"),

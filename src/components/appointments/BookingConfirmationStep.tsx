@@ -6,7 +6,7 @@ import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { APP_NAME } from "@/lib/brand";
 
 interface BookingConfirmationStepProps {
-  selectedDentistId: string;
+  selectedDoctorId: string;
   selectedDate: string;
   selectedTime: string;
   reason: string;
@@ -18,7 +18,7 @@ interface BookingConfirmationStepProps {
 }
 
 function BookingConfirmationStep({
-  selectedDentistId,
+  selectedDoctorId,
   selectedDate,
   selectedTime,
   reason,
@@ -28,8 +28,8 @@ function BookingConfirmationStep({
   onConfirm,
   onModify,
 }: BookingConfirmationStepProps) {
-  const { data: dentists = [] } = useAvailableDoctors();
-  const selectedDoctor = dentists.find((d: any) => d.id === selectedDentistId);
+  const { data: doctors = [] } = useAvailableDoctors();
+  const selectedDoctor = doctors.find((d: any) => d.id === selectedDoctorId);
   
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -56,7 +56,7 @@ function BookingConfirmationStep({
 
                 <CardContent className="p-8 space-y-8">
                     {/* doctor info */}
-                    <DoctorInfo doctorId={selectedDentistId} />
+                    <DoctorInfo doctorId={selectedDoctorId} />
 
                     {/* appointment details grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-white/5">
